@@ -1,74 +1,82 @@
 /*
- * DARK THEME — Rich & Elegant
- * Not an inversion — surfaces lift from near-black,
- * borders get brighter, shadows get heavier, accents bump lightness.
+ * DARK THEME — Paper & Ink (Dark)
+ * Warm dark parchment with blue-ink accents.
+ * Same editorial feel, inverted for dark mode.
  */
 
+[data-theme='dark'] body {
+  background-color: #1c1a17;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"),
+    linear-gradient(170deg, #1c1a17 0%, #201d19 40%, #19170f 100%);
+  background-attachment: fixed;
+}
+
 [data-theme='dark'] {
-  /* SEMANTIC TOKENS (oklch L C H) */
+  /* Semantic tokens (oklch L C H) */
+  --accent-primary: 0.62 0.12 240;
+  --accent-secondary: 0.55 0.1 230;
 
-  /* Accents — lightness bumped from 0.55→0.65 for contrast on dark bg */
-  --accent-primary: 0.65 0.12 65;
-  --accent-secondary: 0.62 0.1 25;
+  --surface-primary: 0.2 0.01 70;
+  --surface-secondary: 0.23 0.012 68;
+  --surface-elevated: 0.27 0.014 65;
+  --surface-overlay: 0.1 0.008 55;
 
-  /* Surfaces — L steps up: overlay(0.08) → primary(0.18) → secondary(0.21) → elevated(0.24) */
-  --surface-primary: 0.18 0.012 50;
-  --surface-secondary: 0.21 0.015 50;
-  --surface-elevated: 0.24 0.018 50;
-  --surface-overlay: 0.08 0.008 50;
+  --border-default: 0.3 0.012 65;
+  --border-subtle: 0.26 0.01 68;
+  --border-strong: 0.4 0.02 60;
 
-  /* Borders — need L 0.25-0.35 to be visible on dark backgrounds */
-  --border-default: 0.32 0.025 50;
-  --border-subtle: 0.26 0.02 50;
-  --border-strong: 0.42 0.035 55;
+  --text-primary: 0.92 0.008 75;
+  --text-secondary: 0.72 0.008 68;
+  --text-muted: 0.52 0.008 62;
+  --text-inverse: 0.15 0.01 50;
 
-  /* Text — inverted: primary is now near-white */
-  --text-primary: 0.92 0.02 65;
-  --text-secondary: 0.72 0.025 60;
-  --text-muted: 0.55 0.025 55;
-  --text-inverse: 0.16 0.012 50;
-
-  /* Shadows — 3-4x opacity of light mode */
   --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.3);
-  --shadow-md: 0 4px 6px oklch(0 0 0 / 0.35);
-  --shadow-lg: 0 10px 15px oklch(0 0 0 / 0.4);
+  --shadow-md: 0 2px 8px oklch(0 0 0 / 0.35);
+  --shadow-lg: 0 8px 24px oklch(0 0 0 / 0.45);
 
-  /* SHADCN BRIDGE TOKENS */
-  --background: oklch(0.18 0.012 50);
-  --foreground: oklch(0.92 0.02 65);
-  --card: oklch(0.21 0.015 50);
-  --card-foreground: oklch(0.92 0.02 65);
-  --popover: oklch(0.21 0.015 50);
-  --popover-foreground: oklch(0.92 0.02 65);
-  --primary: oklch(0.65 0.12 65);
-  --primary-foreground: oklch(0.98 0.006 65);
-  --secondary: oklch(0.26 0.02 50);
-  --secondary-foreground: oklch(0.85 0.02 60);
-  --muted: oklch(0.24 0.015 50);
-  --muted-foreground: oklch(0.6 0.025 55);
-  --accent: oklch(0.24 0.015 50);
-  --accent-foreground: oklch(0.92 0.02 65);
-  --destructive: oklch(0.65 0.2 25);
-  --destructive-foreground: oklch(0.98 0.006 65);
-  --border: oklch(0.32 0.025 50);
-  --input: oklch(0.32 0.025 50);
-  --ring: oklch(0.65 0.12 65);
-  --radius: 0.625rem;
+  /* Card style tokens */
+  --card-radius: 2px;
+  --card-border-width: 1px;
+  --card-border-opacity: 0.4;
+  --card-shadow: none;
+  --card-hover-shadow: var(--shadow-md);
+  --card-hover-y: -2px;
+  --card-accent-bar-height: 0px;
+  --card-accent-bar-scale: 0;
 
-  /* Chart palette */
-  --chart-1: oklch(0.65 0.12 65);
-  --chart-2: oklch(0.62 0.1 25);
-  --chart-3: oklch(0.65 0.1 145);
-  --chart-4: oklch(0.6 0.12 250);
-  --chart-5: oklch(0.62 0.1 310);
-
-  /* Sidebar */
-  --sidebar: oklch(0.14 0.01 50);
-  --sidebar-foreground: oklch(0.65 0.02 55);
-  --sidebar-primary: oklch(0.65 0.12 65);
-  --sidebar-primary-foreground: oklch(0.98 0.006 65);
-  --sidebar-accent: oklch(0.2 0.012 50);
-  --sidebar-accent-foreground: oklch(0.92 0.02 65);
-  --sidebar-border: oklch(0.28 0.02 50);
-  --sidebar-ring: oklch(0.65 0.12 65);
+  /* shadcn bridge tokens (full color values) */
+  --background: hsl(36 12% 10%);
+  --foreground: hsl(36 10% 90%);
+  --card: hsl(36 10% 14%);
+  --card-foreground: hsl(36 10% 90%);
+  --popover: hsl(36 10% 12%);
+  --popover-foreground: hsl(36 10% 90%);
+  --primary: hsl(218 55% 58%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(36 8% 18%);
+  --secondary-foreground: hsl(36 8% 80%);
+  --muted: hsl(36 6% 16%);
+  --muted-foreground: hsl(30 6% 50%);
+  --accent: hsl(36 6% 16%);
+  --accent-foreground: hsl(36 10% 90%);
+  --destructive: hsl(0 72% 55%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(36 8% 20%);
+  --input: hsl(36 8% 20%);
+  --ring: hsl(218 55% 58%);
+  --radius: 0.125rem;
+  --chart-1: hsl(218 55% 58%);
+  --chart-2: hsl(200 40% 52%);
+  --chart-3: hsl(160 40% 50%);
+  --chart-4: hsl(240 35% 55%);
+  --chart-5: hsl(180 35% 48%);
+  --sidebar-background: hsl(36 10% 7%);
+  --sidebar-foreground: hsl(30 6% 50%);
+  --sidebar-primary: hsl(218 55% 55%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(36 6% 14%);
+  --sidebar-accent-foreground: hsl(36 10% 90%);
+  --sidebar-border: hsl(36 8% 16%);
+  --sidebar-ring: hsl(218 55% 55%);
 }

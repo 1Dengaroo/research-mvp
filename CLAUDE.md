@@ -1,52 +1,80 @@
-# Project Outline
+# Signal — CLAUDE.md
 
-- A dead-simple UI where you drop in a company name and it runs a mini version of the research pipeline — funding, hiring signals, tech stack, recent news — and outputs a structured brief.
-- We are using parallel AI to do deep research. Currently this is just a test.
+## Project Overview
 
-## Patterns
+- Signal is an AI-powered outbound sales platform that finds and converts high-intent leads for SMBs and growth-stage startups — without the cost of a sales hire. It monitors the web for behavioral buying signals (job postings, hiring patterns, funding rounds, tech stack changes), finds the right contact, and generates hyper-personalized emails rooted in the exact signal detected.
 
-- Keep files small, focused, and independently testable — one component or concern per file
-- `/app` is for routing structure only — no logic, minimal JSX, just page/layout shells that compose components
-- All components live in `@/components` — organized by feature or domain, not by type (avoid `@/components/buttons/`, prefer `@/components/checkout/`)
-- Optimize for SSR by default — keep `'use client'` isolated to leaf components in their own files, never mixed into server component files
-- Extract repeated UI patterns into reusable components early — if JSX is duplicated more than twice, it's a component
-- Colocate component logic: `<component>.tsx`, `<component>.types.ts`, `<component>.test.tsx`, `<component>.utils.ts` as needed
-- Fetch data at the server component level and pass down as props — avoid client-side fetching unless interactivity requires it
-- Use `loading.tsx` and `error.tsx` at the route level for streaming and error boundaries rather than wrapping every component
-- Prefer `async/await` in server components over `useEffect` + `useState` for data fetching
-- Prefer shadcn/ui components over building from scratch — run `npx shadcn@latest add <component>` before writing custom UI primitives
-- All styling must be themeable — never hardcode colors, radii, shadows, or spacing that should vary by theme; always trace back to a CSS variable or Tailwind semantic token
+- Stack: Next.js App Router · TypeScript · Tailwind · shadcn/ui · Supabase · Inngest · Parallel.ai · Anthropic API · Stripe
+
+## Architecture Rules
+
+### File Structure
+
+- `/app` is routing only — no logic, no `'use client'`, minimal JSX. Page files compose server components and nothing else.
+- All components live in `@/components` organized by feature domain (e.g. `@/components/pipeline/`, `@/components/dashboard/`) — never by type
+- Colocate component files: `<component>.tsx`, `<component>.types.ts`, `<component>.test.tsx`, `<component>.utils.ts`
+
+### SSR / Client Boundary — STRICT RULES
+
+- NEVER put `'use client'` in `page.tsx`, `layout.tsx`, or any file inside `/app`
+- NEVER mix server and client logic in the same file
+- If a component needs interactivity, extract it into `<ComponentName>.client.tsx` inside `@/components` and import it into the server component
+- `page.tsx` hard limit: **40 lines**. If approaching this, stop and extract immediately
+- Fetch data in server components and pass as props — no client-side fetching unless real-time interactivity requires it
+- Use `loading.tsx` and `error.tsx` at route level for streaming and error boundaries
+
+### Before Creating Any File — Run This Checklist
+
+- Is this in `/app`? → Must be a server component. Zero `'use client'`.
+- Does it need interactivity? → Extract to a `.client.tsx` file in `@/components`
+- Is `page.tsx` doing anything besides composing components? → Wrong. Extract it.
+- Is any logic (fetching, transforms, conditionals) inside `page.tsx`? → Wrong. Move it.
+- Is this JSX pattern used more than twice? → Make it a component now.
 
 ## TypeScript
 
-- Avoid type casting with `as` — use type guards or proper inference instead
-- Avoid `enum` — use `as const` objects instead:
+- No `as` type casting — use type guards or proper inference
+- No `enum` — use `as const` objects:
 
 ```ts
-const Direction = { Up: 'up', Down: 'down' } as const;
-type Direction = (typeof Direction)[keyof typeof Direction];
+const Status = { Active: 'active', Paused: 'paused' } as const;
+type Status = (typeof Status)[keyof typeof Status];
 ```
 
-- Avoid `any` — prefer `unknown` with narrowing, or a proper type/interface
-- Prefer `interface` for object shapes, `type` for unions, intersections, and primitives
-- Infer return types where obvious; annotate explicitly for public-facing functions and hooks
-- Create types in `<component>.types.ts` for any non-trivial component; co-locate simple inline types if they're single-use and under ~2 lines
+- No `any` — use `unknown` with narrowing or a proper interface
+- `interface` for object shapes, `type` for unions/intersections/primitives
+- Annotate return types explicitly on all public-facing functions and hooks
+- Non-trivial component types go in `<component>.types.ts` — simple single-use types can be inline if under ~2 lines
 
 ## Tailwind
 
-- Prefer canonical Tailwind utility classes over arbitrary values — use `w-16` not `w-[64px]`, `text-sm` not `text-[14px]`, `gap-4` not `gap-[16px]`
-- Only use arbitrary values (e.g. `w-[37px]`) when no standard class maps to the design requirement
-- Use semantic color tokens (`bg-primary`, `text-muted-foreground`) over raw hex or rgb arbitrary values
-- If no suitable token exists, add one to `@/styles/globals.css` as a CSS variable pair (`:root` + `.dark`)
-- Avoid inline `style` props for anything Tailwind can express
+- Use canonical Tailwind classes over arbitrary values — `w-16` not `w-[64px]`, `text-sm` not `text-[14px]`
+- Only use arbitrary values when no standard class maps to the requirement
+- Use semantic color tokens (`bg-primary`, `text-muted-foreground`) — never raw hex or rgb
+- If no suitable token exists, add a CSS variable pair to `@/styles/globals.css` (`:root` + `.dark`)
+- No inline `style` props for anything Tailwind can express
 - Prefer responsive variants (`md:flex`, `lg:w-1/2`) over conditional class logic in JS
+
+## Component Patterns
+
+- Prefer `shadcn/ui` over building from scratch — run `npx shadcn@latest add <component>` before writing custom primitives
+- All styling must be themeable — never hardcode colors, radii, shadows, or spacing that should vary by theme
+- Prefer `async/await` in server components over `useEffect` + `useState` for data fetching
+- Extract repeated JSX into a component after the second duplication — not the third
+
+## Core Principles
+
+- **Simplicity first** — make every change as small as possible. Touch only what's necessary.
+- **No laziness** — find root causes. No temporary fixes. Senior engineer standards.
+- **No side effects** — changes must not introduce regressions elsewhere. Diff your impact.
+- Run `npx prettier --write .` after every response that includes code changes.
 
 ## Workflow Orchestration
 
 ### Plan Node Default
 
 - Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions)
-- If something goes sideways, STOP and re-plan immediately – don't keep pushing
+- If something goes sideways, STOP and re-plan immediately — don't keep pushing
 - Use plan mode for verification steps, not just building
 - Write detailed specs upfront to reduce ambiguity
 
@@ -59,10 +87,10 @@ type Direction = (typeof Direction)[keyof typeof Direction];
 
 ### Self-Improvement Loop
 
-- After ANY correction from the user: update the lessons section in`CLAUDE.md` with the pattern
+- After ANY correction from the user: update the Lessons section below with the pattern
 - Write rules for yourself that prevent the same mistake
 - Ruthlessly iterate on these lessons until mistake rate drops
-- Review lessons at session start for relevant project
+- Review lessons at session start for relevant project context
 
 ### Verification Before Done
 
@@ -75,27 +103,20 @@ type Direction = (typeof Direction)[keyof typeof Direction];
 
 - For non-trivial changes: pause and ask "is there a more elegant way?"
 - If a fix feels hacky: "Knowing everything I know now, implement the elegant solution"
-- Skip this for simple, obvious fixes – don't over-engineer
+- Skip this for simple, obvious fixes — don't over-engineer
 - Challenge your own work before presenting it
 
 ### Autonomous Bug Fixing
 
-- When given a bug report: just fix it. Don't ask for hand-holding
-- Point at logs, errors, failing tests – then resolve them
+- When given a bug report: just fix it. Don't ask for hand-holding.
+- Point at logs, errors, failing tests — then resolve them
 - Zero context switching required from the user
 - Go fix failing CI tests without being told how
 
-## Core Principles
-
-- Simplicity First: Make every change as simple as possible. Impact minimal code.
-- No Laziness: Find root causes. No temporary fixes. Senior developer standards.
-- Minimal Impact: Changes should only touch what's necessary. Avoid introducing bugs.
-- Run `npx prettier --write .` after every response that includes code changes
-
 ## Guardrails
 
-- DO NOT modify anything in this file other than the lessons.
+- DO NOT modify anything in this file other than the Lessons section below.
 
 ## Lessons
 
--
+- MISTAKE: Created a giant `page.tsx` with `'use client'` and all logic colocated. RULE: `page.tsx` is a shell, 40 lines max, composition only, never `'use client'`. Extract all logic and interactive pieces into named components.

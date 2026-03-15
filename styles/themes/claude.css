@@ -1,0 +1,121 @@
+/* Claude — Anthropic's dark warm sand & terracotta aesthetic */
+
+[data-theme='claude'] body {
+  background-color: #1a1614;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"),
+    linear-gradient(170deg, #1a1614 0%, #1e1a16 40%, #171412 100%);
+  background-attachment: fixed;
+}
+
+[data-theme='claude'] {
+  /* Semantic tokens (oklch L C H) */
+  --accent-primary: 0.65 0.15 45;
+  --accent-secondary: 0.58 0.12 35;
+
+  --surface-primary: 0.18 0.015 50;
+  --surface-secondary: 0.21 0.018 50;
+  --surface-elevated: 0.25 0.02 50;
+  --surface-overlay: 0.08 0.01 45;
+
+  --border-default: 0.28 0.02 50;
+  --border-subtle: 0.24 0.015 48;
+  --border-strong: 0.38 0.03 52;
+
+  --text-primary: 0.92 0.01 70;
+  --text-secondary: 0.74 0.01 65;
+  --text-muted: 0.56 0.01 58;
+  --text-inverse: 0.15 0.01 50;
+
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.35);
+  --shadow-md: 0 4px 8px oklch(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 20px oklch(0 0 0 / 0.5);
+
+  /* Card style tokens — soft rounded, warm shadows */
+  --card-radius: 16px;
+  --card-border-width: 1px;
+  --card-border-opacity: 0.3;
+  --card-shadow: none;
+  --card-hover-shadow: var(--shadow-lg);
+  --card-hover-y: -3px;
+  --card-accent-bar-height: 0px;
+  --card-accent-bar-scale: 0;
+
+  /* Typography — clean, readable */
+  --heading-font: inherit;
+  --section-label-font: inherit;
+  --section-label-size: 0.75rem;
+  --section-label-tracking: 0.04em;
+  --section-label-transform: uppercase;
+  --tag-font: inherit;
+  --tag-radius: 9999px;
+  --tag-padding-y: 0.25rem;
+  --tag-padding-x: 0.75rem;
+  --tag-font-size: 0.75rem;
+
+  /* shadcn bridge tokens (full color values) */
+  --background: hsl(25 15% 8%);
+  --foreground: hsl(36 12% 90%);
+  --card: hsl(25 12% 13%);
+  --card-foreground: hsl(36 12% 90%);
+  --popover: hsl(25 12% 10%);
+  --popover-foreground: hsl(36 12% 90%);
+  --primary: hsl(24 70% 55%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(25 10% 20%);
+  --secondary-foreground: hsl(36 10% 80%);
+  --muted: hsl(25 8% 16%);
+  --muted-foreground: hsl(30 8% 55%);
+  --accent: hsl(25 8% 16%);
+  --accent-foreground: hsl(36 12% 90%);
+  --destructive: hsl(0 72% 52%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(25 10% 20%);
+  --input: hsl(25 10% 20%);
+  --ring: hsl(24 70% 55%);
+  --radius: 1rem;
+  --chart-1: hsl(24 65% 52%);
+  --chart-2: hsl(15 50% 52%);
+  --chart-3: hsl(40 45% 50%);
+  --chart-4: hsl(0 45% 55%);
+  --chart-5: hsl(35 55% 48%);
+  --sidebar-background: hsl(25 12% 5%);
+  --sidebar-foreground: hsl(30 8% 52%);
+  --sidebar-primary: hsl(24 70% 50%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(25 8% 12%);
+  --sidebar-accent-foreground: hsl(36 12% 90%);
+  --sidebar-border: hsl(25 10% 15%);
+  --sidebar-ring: hsl(24 70% 50%);
+}
+
+/* Warm terracotta accent on labels */
+[data-theme='claude'] .section-label {
+  color: oklch(0.65 0.15 45);
+}
+
+/* Card surface lift on hover */
+[data-theme='claude'] .card-editorial {
+  background: hsl(25 12% 13%);
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.3s ease;
+}
+
+[data-theme='claude'] .card-editorial:hover {
+  background: hsl(25 12% 16%);
+}
+
+/* Soft pill tags */
+[data-theme='claude'] .tag-pill {
+  border-color: hsl(25 10% 24%);
+  color: hsl(30 8% 60%);
+  background: transparent;
+}
+
+[data-theme='claude'] .tag-pill:hover {
+  border-color: oklch(0.65 0.15 45);
+  color: oklch(0.65 0.15 45);
+  background: oklch(0.65 0.15 45 / 0.1);
+}

@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Research MVP',
-  description: 'Research dashboard'
+  title: 'Signal',
+  description: 'AI-powered outbound sales that finds and converts high-intent leads'
 };
 
 export default function RootLayout({

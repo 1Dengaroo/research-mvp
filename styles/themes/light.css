@@ -1,77 +1,82 @@
 /*
- * LIGHT THEME — Warm & Refined
- * Warm amber accent on cream surfaces.
- * Hue angle 50-75 gives the warm character.
+ * LIGHT THEME — Paper & Ink
+ * Warm parchment surfaces with blue-ink accents.
+ * Minimal card chrome, sharp corners — editorial feel.
  */
 
+[data-theme='light'] body {
+  background-color: #f2efea;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E"),
+    linear-gradient(170deg, #f2efea 0%, #ede8e1 40%, #f0ece6 100%);
+  background-attachment: fixed;
+}
+
 [data-theme='light'] {
-  /* SEMANTIC TOKENS (oklch L C H)
-   * Used via: oklch(var(--surface-primary))
-   * Alpha:    oklch(var(--accent-primary) / 0.1)
-   */
+  /* Semantic tokens (oklch L C H) */
+  --accent-primary: 0.52 0.12 240;
+  --accent-secondary: 0.45 0.1 230;
 
-  /* Accents — warm amber primary, warm red secondary */
-  --accent-primary: 0.55 0.12 55;
-  --accent-secondary: 0.58 0.1 15;
+  --surface-primary: 0.97 0.005 80;
+  --surface-secondary: 0.95 0.008 75;
+  --surface-elevated: 0.99 0.003 90;
+  --surface-overlay: 0.18 0.01 50;
 
-  /* Surfaces — cream page bg (L 0.97), near-white cards (L 0.99) */
-  --surface-primary: 0.97 0.008 75;
-  --surface-secondary: 0.94 0.012 70;
-  --surface-elevated: 0.99 0.004 75;
-  --surface-overlay: 0.25 0.015 50;
+  --border-default: 0.9 0.01 70;
+  --border-subtle: 0.93 0.008 75;
+  --border-strong: 0.8 0.02 60;
 
-  /* Borders — warm undertone matches the surfaces */
-  --border-default: 0.88 0.018 65;
-  --border-subtle: 0.92 0.01 70;
-  --border-strong: 0.72 0.035 55;
+  --text-primary: 0.15 0.01 50;
+  --text-secondary: 0.38 0.01 50;
+  --text-muted: 0.52 0.01 55;
+  --text-inverse: 0.97 0.005 80;
 
-  /* Text — warm charcoal, not pure black */
-  --text-primary: 0.2 0.02 50;
-  --text-secondary: 0.42 0.02 50;
-  --text-muted: 0.58 0.015 55;
-  --text-inverse: 0.96 0.006 75;
+  --shadow-sm: 0 1px 2px oklch(0.3 0.01 50 / 0.06);
+  --shadow-md: 0 2px 8px oklch(0.3 0.01 50 / 0.06);
+  --shadow-lg: 0 8px 24px oklch(0.3 0.01 50 / 0.08);
 
-  /* Shadows — warm-tinted for cohesion */
-  --shadow-sm: 0 1px 2px oklch(0.25 0.02 50 / 0.08);
-  --shadow-md: 0 4px 6px oklch(0.25 0.02 50 / 0.1);
-  --shadow-lg: 0 10px 15px oklch(0.25 0.02 50 / 0.14);
+  /* Card style tokens */
+  --card-radius: 2px;
+  --card-border-width: 1px;
+  --card-border-opacity: 0.4;
+  --card-shadow: none;
+  --card-hover-shadow: var(--shadow-md);
+  --card-hover-y: -2px;
+  --card-accent-bar-height: 0px;
+  --card-accent-bar-scale: 0;
 
-  /* SHADCN BRIDGE TOKENS (full oklch values) */
-  --background: oklch(0.97 0.008 75);
-  --foreground: oklch(0.2 0.02 50);
-  --card: oklch(0.99 0.004 75);
-  --card-foreground: oklch(0.2 0.02 50);
-  --popover: oklch(0.99 0.004 75);
-  --popover-foreground: oklch(0.2 0.02 50);
-  --primary: oklch(0.55 0.12 55);
-  --primary-foreground: oklch(0.98 0.008 75);
-  --secondary: oklch(0.93 0.015 65);
-  --secondary-foreground: oklch(0.3 0.02 50);
-  --muted: oklch(0.94 0.012 70);
-  --muted-foreground: oklch(0.5 0.02 55);
-  --accent: oklch(0.94 0.012 70);
-  --accent-foreground: oklch(0.2 0.02 50);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.98 0.008 75);
-  --border: oklch(0.88 0.018 65);
-  --input: oklch(0.88 0.018 65);
-  --ring: oklch(0.55 0.12 55);
-  --radius: 0.625rem;
-
-  /* Chart palette — spread across hue wheel */
-  --chart-1: oklch(0.55 0.12 55);
-  --chart-2: oklch(0.58 0.1 15);
-  --chart-3: oklch(0.6 0.1 145);
-  --chart-4: oklch(0.55 0.12 250);
-  --chart-5: oklch(0.58 0.1 310);
-
-  /* Sidebar */
-  --sidebar: oklch(0.95 0.01 70);
-  --sidebar-foreground: oklch(0.42 0.02 50);
-  --sidebar-primary: oklch(0.55 0.12 55);
-  --sidebar-primary-foreground: oklch(0.98 0.008 75);
-  --sidebar-accent: oklch(0.92 0.015 65);
-  --sidebar-accent-foreground: oklch(0.2 0.02 50);
-  --sidebar-border: oklch(0.86 0.02 65);
-  --sidebar-ring: oklch(0.55 0.12 55);
+  /* shadcn bridge tokens (full color values) */
+  --background: hsl(36 20% 93%);
+  --foreground: hsl(30 6% 10%);
+  --card: hsl(40 20% 98%);
+  --card-foreground: hsl(30 6% 10%);
+  --popover: hsl(40 20% 98%);
+  --popover-foreground: hsl(30 6% 10%);
+  --primary: hsl(218 55% 48%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(36 12% 91%);
+  --secondary-foreground: hsl(30 6% 18%);
+  --muted: hsl(36 10% 93%);
+  --muted-foreground: hsl(30 4% 40%);
+  --accent: hsl(36 10% 93%);
+  --accent-foreground: hsl(30 6% 10%);
+  --destructive: hsl(0 72% 50%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(36 12% 88%);
+  --input: hsl(36 12% 88%);
+  --ring: hsl(218 55% 48%);
+  --radius: 0.125rem;
+  --chart-1: hsl(218 55% 48%);
+  --chart-2: hsl(200 40% 42%);
+  --chart-3: hsl(160 40% 45%);
+  --chart-4: hsl(240 35% 48%);
+  --chart-5: hsl(180 35% 40%);
+  --sidebar-background: hsl(36 18% 95%);
+  --sidebar-foreground: hsl(30 4% 40%);
+  --sidebar-primary: hsl(218 55% 45%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(36 10% 91%);
+  --sidebar-accent-foreground: hsl(30 6% 10%);
+  --sidebar-border: hsl(36 12% 86%);
+  --sidebar-ring: hsl(218 55% 45%);
 }

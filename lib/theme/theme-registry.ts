@@ -14,45 +14,34 @@ export const themes: ThemeDefinition[] = [
   {
     id: 'light',
     name: 'Light',
-    description: 'Warm and refined',
+    description: 'Paper and ink',
     isDark: false,
     previewColors: {
-      bg: 'oklch(0.97 0.008 75)',
-      primary: 'oklch(0.55 0.12 55)',
-      accent: 'oklch(0.58 0.1 15)'
+      bg: '#f2efea',
+      primary: 'hsl(218, 55%, 48%)',
+      accent: 'hsl(200, 40%, 42%)'
     }
   },
   {
     id: 'dark',
     name: 'Dark',
-    description: 'Rich and elegant',
+    description: 'Paper and ink (dark)',
     isDark: true,
     previewColors: {
-      bg: 'oklch(0.18 0.012 50)',
-      primary: 'oklch(0.65 0.12 65)',
-      accent: 'oklch(0.62 0.1 25)'
+      bg: '#1c1a17',
+      primary: 'hsl(218, 55%, 58%)',
+      accent: 'hsl(200, 40%, 52%)'
     }
   },
   {
-    id: 'midnight',
-    name: 'Midnight',
-    description: 'Deep blue',
+    id: 'claude',
+    name: 'Claude',
+    description: 'Warm sand & terracotta',
     isDark: true,
     previewColors: {
-      bg: 'oklch(0.16 0.025 260)',
-      primary: 'oklch(0.62 0.18 250)',
-      accent: 'oklch(0.65 0.12 195)'
-    }
-  },
-  {
-    id: 'rose',
-    name: 'Rose',
-    description: 'Soft and elegant',
-    isDark: false,
-    previewColors: {
-      bg: 'oklch(0.97 0.008 350)',
-      primary: 'oklch(0.58 0.12 350)',
-      accent: 'oklch(0.52 0.1 310)'
+      bg: '#1a1614',
+      primary: 'hsl(24, 70%, 55%)',
+      accent: 'hsl(15, 50%, 52%)'
     }
   }
 ];
