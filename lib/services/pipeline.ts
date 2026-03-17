@@ -1,7 +1,11 @@
-import type { ICPCriteria, CompanyResult, ResearchStreamEvent } from '@/lib/types';
+import type {
+  ICPCriteria,
+  CompanyResult,
+  ResearchStreamEvent,
+  DiscoveredCompanyPreview
+} from '@/lib/types';
 import type { ICPParser, CompanyDiscovery, CompanyResearcher } from './interfaces';
 
-/** Default service providers — swap these to change the pipeline */
 import { claudeICPParser } from './ai';
 import { parallelCompanyDiscovery } from './parallel';
 import { claudeResearchAgent } from './research-agent';
@@ -44,66 +48,57 @@ function filterRealContacts(
 }
 
 /**
- * Run the full research pipeline.
- * Accepts a send function to stream SSE events back to the client.
- * Providers are injectable — swap icpParser, companyDiscovery, or companyResearcher
- * without touching the orchestration logic.
+ * Phase 1: Discover companies matching the ICP.
+ * Returns candidates for user confirmation.
  */
-export async function runResearchPipeline(
-  input: { transcript?: string; icp?: ICPCriteria },
+export async function discoverCompanies(
+  icp: ICPCriteria,
   send: (event: ResearchStreamEvent) => void,
   config: PipelineConfig = defaultConfig
 ): Promise<void> {
-  const { icpParser, companyDiscovery, companyResearcher } = config;
-
-  // Step 1: Get ICP
-  let icp: ICPCriteria;
-  if (input.icp) {
-    icp = input.icp;
-    send({ type: 'icp', data: icp });
-  } else if (input.transcript) {
-    send({ type: 'status', message: 'Extracting ICP from transcript...' });
-    icp = await icpParser.parse(input.transcript);
-    send({ type: 'icp', data: icp });
-  } else {
-    throw new Error('Transcript or ICP is required');
-  }
-
-  // Step 2: Discover companies
   send({ type: 'status', message: `Searching for companies matching: ${icp.description}` });
-  const companies = await companyDiscovery.find(icp);
+  const companies = await config.companyDiscovery.find(icp);
 
   if (companies.length === 0) {
     send({ type: 'status', message: 'No companies found matching your criteria.' });
-    send({ type: 'done', total: 0 });
+    send({ type: 'candidates', data: [] });
     return;
   }
 
-  const companyNames = companies.map((c) => c.name).join(', ');
-  send({
-    type: 'status',
-    message: `Found ${companies.length} companies: ${companyNames}. Researching all in parallel...`
-  });
+  const candidates: DiscoveredCompanyPreview[] = companies.map((c) => ({
+    name: c.name,
+    website: c.website,
+    description: c.description
+  }));
 
-  // Step 3: Research each company concurrently
+  send({ type: 'candidates', data: candidates });
+}
+
+/**
+ * Phase 2: Deep-research confirmed companies.
+ * Takes a list of company names the user approved.
+ */
+export async function researchConfirmedCompanies(
+  companyNames: string[],
+  icp: ICPCriteria,
+  send: (event: ResearchStreamEvent) => void,
+  config: PipelineConfig = defaultConfig
+): Promise<void> {
   let completedCount = 0;
 
-  const processCompany = async (company: (typeof companies)[number]) => {
+  const processCompany = async (companyName: string) => {
     try {
-      const research = await companyResearcher.research(company.name, icp, {
-        description: company.description,
-        website: company.website
-      });
+      const research = await config.companyResearcher.research(companyName, icp);
 
-      const contacts = filterRealContacts(research.inferred_contacts, company.name);
+      const contacts = filterRealContacts(research.inferred_contacts, companyName);
 
       const result: CompanyResult = {
-        company_name: company.name,
+        company_name: companyName,
         industry: research.industry,
         funding_stage: research.funding_stage,
         amount_raised: research.amount_raised,
-        website: company.website || null,
-        linkedin_search_url: buildLinkedInSearchUrl(company.name),
+        website: null,
+        linkedin_search_url: buildLinkedInSearchUrl(companyName),
         signals: research.signals,
         match_reason: research.match_reason,
         company_overview: research.company_overview,
@@ -115,17 +110,16 @@ export async function runResearchPipeline(
       completedCount++;
       send({ type: 'company', data: result });
     } catch {
-      send({ type: 'status', message: `Skipped ${company.name} due to an error.` });
+      send({ type: 'status', message: `Skipped ${companyName} due to an error.` });
     }
   };
 
-  // Process sequentially to stay within rate limits
-  for (const company of companies) {
+  for (let i = 0; i < companyNames.length; i++) {
     send({
       type: 'status',
-      message: `Researching ${company.name} (${completedCount + 1}/${companies.length})...`
+      message: `Researching ${companyNames[i]} (${i + 1}/${companyNames.length})...`
     });
-    await processCompany(company);
+    await processCompany(companyNames[i]);
   }
   send({ type: 'done', total: completedCount });
 }

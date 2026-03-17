@@ -60,9 +60,16 @@ export interface ComposeEmailParams {
   initialBody: string;
 }
 
+export interface DiscoveredCompanyPreview {
+  name: string;
+  website?: string;
+  description?: string;
+}
+
 export type ResearchStreamEvent =
   | { type: 'status'; message: string }
   | { type: 'icp'; data: ICPCriteria }
+  | { type: 'candidates'; data: DiscoveredCompanyPreview[] }
   | { type: 'company'; data: CompanyResult }
   | { type: 'done'; total: number }
   | { type: 'error'; message: string };

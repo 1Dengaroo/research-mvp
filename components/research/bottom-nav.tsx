@@ -3,86 +3,111 @@
 import { Loader2, ChevronRight, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-type Step = 'input' | 'review' | 'results';
+type Step = 'input' | 'review' | 'confirm' | 'results';
+
+function NavButton({
+  label,
+  active,
+  enabled,
+  onClick
+}: {
+  label: string;
+  active: boolean;
+  enabled: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={() => enabled && onClick()}
+      disabled={!enabled}
+      className={`rounded-md px-2.5 py-1.5 transition-colors ${
+        active
+          ? 'bg-muted text-foreground font-medium'
+          : enabled
+            ? 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+            : 'text-muted-foreground/50 cursor-not-allowed'
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
 
 export function BottomNav({
   step,
   setStep,
   isExtracting,
+  isDiscovering,
   isLoading,
   hasIcp,
+  hasCandidates,
   hasResults,
   transcript,
   icpDescription,
+  selectedCount,
   onExtractICP,
-  onRunResearch,
+  onDiscover,
+  onResearch,
   onStartOver,
   onSkip
 }: {
   step: Step;
   setStep: (s: Step) => void;
   isExtracting: boolean;
+  isDiscovering: boolean;
   isLoading: boolean;
   hasIcp: boolean;
+  hasCandidates: boolean;
   hasResults: boolean;
   transcript: string;
   icpDescription: string;
+  selectedCount: number;
   onExtractICP: () => void;
-  onRunResearch: () => void;
+  onDiscover: () => void;
+  onResearch: () => void;
   onStartOver: () => void;
   onSkip: () => void;
 }) {
   return (
     <div className="border-border bg-card/80 fixed right-0 bottom-0 left-0 border-t backdrop-blur-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-        {/* Left: clickable step navigation */}
+        {/* Left: step navigation */}
         <div className="flex items-center gap-1 text-xs">
-          <button
+          <NavButton
+            label="1. Transcript"
+            active={step === 'input'}
+            enabled
             onClick={() => setStep('input')}
-            className={`rounded-md px-2.5 py-1.5 transition-colors ${
-              step === 'input'
-                ? 'bg-muted text-foreground font-medium'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-            }`}
-          >
-            1. Transcript
-          </button>
+          />
           <span className="text-border">&mdash;</span>
-          <button
-            onClick={() => hasIcp && setStep('review')}
-            disabled={!hasIcp}
-            className={`rounded-md px-2.5 py-1.5 transition-colors ${
-              step === 'review'
-                ? 'bg-muted text-foreground font-medium'
-                : hasIcp
-                  ? 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                  : 'text-muted-foreground/50 cursor-not-allowed'
-            }`}
-          >
-            2. Review ICP
-          </button>
+          <NavButton
+            label="2. ICP"
+            active={step === 'review'}
+            enabled={hasIcp}
+            onClick={() => setStep('review')}
+          />
           <span className="text-border">&mdash;</span>
-          <button
-            onClick={() => (hasResults || isLoading) && setStep('results')}
-            disabled={!hasResults && !isLoading}
-            className={`rounded-md px-2.5 py-1.5 transition-colors ${
-              step === 'results'
-                ? 'bg-muted text-foreground font-medium'
-                : hasResults || isLoading
-                  ? 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                  : 'text-muted-foreground/50 cursor-not-allowed'
-            }`}
-          >
-            3. Results
-          </button>
+          <NavButton
+            label="3. Companies"
+            active={step === 'confirm'}
+            enabled={hasCandidates || isDiscovering}
+            onClick={() => setStep('confirm')}
+          />
+          <span className="text-border">&mdash;</span>
+          <NavButton
+            label="4. Results"
+            active={step === 'results'}
+            enabled={hasResults || isLoading}
+            onClick={() => setStep('results')}
+          />
         </div>
 
         {/* Right: action buttons */}
         <div className="flex items-center gap-2">
-          {isLoading && step !== 'results' && (
+          {(isDiscovering || isLoading) && step !== 'confirm' && step !== 'results' && (
             <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
               <Loader2 className="size-3 animate-spin" />
-              Researching...
+              {isDiscovering ? 'Discovering...' : 'Researching...'}
             </span>
           )}
 
@@ -115,21 +140,49 @@ export function BottomNav({
           {step === 'review' && (
             <Button
               size="sm"
-              onClick={onRunResearch}
-              disabled={isLoading || !icpDescription.trim()}
+              onClick={onDiscover}
+              disabled={isDiscovering || !icpDescription.trim()}
             >
-              {isLoading ? (
+              {isDiscovering ? (
                 <>
                   <Loader2 className="size-3.5 animate-spin" />
-                  Researching...
+                  Finding...
                 </>
               ) : (
                 <>
-                  Run Research
+                  Find Companies
                   <ChevronRight className="size-4" />
                 </>
               )}
             </Button>
+          )}
+
+          {step === 'confirm' && (
+            <>
+              {isDiscovering && (
+                <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                  <Loader2 className="size-3 animate-spin" />
+                  Discovering...
+                </span>
+              )}
+              <Button
+                size="sm"
+                onClick={onResearch}
+                disabled={isDiscovering || isLoading || selectedCount === 0}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="size-3.5 animate-spin" />
+                    Researching...
+                  </>
+                ) : (
+                  <>
+                    Research {selectedCount} {selectedCount === 1 ? 'Company' : 'Companies'}
+                    <ChevronRight className="size-4" />
+                  </>
+                )}
+              </Button>
+            </>
           )}
 
           {step === 'results' && (

@@ -1,4 +1,4 @@
-import type { ICPCriteria, ResearchStreamEvent } from '@/lib/types';
+import type { ICPCriteria, DiscoveredCompanyPreview, ResearchStreamEvent } from '@/lib/types';
 
 class ApiError extends Error {
   constructor(
@@ -24,7 +24,7 @@ async function post<T>(url: string, body: unknown, signal?: AbortSignal): Promis
       const data = await response.json();
       if (data.error) message = data.error;
     } catch {
-      // response wasn't JSON — use the status-based message
+      // response wasn't JSON
     }
     throw new ApiError(message, response.status);
   }
@@ -32,20 +32,16 @@ async function post<T>(url: string, body: unknown, signal?: AbortSignal): Promis
   return (await response.json()) as T;
 }
 
-export async function parseICP(input: string, signal?: AbortSignal): Promise<ICPCriteria> {
-  const data = await post<{ icp: ICPCriteria }>('/api/parse-icp', { input }, signal);
-  return data.icp;
-}
-
-export async function runResearch(
-  icp: ICPCriteria,
+async function streamSSE(
+  url: string,
+  body: unknown,
   onEvent: (event: ResearchStreamEvent) => void,
   signal?: AbortSignal
 ): Promise<void> {
-  const response = await fetch('/api/research', {
+  const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ icp }),
+    body: JSON.stringify(body),
     signal
   });
 
@@ -83,9 +79,46 @@ export async function runResearch(
         }
         onEvent(event);
       } catch (e) {
-        // Re-throw intentional errors (from SSE error events), skip parse failures
         if (e instanceof Error && !(e instanceof SyntaxError)) throw e;
       }
     }
   }
+}
+
+export async function parseICP(input: string, signal?: AbortSignal): Promise<ICPCriteria> {
+  const data = await post<{ icp: ICPCriteria }>('/api/parse-icp', { input }, signal);
+  return data.icp;
+}
+
+/** Phase 1: Discover candidate companies for an ICP */
+export async function discoverCompanies(
+  icp: ICPCriteria,
+  onEvent: (event: ResearchStreamEvent) => void,
+  signal?: AbortSignal
+): Promise<DiscoveredCompanyPreview[]> {
+  let candidates: DiscoveredCompanyPreview[] = [];
+
+  await streamSSE(
+    '/api/research',
+    { icp },
+    (event) => {
+      if (event.type === 'candidates') {
+        candidates = event.data;
+      }
+      onEvent(event);
+    },
+    signal
+  );
+
+  return candidates;
+}
+
+/** Phase 2: Research confirmed companies */
+export async function researchCompanies(
+  icp: ICPCriteria,
+  companies: string[],
+  onEvent: (event: ResearchStreamEvent) => void,
+  signal?: AbortSignal
+): Promise<void> {
+  await streamSSE('/api/research', { icp, companies }, onEvent, signal);
 }
