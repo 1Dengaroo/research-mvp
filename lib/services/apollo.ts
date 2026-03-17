@@ -144,6 +144,7 @@ export const apolloCompanyDiscovery: CompanyDiscovery = {
       description: org.short_description || undefined,
       linkedin_url: org.linkedin_url || undefined,
       logo_url: org.logo_url || undefined,
+      apollo_org_id: org.id,
       match_context: JSON.stringify({
         employee_count: org.estimated_num_employees,
         industry: org.industry,

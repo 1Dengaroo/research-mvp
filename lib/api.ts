@@ -1,4 +1,10 @@
-import type { ICPCriteria, DiscoveredCompanyPreview, ResearchStreamEvent } from '@/lib/types';
+import type {
+  ICPCriteria,
+  DiscoveredCompanyPreview,
+  ResearchStreamEvent,
+  PeopleSearchResult,
+  ApolloPersonPreview
+} from '@/lib/types';
 
 class ApiError extends Error {
   constructor(
@@ -107,6 +113,46 @@ export async function discoverCompanies(
   );
 
   return candidates;
+}
+
+/** Search for people at companies via Apollo */
+export async function searchPeople(
+  orgIds: string[],
+  icp: ICPCriteria,
+  companies: { name: string; apollo_org_id: string }[],
+  signal?: AbortSignal
+): Promise<PeopleSearchResult[]> {
+  const data = await post<{ results: PeopleSearchResult[] }>(
+    '/api/people/search',
+    { org_ids: orgIds, icp, companies },
+    signal
+  );
+  return data.results;
+}
+
+/** Enrich a single person via Apollo (1 credit) */
+export async function enrichPerson(
+  personId: string,
+  signal?: AbortSignal
+): Promise<{
+  first_name: string;
+  last_name: string;
+  title: string | null;
+  email: string | null;
+  phone: string | null;
+  linkedin_url: string | null;
+}> {
+  const data = await post<{
+    person: {
+      first_name: string;
+      last_name: string;
+      title: string | null;
+      email: string | null;
+      phone: string | null;
+      linkedin_url: string | null;
+    };
+  }>('/api/people/enrich', { person_id: personId }, signal);
+  return data.person;
 }
 
 /** Phase 2: Research confirmed companies */

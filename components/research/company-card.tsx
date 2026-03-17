@@ -23,7 +23,8 @@ import type {
   ComposeEmailParams,
   TargetContact,
   SourceLink,
-  DiscoveredCompanyPreview
+  DiscoveredCompanyPreview,
+  ApolloPersonPreview
 } from '@/lib/types';
 
 export const GRID_COLS = 'min-w-[900px] grid-cols-[1fr_1fr_1.5fr_1.5fr]';
@@ -94,6 +95,88 @@ function ContactRow({
   );
 }
 
+function PersonRow({
+  person,
+  isEnriching,
+  onEnrich
+}: {
+  person: ApolloPersonPreview;
+  isEnriching: boolean;
+  onEnrich: () => void;
+}) {
+  const displayName = person.is_enriched
+    ? `${person.first_name} ${person.last_name}`
+    : `${person.first_name} ${person.last_name_obfuscated}`;
+
+  return (
+    <div className="space-y-0.5">
+      <div className="flex items-center gap-1.5">
+        {person.has_email && <Mail className="text-primary size-3 shrink-0" />}
+        <span className="text-sm font-medium">{displayName}</span>
+        {person.is_enriched && person.linkedin_url && (
+          <a
+            href={person.linkedin_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-primary transition-colors"
+            title={`View ${person.first_name} on LinkedIn`}
+          >
+            <Linkedin className="size-3" />
+          </a>
+        )}
+      </div>
+      {person.title && <p className="text-muted-foreground text-xs">{person.title}</p>}
+
+      {person.is_enriched ? (
+        <div className="mt-1 space-y-0.5">
+          {person.email && (
+            <div className="flex items-center gap-1">
+              <AtSign className="text-muted-foreground size-3 shrink-0" />
+              <span className="text-muted-foreground hover:text-foreground min-w-0 truncate text-xs transition-colors">
+                {person.email}
+              </span>
+              <span className="shrink-0">
+                <CopyButton text={person.email} />
+              </span>
+            </div>
+          )}
+          {person.phone && (
+            <div className="flex items-center gap-1">
+              <span className="text-muted-foreground size-3 shrink-0 text-center text-xs">#</span>
+              <span className="text-muted-foreground hover:text-foreground min-w-0 truncate text-xs transition-colors">
+                {person.phone}
+              </span>
+              <span className="shrink-0">
+                <CopyButton text={person.phone} />
+              </span>
+            </div>
+          )}
+        </div>
+      ) : (
+        <Button
+          variant="outline"
+          size="xs"
+          onClick={onEnrich}
+          disabled={isEnriching}
+          className="mt-1.5"
+        >
+          {isEnriching ? (
+            <>
+              <Loader2 className="size-3 animate-spin" />
+              <span className="ml-1">Loading...</span>
+            </>
+          ) : (
+            <>
+              <Users className="size-3" />
+              Get Contact
+            </>
+          )}
+        </Button>
+      )}
+    </div>
+  );
+}
+
 function ShimmerBlock({ className }: { className?: string }) {
   return <div className={`bg-muted animate-pulse rounded ${className ?? ''}`} />;
 }
@@ -128,13 +211,21 @@ export function CompanyRow({
   result,
   status,
   index,
-  onComposeEmail
+  onComposeEmail,
+  people,
+  isPeopleSearching,
+  onEnrichPerson,
+  enrichingPersonIds
 }: {
   preview: DiscoveredCompanyPreview;
   result: CompanyResult | null;
   status: RowStatus;
   index: number;
   onComposeEmail?: (params: ComposeEmailParams) => void;
+  people?: ApolloPersonPreview[];
+  isPeopleSearching?: boolean;
+  onEnrichPerson?: (personId: string, companyName: string) => void;
+  enrichingPersonIds?: string[];
 }) {
   const [contactsOpen, setContactsOpen] = useState(false);
   const isComplete = status === 'complete' && result !== null;
@@ -152,6 +243,7 @@ export function CompanyRow({
   const decisionMakers = result?.contacts.filter((c) => c.is_decision_maker) ?? [];
   const otherContacts = result?.contacts.filter((c) => !c.is_decision_maker) ?? [];
   const firstContact = decisionMakers[0] ?? result?.contacts[0];
+  const hasPeople = people && people.length > 0;
 
   const allSources = result
     ? [...result.sources.funding, ...result.sources.news, ...result.sources.jobs]
@@ -249,7 +341,33 @@ export function CompanyRow({
       </div>
 
       <div className="border-border min-w-0 border-r">
-        {isComplete && result ? (
+        {hasPeople ? (
+          <div className="space-y-3 p-4">
+            {people.map((person, i) => (
+              <PersonRow
+                key={person.apollo_person_id}
+                person={person}
+                isEnriching={enrichingPersonIds?.includes(person.apollo_person_id) ?? false}
+                onEnrich={() => onEnrichPerson?.(person.apollo_person_id, preview.name)}
+              />
+            ))}
+            <a
+              href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(preview.name)}&origin=GLOBAL_SEARCH_HEADER`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary inline-flex items-center gap-1.5 text-xs transition-colors"
+            >
+              <Linkedin className="size-3" />
+              Browse all at {preview.name}
+            </a>
+          </div>
+        ) : isPeopleSearching ? (
+          <PendingColumn isResearching={true} />
+        ) : !preview.apollo_org_id ? (
+          <div className="flex items-center p-4">
+            <p className="text-muted-foreground text-xs">No contacts available</p>
+          </div>
+        ) : isComplete && result ? (
           <div className="space-y-3 p-4">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0 flex-1 space-y-2">
@@ -263,7 +381,7 @@ export function CompanyRow({
                     onCompose={() => composeFor(result.contacts[0])}
                   />
                 ) : (
-                  <p className="text-muted-foreground text-xs">No contacts inferred</p>
+                  <p className="text-muted-foreground text-xs">No contacts found</p>
                 )}
               </div>
               {firstContact && (

@@ -1,10 +1,17 @@
 import { create } from 'zustand';
-import { parseICP, discoverCompanies, researchCompanies } from '@/lib/api';
+import {
+  parseICP,
+  discoverCompanies,
+  researchCompanies,
+  searchPeople,
+  enrichPerson
+} from '@/lib/api';
 import type {
   ICPCriteria,
   CompanyResult,
   ComposeEmailParams,
-  DiscoveredCompanyPreview
+  DiscoveredCompanyPreview,
+  ApolloPersonPreview
 } from '@/lib/types';
 
 type Step = 'input' | 'review' | 'confirm' | 'results';
@@ -42,6 +49,11 @@ interface ResearchState {
   results: CompanyResult[];
   researchingCompany: string | null;
 
+  // People search
+  peopleResults: Record<string, ApolloPersonPreview[]>;
+  isPeopleSearching: boolean;
+  enrichingPersonIds: string[];
+
   // Shared
   statusMessage: string;
   error: string | null;
@@ -73,6 +85,8 @@ interface ResearchActions {
 
   // Step 4
   research: () => Promise<void>;
+  searchPeopleAction: () => Promise<void>;
+  enrichPersonAction: (personId: string, companyName: string) => Promise<void>;
 
   // Shared
   setError: (error: string | null) => void;
@@ -100,6 +114,9 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
   isResearching: false,
   results: [],
   researchingCompany: null,
+  peopleResults: {},
+  isPeopleSearching: false,
+  enrichingPersonIds: [],
   statusMessage: '',
   error: null,
   composeParams: null,
@@ -205,6 +222,9 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
       abortController
     });
 
+    // Fire people search in parallel with company research
+    get().searchPeopleAction();
+
     try {
       await researchCompanies(
         icp,
@@ -246,6 +266,73 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
     }
   },
 
+  // People search
+  searchPeopleAction: async () => {
+    const { icp, candidates, selectedCompanies } = get();
+    if (!icp) return;
+
+    const selectedSet = new Set(selectedCompanies);
+    const companiesWithOrgIds = candidates
+      .filter((c) => selectedSet.has(c.name) && c.apollo_org_id)
+      .map((c) => ({ name: c.name, apollo_org_id: c.apollo_org_id! }));
+
+    if (companiesWithOrgIds.length === 0) return;
+
+    set({ isPeopleSearching: true });
+
+    try {
+      const orgIds = companiesWithOrgIds.map((c) => c.apollo_org_id);
+      const results = await searchPeople(orgIds, icp, companiesWithOrgIds);
+
+      const peopleResults: Record<string, ApolloPersonPreview[]> = {};
+      for (const result of results) {
+        peopleResults[result.company_name] = result.ranked_people;
+      }
+
+      set({ peopleResults, isPeopleSearching: false });
+    } catch (err) {
+      console.error('People search failed:', err);
+      set({ isPeopleSearching: false });
+    }
+  },
+
+  enrichPersonAction: async (personId: string, companyName: string) => {
+    const { enrichingPersonIds } = get();
+    if (enrichingPersonIds.includes(personId)) return;
+
+    set({ enrichingPersonIds: [...enrichingPersonIds, personId] });
+
+    try {
+      const enriched = await enrichPerson(personId);
+
+      set((state) => {
+        const people = state.peopleResults[companyName] ?? [];
+        const updated = people.map((p) =>
+          p.apollo_person_id === personId
+            ? {
+                ...p,
+                last_name: enriched.last_name,
+                email: enriched.email ?? undefined,
+                phone: enriched.phone ?? undefined,
+                linkedin_url: enriched.linkedin_url ?? undefined,
+                is_enriched: true
+              }
+            : p
+        );
+
+        return {
+          peopleResults: { ...state.peopleResults, [companyName]: updated },
+          enrichingPersonIds: state.enrichingPersonIds.filter((id) => id !== personId)
+        };
+      });
+    } catch (err) {
+      console.error('Person enrichment failed:', err);
+      set((state) => ({
+        enrichingPersonIds: state.enrichingPersonIds.filter((id) => id !== personId)
+      }));
+    }
+  },
+
   // Shared
   setError: (error) => set({ error }),
 
@@ -257,6 +344,9 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
       selectedCompanies: [],
       results: [],
       researchingCompany: null,
+      peopleResults: {},
+      isPeopleSearching: false,
+      enrichingPersonIds: [],
       error: null,
       statusMessage: '',
       composeParams: null

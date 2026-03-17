@@ -25,14 +25,6 @@ const defaultConfig: PipelineConfig = {
   companyResearcher: claudeResearchAgent
 };
 
-const TITLE_PREFIX_PATTERN =
-  /^(VP|CTO|CEO|CFO|COO|Head|Director|Manager|Chief|President|SVP|EVP)\b/i;
-
-function buildLinkedInSearchUrl(name: string, companyName?: string): string {
-  const keywords = companyName ? `${name} ${companyName}` : name;
-  return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(keywords)}&origin=GLOBAL_SEARCH_HEADER`;
-}
-
 function buildLinkedInCompanySearchUrl(companyName: string): string {
   return `https://www.linkedin.com/search/results/companies/?keywords=${encodeURIComponent(companyName)}`;
 }
@@ -42,25 +34,6 @@ function buildLogoUrl(website: string | null, companyName: string): string {
     website?.replace(/^https?:\/\//, '').replace(/\/.*$/, '') ||
     `${companyName.toLowerCase().replace(/\s+/g, '')}.com`;
   return `https://logo.clearbit.com/${domain}`;
-}
-
-function filterRealContacts(
-  contacts: { name: string; title: string; email: string | null; is_decision_maker: boolean }[],
-  companyName: string
-) {
-  return contacts
-    .filter((c) => {
-      const name = c.name.trim();
-      if (!name || name.split(/\s+/).length < 2) return false;
-      return !TITLE_PREFIX_PATTERN.test(name);
-    })
-    .map((c) => ({
-      name: c.name,
-      title: c.title,
-      linkedin_url: buildLinkedInSearchUrl(c.name, companyName),
-      email: c.email || null,
-      is_decision_maker: c.is_decision_maker
-    }));
 }
 
 /**
@@ -92,7 +65,8 @@ export async function discoverCompanies(
     website: c.website,
     description: c.description,
     linkedin_url: c.linkedin_url,
-    logo_url: c.logo_url
+    logo_url: c.logo_url,
+    apollo_org_id: c.apollo_org_id
   }));
 
   send({ type: 'candidates', data: candidates });
@@ -127,7 +101,14 @@ export async function researchConfirmedCompanies(
         website: candidate?.website
       });
 
-      const contacts = filterRealContacts(research.inferred_contacts, companyName);
+      // Apollo people search handles contacts — skip Claude-inferred ones
+      const contacts: {
+        name: string;
+        title: string;
+        linkedin_url: string;
+        email: string | null;
+        is_decision_maker: boolean;
+      }[] = [];
 
       // Prefer discovery-provided URLs, fall back to research results
       const websiteUrl = candidate?.website || research.website || null;

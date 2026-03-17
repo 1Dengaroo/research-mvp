@@ -123,6 +123,10 @@ export function ResultsStep() {
   const setComposeParams = useResearchStore((s) => s.setComposeParams);
   const setStep = useResearchStore((s) => s.setStep);
   const selectedCandidates = useResearchStore((s) => s.selectedCandidates)();
+  const peopleResults = useResearchStore((s) => s.peopleResults);
+  const isPeopleSearching = useResearchStore((s) => s.isPeopleSearching);
+  const enrichingPersonIds = useResearchStore((s) => s.enrichingPersonIds);
+  const enrichPersonAction = useResearchStore((s) => s.enrichPersonAction);
 
   const resultMap = useMemo(() => {
     const map = new Map<string, (typeof results)[number]>();
@@ -194,6 +198,10 @@ export function ResultsStep() {
                   status={status}
                   index={i}
                   onComposeEmail={setComposeParams}
+                  people={peopleResults[candidate.name]}
+                  isPeopleSearching={isPeopleSearching}
+                  onEnrichPerson={enrichPersonAction}
+                  enrichingPersonIds={enrichingPersonIds}
                 />
               );
             })}
