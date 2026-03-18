@@ -106,7 +106,7 @@ export function EmailEditorPanel({
           const fallback: [GeneratedEmail, GeneratedEmail, GeneratedEmail] = [
             {
               subject: `${signalTitle} — ${params.company.company_name}`,
-              body: params.initialBody
+              body: ''
             },
             { subject: `Re: ${signalTitle} — ${params.company.company_name}`, body: '' },
             { subject: `Re: ${signalTitle} — ${params.company.company_name}`, body: '' }

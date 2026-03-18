@@ -240,7 +240,6 @@ export const claudeResearchAgent: CompanyResearcher = {
       signals,
       match_reason: stripCites(parsed.match_reason || ''),
       company_overview: stripCites(parsed.company_overview || ''),
-      email_hook: stripCites(parsed.email_hook || ''),
       industry: parsed.industry || 'Unknown',
       funding_stage: parsed.funding_stage || 'Unknown',
       amount_raised: parsed.amount_raised || 'Unknown',

@@ -171,7 +171,6 @@ For each confirmed company, Claude Haiku performs deep research:
   signals: CompanySignal[],       // job_posting, funding, news, product_launch, other
   match_reason: string,           // 1 sentence concrete fact
   company_overview: string,       // 2-3 sentences
-  email_hook: string,             // Cold email opener referencing signal
   industry, funding_stage, amount_raised,
   inferred_contacts: [{name, title, email, is_decision_maker}],
   sources: {jobs: [], funding: [], news: []}

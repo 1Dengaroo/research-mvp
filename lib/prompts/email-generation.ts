@@ -17,7 +17,6 @@ CONTEXT:
 - Funding: ${company.funding_stage} (${company.amount_raised})
 - Buying signals detected:
 ${signalsSummary}
-- Email hook (use as inspiration): ${company.email_hook}
 - What the sender sells: ${icp.description}
 
 TONE RULES (apply to ALL emails):

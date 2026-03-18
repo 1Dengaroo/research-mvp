@@ -54,7 +54,6 @@ export interface CompanyResearchResult {
   signals: CompanySignal[];
   match_reason: string;
   company_overview: string;
-  email_hook: string;
   industry: string;
   funding_stage: string;
   amount_raised: string;

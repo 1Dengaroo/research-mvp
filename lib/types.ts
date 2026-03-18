@@ -42,7 +42,6 @@ export interface CompanyResult {
   match_reason: string;
   company_overview: string;
   contacts: TargetContact[];
-  email_hook: string;
   /** Raw sources grouped by category for linking in the UI */
   sources: {
     jobs: SourceLink[];
@@ -54,7 +53,6 @@ export interface CompanyResult {
 export interface ComposeEmailParams {
   company: CompanyResult;
   contact: TargetContact;
-  initialBody: string;
   icp: ICPCriteria;
 }
 

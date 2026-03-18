@@ -122,9 +122,6 @@ interface ResearchActions {
   loadContactedCompanies: () => Promise<void>;
   isContactContacted: (companyName: string, email: string) => boolean;
   getContactedEmails: (companyName: string) => string[];
-
-  // Derived getters
-  selectedCandidates: () => DiscoveredCompanyPreview[];
 }
 
 export type ResearchStore = ResearchState & ResearchActions;
@@ -287,8 +284,6 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
     set({
       isDiscovering: true,
       statusMessage: '',
-      candidates: [],
-      selectedCompanies: [],
       error: null,
       step: 'confirm'
     });
@@ -299,9 +294,18 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
           set({ statusMessage: event.message });
         }
       });
+      // Merge new candidates with existing — new previews overwrite old for same name
+      const { candidates: existing, selectedCompanies: existingSelected } = get();
+      const merged = new Map<string, DiscoveredCompanyPreview>();
+      for (const c of existing) merged.set(c.name, c);
+      for (const c of found) merged.set(c.name, c);
+      const mergedCandidates = [...merged.values()];
+      // Auto-select new discoveries while preserving existing selections
+      const newNames = found.map((c) => c.name);
+      const selectedSet = new Set([...existingSelected, ...newNames]);
       set({
-        candidates: found,
-        selectedCompanies: found.map((c) => c.name),
+        candidates: mergedCandidates,
+        selectedCompanies: [...selectedSet],
         isDiscovering: false
       });
       // Auto-save after discovery
@@ -336,15 +340,24 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
 
   // Step 4: Research
   research: async () => {
-    const { icp, isResearching, selectedCompanies, candidates } = get();
+    const { icp, isResearching, selectedCompanies, candidates, results: existingResults } = get();
     if (!icp || isResearching || selectedCompanies.length === 0) return;
+
+    // Only research companies that don't already have results
+    const alreadyResearched = new Set(existingResults.map((r) => r.company_name));
+    const newCompanies = selectedCompanies.filter((name) => !alreadyResearched.has(name));
+
+    // If all selected are already researched, just navigate to results
+    if (newCompanies.length === 0) {
+      set({ step: 'results' });
+      return;
+    }
 
     const abortController = new AbortController();
 
     set({
       isResearching: true,
       statusMessage: '',
-      results: [],
       researchingCompany: null,
       error: null,
       step: 'results',
@@ -357,7 +370,7 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
     try {
       await researchCompanies(
         icp,
-        selectedCompanies,
+        newCompanies,
         (event) => {
           switch (event.type) {
             case 'status': {
@@ -376,12 +389,14 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
               // Auto-save after each company result
               get().saveSession();
               break;
-            case 'done':
+            case 'done': {
+              const totalCount = get().results.length;
               set({
-                statusMessage: `Research complete. Found ${event.total} companies.`,
+                statusMessage: `Research complete. ${totalCount} companies researched.`,
                 researchingCompany: null
               });
               break;
+            }
           }
         },
         abortController.signal,
@@ -413,18 +428,25 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
       .filter((c) => selectedSet.has(c.name) && c.apollo_org_id)
       .map((c) => ({ name: c.name, apollo_org_id: c.apollo_org_id! }));
 
-    if (companiesWithOrgIds.length === 0) return;
+    // Filter out companies that already have people results
+    const existingPeople = get().peopleResults;
+    const newCompaniesWithOrgIds = companiesWithOrgIds.filter((c) => !existingPeople[c.name]);
+
+    if (newCompaniesWithOrgIds.length === 0) return;
 
     set({ isPeopleSearching: true });
 
     try {
-      const orgIds = companiesWithOrgIds.map((c) => c.apollo_org_id);
-      const results = await searchPeople(orgIds, icp, companiesWithOrgIds);
+      const orgIds = newCompaniesWithOrgIds.map((c) => c.apollo_org_id);
+      const results = await searchPeople(orgIds, icp, newCompaniesWithOrgIds);
 
-      const peopleResults = Object.fromEntries(
+      const newPeopleResults = Object.fromEntries(
         results.map((r) => [r.company_name, r.ranked_people])
       );
-      set({ peopleResults, isPeopleSearching: false });
+      set((state) => ({
+        peopleResults: { ...state.peopleResults, ...newPeopleResults },
+        isPeopleSearching: false
+      }));
     } catch (err) {
       console.error('People search failed:', err);
       set({ isPeopleSearching: false });
@@ -565,12 +587,5 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
 
   getContactedEmails: (companyName: string) => {
     return get().contactedCompanies.get(companyName) ?? [];
-  },
-
-  // Derived
-  selectedCandidates: () => {
-    const { candidates, selectedCompanies } = get();
-    const selectedSet = new Set(selectedCompanies);
-    return candidates.filter((c) => selectedSet.has(c.name));
   }
 }));

@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { CompanyRow, GRID_COLS } from './company-card';
 import { LoadingStatus } from './loading-status';
 import { useResearchStore } from '@/lib/store/research-store';
-import type { ICPCriteria } from '@/lib/types';
+import type { ICPCriteria, DiscoveredCompanyPreview } from '@/lib/types';
 
 function ICPSummary({ icp, onEditCriteria }: { icp: ICPCriteria; onEditCriteria?: () => void }) {
   const [expanded, setExpanded] = useState(false);
@@ -114,7 +114,8 @@ export function ResultsStep() {
   const error = useResearchStore((s) => s.error);
   const setComposeParams = useResearchStore((s) => s.setComposeParams);
   const setStep = useResearchStore((s) => s.setStep);
-  const selectedCandidates = useResearchStore((s) => s.selectedCandidates)();
+  const candidates = useResearchStore((s) => s.candidates);
+  const selectedCompanies = useResearchStore((s) => s.selectedCompanies);
   const peopleResults = useResearchStore((s) => s.peopleResults);
   const isPeopleSearching = useResearchStore((s) => s.isPeopleSearching);
   const enrichingPersonIds = useResearchStore((s) => s.enrichingPersonIds);
@@ -129,8 +130,40 @@ export function ResultsStep() {
     return map;
   }, [results]);
 
+  // Show union of: all companies with results + selected candidates not yet researched
+  const displayCompanies = useMemo(() => {
+    const seen = new Set<string>();
+    const display: DiscoveredCompanyPreview[] = [];
+    const candidateMap = new Map(candidates.map((c) => [c.name, c]));
+    const selectedSet = new Set(selectedCompanies);
+
+    // 1. All companies with a result (always visible)
+    for (const r of results) {
+      seen.add(r.company_name);
+      const candidate = candidateMap.get(r.company_name);
+      display.push(
+        candidate ?? {
+          name: r.company_name,
+          website: r.website ?? undefined,
+          linkedin_url: r.linkedin_url,
+          logo_url: r.logo_url
+        }
+      );
+    }
+
+    // 2. Selected candidates not yet researched (pending/in-progress)
+    for (const c of candidates) {
+      if (selectedSet.has(c.name) && !seen.has(c.name)) {
+        seen.add(c.name);
+        display.push(c);
+      }
+    }
+
+    return display;
+  }, [candidates, selectedCompanies, results]);
+
   const completedCount = results.length;
-  const totalCount = selectedCandidates.length;
+  const totalCount = displayCompanies.length;
 
   return (
     <>
@@ -148,7 +181,7 @@ export function ResultsStep() {
         <LoadingStatus statusMessage={statusMessage} subtitle="This usually takes 30–60 seconds" />
       )}
 
-      {selectedCandidates.length > 0 && (
+      {displayCompanies.length > 0 && (
         <div>
           <div className="mb-3 flex items-baseline justify-between">
             <h3 className="text-sm font-medium">
@@ -172,7 +205,7 @@ export function ResultsStep() {
               )}
             </div>
 
-            {selectedCandidates.map((candidate, i) => {
+            {displayCompanies.map((candidate, i) => {
               const result = resultMap.get(candidate.name) ?? null;
               const isCurrentlyResearching = researchingCompany === candidate.name;
 
@@ -205,7 +238,7 @@ export function ResultsStep() {
         </div>
       )}
 
-      {!isResearching && !error && selectedCandidates.length === 0 && (
+      {!isResearching && !error && displayCompanies.length === 0 && (
         <div className="py-12 text-center">
           <p className="text-muted-foreground text-sm">
             No matching companies found. Try editing your ICP criteria.

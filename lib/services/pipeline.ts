@@ -135,7 +135,6 @@ export async function researchConfirmedCompanies(
         match_reason: research.match_reason,
         company_overview: research.company_overview,
         contacts,
-        email_hook: research.email_hook,
         sources: research.sources
       };
 

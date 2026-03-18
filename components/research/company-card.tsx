@@ -283,7 +283,6 @@ export function CompanyRow({
     onComposeEmail?.({
       company: result,
       contact,
-      initialBody: result.email_hook,
       icp: fallbackIcp
     });
   };
@@ -547,11 +546,11 @@ export function CompanyRow({
                     )}
                   </div>
                   {signal.key_phrases.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex gap-1 overflow-hidden">
                       {signal.key_phrases.slice(0, 3).map((phrase, j) => (
                         <span
                           key={j}
-                          className="bg-muted text-muted-foreground rounded px-1.5 py-0.5 text-xs"
+                          className="bg-muted text-muted-foreground shrink-0 rounded px-1.5 py-0.5 text-xs"
                         >
                           {phrase}
                         </span>
@@ -572,24 +571,6 @@ export function CompanyRow({
         {isComplete && result ? (
           <div className="space-y-3 p-4">
             <p className="text-xs leading-relaxed">{result.company_overview}</p>
-
-            <div
-              className="border-accent-tertiary/20 bg-accent-tertiary/5 hover:border-accent-tertiary/40 cursor-pointer space-y-1.5 rounded-lg border p-3 transition-colors"
-              onClick={() => firstContact && composeFor(firstContact)}
-            >
-              <div className="flex items-center gap-1.5">
-                <Mail className="text-accent-tertiary size-3" />
-                <span className="text-muted-foreground section-label">Email Hook</span>
-              </div>
-              <div className="flex items-start gap-1.5">
-                <p className="flex-1 text-xs leading-relaxed italic">
-                  &ldquo;{result.email_hook}&rdquo;
-                </p>
-                <span onClick={(e) => e.stopPropagation()}>
-                  <CopyButton text={result.email_hook} />
-                </span>
-              </div>
-            </div>
           </div>
         ) : status === 'error' ? (
           <div className="flex items-center gap-2 p-4">
