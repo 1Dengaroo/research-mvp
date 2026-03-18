@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ThemeSettings } from '@/components/theme-settings';
+import { UserMenu } from '@/components/auth/user-menu.client';
 
 function SignalMark({ className }: { className?: string }) {
   return (
@@ -38,7 +39,10 @@ export function Header() {
             <Link href="/research">Research</Link>
           </Button>
         </div>
-        <ThemeSettings />
+        <div className="flex items-center gap-2">
+          <ThemeSettings />
+          <UserMenu />
+        </div>
       </div>
     </header>
   );

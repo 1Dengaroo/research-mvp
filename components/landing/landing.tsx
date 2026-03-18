@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { ArrowRight, Radio, UserCheck, Pencil, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/lib/store/auth-store';
 
 const STEPS = [
   {
@@ -32,6 +32,8 @@ const STATS = [
 ];
 
 export function Landing() {
+  const openAuthModal = useAuthStore((s) => s.openAuthModal);
+
   return (
     <div className="relative min-h-[calc(100vh-49px)] overflow-hidden">
       <div
@@ -95,11 +97,9 @@ export function Landing() {
             </p>
 
             <div className="flex items-center gap-4">
-              <Button asChild size="lg" className="gap-2 px-6">
-                <Link href="/research">
-                  Get started
-                  <ArrowRight className="size-4" />
-                </Link>
+              <Button size="lg" className="gap-2 px-6" onClick={openAuthModal}>
+                Get started
+                <ArrowRight className="size-4" />
               </Button>
               <span className="text-muted-foreground text-xs tracking-wide">
                 No credit card required
@@ -190,11 +190,9 @@ export function Landing() {
               Stop paying for sales hires that take months to ramp. Let Signal find and engage your
               best prospects automatically.
             </p>
-            <Button asChild size="lg" className="mt-8 gap-2 px-6">
-              <Link href="/research">
-                Start for free
-                <ArrowRight className="size-4" />
-              </Link>
+            <Button size="lg" className="mt-8 gap-2 px-6" onClick={openAuthModal}>
+              Start for free
+              <ArrowRight className="size-4" />
             </Button>
           </div>
         </section>

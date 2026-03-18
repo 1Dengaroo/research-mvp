@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/lib/theme/theme-provider';
 import { FontProvider } from '@/lib/theme/font-provider';
 import { Header } from '@/components/header';
+import { AuthModal } from '@/components/auth/auth-modal.client';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 const sora = Sora({ subsets: ['latin'], variable: '--font-sora' });
@@ -40,6 +41,7 @@ export default function RootLayout({
           <FontProvider>
             <TooltipProvider>
               <Header />
+              <AuthModal />
               {children}
             </TooltipProvider>
           </FontProvider>
