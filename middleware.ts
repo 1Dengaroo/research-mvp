@@ -32,10 +32,14 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // Protect /research and /api/* (except auth callback)
+  // Protect app routes and /api/* (except auth callbacks)
   const isProtected =
     pathname.startsWith('/research') ||
-    (pathname.startsWith('/api/') && !pathname.startsWith('/api/auth'));
+    pathname.startsWith('/settings') ||
+    pathname.startsWith('/emails') ||
+    (pathname.startsWith('/api/') &&
+      !pathname.startsWith('/api/auth') &&
+      !pathname.startsWith('/api/gmail/callback'));
 
   if (!user && isProtected) {
     if (pathname.startsWith('/api/')) {

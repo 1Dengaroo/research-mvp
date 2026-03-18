@@ -55,6 +55,35 @@ export interface ComposeEmailParams {
   company: CompanyResult;
   contact: TargetContact;
   initialBody: string;
+  icp: ICPCriteria;
+}
+
+export interface GeneratedEmail {
+  subject: string;
+  body: string;
+}
+
+export interface SentEmail {
+  id: string;
+  user_id: string;
+  recipient_email: string;
+  recipient_name: string;
+  subject: string;
+  body: string;
+  company_name: string;
+  contact_name: string;
+  status: 'sent' | 'failed';
+  error_message: string | null;
+  gmail_message_id: string | null;
+  created_at: string;
+}
+
+export interface SendEmailRequest {
+  to: string;
+  subject: string;
+  body: string;
+  companyName: string;
+  contactName: string;
 }
 
 export interface DiscoveredCompanyPreview {

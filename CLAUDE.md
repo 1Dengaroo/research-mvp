@@ -1,83 +1,58 @@
-# Signal — CLAUDE.md
+# Signal
 
-## Project Overview
+AI-powered outbound sales platform for SMBs. Monitors the web for buying signals, finds contacts, generates personalized outreach.
 
-Signal is an AI-powered outbound sales platform for SMBs. It monitors the web for behavioral buying signals (job postings, hiring patterns, funding rounds, tech stack changes), finds the right contact, and generates hyper-personalized outreach emails.
+**Stack:** Next.js App Router · TypeScript · Tailwind · shadcn/ui · Supabase · Anthropic API · Apollo API
 
-**Stack:** Next.js App Router · TypeScript · Tailwind · shadcn/ui · Supabase · Inngest · Parallel.ai · Anthropic API · Stripe
+## Docs
 
-## File Structure
+```
+CLAUDE.md                          ← You are here
+docs/
+├── ARCHITECTURE.md                ← Domain layers, data flow, service interfaces
+├── PRODUCT.md                     ← User flows, business domain, current limitations
+└── CONVENTIONS.md                 ← SSR boundary, TypeScript, Tailwind, component rules
+.claude/skills/
+├── research-pipeline/skill.md     ← Pipeline deep-dive: types, APIs, config, Apollo integration
+└── theme-framework/skill.md       ← Token system, adding themes, font system
+```
 
-- `/app` is routing only — no logic, no `'use client'`, minimal JSX
-- All components in `@/components` organized by feature domain (e.g. `pipeline/`, `dashboard/`) — never by type
-- Colocate: `<component>.tsx`, `.types.ts`, `.test.tsx`, `.utils.ts`
+## Key Files
 
-## SSR / Client Boundary — STRICT
+```
+lib/types.ts                       ← All TypeScript interfaces
+lib/services/config.ts             ← Models, limits, thresholds (one file to tune)
+lib/services/interfaces.ts         ← Swappable service contracts
+lib/services/pipeline.ts           ← Pipeline orchestrator
+lib/services/gmail.ts              ← Gmail OAuth + sending
+lib/store/research-store.ts        ← Zustand store (all state + actions)
+lib/store/profile-store.ts         ← Profile modal state
+lib/api.ts                         ← Client-side fetch wrappers
+middleware.ts                      ← Supabase auth + route protection
+```
 
-- **Never** put `'use client'` in `page.tsx`, `layout.tsx`, or anything in `/app`
-- **Never** mix server and client logic in the same file
-- Interactivity → extract to `<Name>.client.tsx` in `@/components`, import into the server component
-- `page.tsx` hard limit: **40 lines**. Composition only — no fetching, no logic, no conditionals
-- Fetch in server components, pass as props. Use `loading.tsx` / `error.tsx` for streaming/errors
+## Rules
 
-**Pre-file checklist:**
+1. `/app` is routing only — zero `'use client'`, zero logic, `page.tsx` ≤ 40 lines
+2. Interactivity → `<Name>.client.tsx` in `@/components`
+3. No `any`, no `as`, no `enum`
+4. Semantic tokens only — no hardcoded colors
+5. `shadcn/ui` first — before custom primitives
+6. Components organized by feature domain — never by type
+7. Run `npx prettier --write .` after code changes
 
-- In `/app`? → Server component. Zero `'use client'`.
-- Needs interactivity? → `.client.tsx` in `@/components`
-- `page.tsx` doing anything besides composing? → Wrong. Extract it.
-- JSX pattern used 2+ times? → Make it a component now.
+## Principles
 
-## TypeScript
-
-- No `as` casting — use type guards or proper inference
-- No `enum` — use `as const`:
-  ```ts
-  const Status = { Active: 'active', Paused: 'paused' } as const;
-  type Status = (typeof Status)[keyof typeof Status];
-  ```
-- No `any` — use `unknown` with narrowing or a proper interface
-- `interface` for object shapes, `type` for unions/intersections/primitives
-- Annotate return types on all public functions and hooks
-- Non-trivial component types → `<component>.types.ts`. Simple inline types OK if under ~2 lines
-
-## Tailwind
-
-- Canonical classes over arbitrary values — `w-16` not `w-[64px]`
-- Semantic color tokens (`bg-primary`, `text-muted-foreground`) — never raw hex/rgb
-- No token? → Add CSS variable pair to `globals.css` (`:root` + `.dark`)
-- No inline `style` props for anything Tailwind can express
-- Responsive variants (`md:flex`) over conditional class logic in JS
-
-## Components
-
-- Prefer `shadcn/ui` — run `npx shadcn@latest add <component>` before writing custom primitives
-- All styling must be themeable — no hardcoded colors, radii, shadows, or spacing
-- Server components: `async/await` for data fetching, not `useEffect` + `useState`
-- Extract repeated JSX after the second duplication — not the third
-
-## Core Principles
-
-- **Simplicity first** — smallest change possible, touch only what's necessary
-- **No laziness** — find root causes, no temp fixes, senior engineer standards
-- **No side effects** — changes must not introduce regressions. Diff your impact.
-- Run `npx prettier --write .` after every response with code changes
+- Simplicity first — smallest change, touch only what's necessary
+- No laziness — root causes, no temp fixes, staff engineer standards
+- No side effects — changes must not introduce regressions
 
 ## Workflow
 
-**Planning:** Enter plan mode for any task with 3+ steps or architectural decisions. If something goes sideways, stop and re-plan — don't push through.
-
-**Subagents:** Use liberally. Offload research, exploration, and parallel analysis. One task per subagent. Keep main context clean.
-
-**Verification:** Never mark complete without proving it works. Ask: "Would a staff engineer approve this?"
-
-**Elegance:** For non-trivial changes, pause and ask "is there a more elegant way?" Skip for simple, obvious fixes.
-
-**Bugs:** When given a bug report, just fix it. Point at logs/errors, resolve them. No hand-holding needed.
-
-## Guardrails
-
-Do not modify anything in this file except the Lessons section.
+- Plan mode first for 3+ step tasks. Re-plan if something breaks.
+- Use subagents liberally. One task per subagent.
+- Never mark complete without verification.
 
 ## Lessons
 
-- **MISTAKE:** Created a giant `page.tsx` with `'use client'` and all logic colocated. **RULE:** `page.tsx` is a shell — 40 lines max, composition only, never `'use client'`. Extract all logic and interactive pieces into named components.
+- `page.tsx` is a shell — 40 lines max, composition only, never `'use client'`. Extract all logic into named components.

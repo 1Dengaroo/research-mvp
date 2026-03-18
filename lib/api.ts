@@ -3,7 +3,11 @@ import type {
   DiscoveredCompanyPreview,
   ResearchStreamEvent,
   PeopleSearchResult,
-  StrategyMessage
+  StrategyMessage,
+  GeneratedEmail,
+  CompanyResult,
+  TargetContact,
+  SendEmailRequest
 } from '@/lib/types';
 
 class ApiError extends Error {
@@ -229,4 +233,52 @@ export async function enrichPerson(
     };
   };
   return data.person;
+}
+
+// ---------------------------------------------------------------------------
+// Email generation & sending
+// ---------------------------------------------------------------------------
+
+/** Generate a personalized email via AI */
+export async function generateEmail(
+  company: CompanyResult,
+  contact: TargetContact,
+  icp: ICPCriteria,
+  signal?: AbortSignal
+): Promise<GeneratedEmail> {
+  const response = await postJson('/api/emails/generate', { company, contact, icp }, signal);
+  return (await response.json()) as GeneratedEmail;
+}
+
+/** Send an email via connected Gmail */
+export async function sendEmail(
+  params: SendEmailRequest,
+  signal?: AbortSignal
+): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  const response = await postJson('/api/emails/send', params, signal);
+  return (await response.json()) as { success: boolean; messageId?: string; error?: string };
+}
+
+// ---------------------------------------------------------------------------
+// Gmail connection
+// ---------------------------------------------------------------------------
+
+/** Check Gmail connection status */
+export async function getGmailStatus(): Promise<{ connected: boolean; email: string | null }> {
+  const response = await fetch('/api/gmail/status');
+  if (!response.ok) return { connected: false, email: null };
+  return (await response.json()) as { connected: boolean; email: string | null };
+}
+
+/** Get Gmail OAuth URL and redirect to it */
+export async function connectGmail(): Promise<void> {
+  const response = await fetch('/api/gmail/authorize');
+  if (!response.ok) throw new Error('Failed to get authorization URL');
+  const data = (await response.json()) as { url: string };
+  window.location.href = data.url;
+}
+
+/** Disconnect Gmail account */
+export async function disconnectGmail(): Promise<void> {
+  await postJson('/api/gmail/disconnect', {});
 }

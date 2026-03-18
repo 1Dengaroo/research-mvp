@@ -23,13 +23,13 @@ Every theme file must implement **both** layers:
 
 Three space-separated numbers. Consumed via `oklch(var(--token))` or with alpha `oklch(var(--token) / 0.5)`. These are bridged to Tailwind in `globals.css` as `--color-*` custom properties.
 
-| Group | Tokens |
-|-------|--------|
-| **Accents** | `--accent-primary`, `--accent-secondary` |
+| Group        | Tokens                                                                                |
+| ------------ | ------------------------------------------------------------------------------------- |
+| **Accents**  | `--accent-primary`, `--accent-secondary`                                              |
 | **Surfaces** | `--surface-primary`, `--surface-secondary`, `--surface-elevated`, `--surface-overlay` |
-| **Borders** | `--border-default`, `--border-subtle`, `--border-strong` |
-| **Text** | `--text-primary`, `--text-secondary`, `--text-muted`, `--text-inverse` |
-| **Shadows** | `--shadow-sm`, `--shadow-md`, `--shadow-lg` (full CSS shadow values, not components) |
+| **Borders**  | `--border-default`, `--border-subtle`, `--border-strong`                              |
+| **Text**     | `--text-primary`, `--text-secondary`, `--text-muted`, `--text-inverse`                |
+| **Shadows**  | `--shadow-sm`, `--shadow-md`, `--shadow-lg` (full CSS shadow values, not components)  |
 
 Usage in Tailwind classes: `bg-surface-primary`, `text-text-secondary`, `border-border-default`, etc.
 
@@ -37,13 +37,13 @@ Usage in Tailwind classes: `bg-surface-primary`, `text-text-secondary`, `border-
 
 Full color values (use `hsl()` or `oklch()` wrapper — bare component numbers will NOT work). These power all shadcn/ui components through the `@theme inline` bridge in `globals.css`.
 
-| Group | Tokens |
-|-------|--------|
-| **Page** | `--background`, `--foreground` |
-| **Components** | `--card`, `--card-foreground`, `--popover`, `--popover-foreground`, `--primary`, `--primary-foreground`, `--secondary`, `--secondary-foreground`, `--muted`, `--muted-foreground`, `--accent`, `--accent-foreground`, `--destructive`, `--destructive-foreground` |
-| **UI Elements** | `--border`, `--input`, `--ring`, `--radius` |
-| **Charts** | `--chart-1` through `--chart-5` |
-| **Sidebar** | `--sidebar-background`, `--sidebar-foreground`, `--sidebar-primary`, `--sidebar-primary-foreground`, `--sidebar-accent`, `--sidebar-accent-foreground`, `--sidebar-border`, `--sidebar-ring` |
+| Group           | Tokens                                                                                                                                                                                                                                                            |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Page**        | `--background`, `--foreground`                                                                                                                                                                                                                                    |
+| **Components**  | `--card`, `--card-foreground`, `--popover`, `--popover-foreground`, `--primary`, `--primary-foreground`, `--secondary`, `--secondary-foreground`, `--muted`, `--muted-foreground`, `--accent`, `--accent-foreground`, `--destructive`, `--destructive-foreground` |
+| **UI Elements** | `--border`, `--input`, `--ring`, `--radius`                                                                                                                                                                                                                       |
+| **Charts**      | `--chart-1` through `--chart-5`                                                                                                                                                                                                                                   |
+| **Sidebar**     | `--sidebar-background`, `--sidebar-foreground`, `--sidebar-primary`, `--sidebar-primary-foreground`, `--sidebar-accent`, `--sidebar-accent-foreground`, `--sidebar-border`, `--sidebar-ring`                                                                      |
 
 Usage in Tailwind classes: `bg-primary`, `text-muted-foreground`, `border-border`, etc.
 
@@ -54,7 +54,7 @@ Usage in Tailwind classes: `bg-primary`, `text-muted-foreground`, `border-border
 Control card appearance per theme (sharp editorial vs soft rounded):
 
 ```css
---card-radius: 2px;           /* or 16px for rounded themes */
+--card-radius: 2px; /* or 16px for rounded themes */
 --card-border-width: 1px;
 --card-border-opacity: 0.4;
 --card-shadow: none;
@@ -75,6 +75,7 @@ Control card appearance per theme (sharp editorial vs soft rounded):
    @import '../styles/themes/<name>.css';
    ```
 3. **Register** in `lib/theme/theme-registry.ts`:
+
    ```ts
    {
      id: '<name>',
@@ -84,6 +85,7 @@ Control card appearance per theme (sharp editorial vs soft rounded):
      previewColors: { bg: '...', primary: '...', accent: '...' }
    }
    ```
+
    - Set `isDark: true` for dark themes — this toggles the `.dark` class on `<html>` for Tailwind's `dark:` variant
 
 ## How Theme Switching Works
@@ -105,21 +107,21 @@ Control card appearance per theme (sharp editorial vs soft rounded):
 
 ## Current Themes
 
-| ID | Name | Type | Character |
-|----|------|------|-----------|
-| `light` | Light | Light | Paper & ink, blue accents, sharp 2px corners |
-| `dark` | Dark | Dark | Dark parchment, blue accents, sharp 2px corners |
-| `claude` | Claude | Dark | Warm sand & terracotta, rounded 16px cards |
+| ID       | Name   | Type  | Character                                       |
+| -------- | ------ | ----- | ----------------------------------------------- |
+| `light`  | Light  | Light | Paper & ink, blue accents, sharp 2px corners    |
+| `dark`   | Dark   | Dark  | Dark parchment, blue accents, sharp 2px corners |
+| `claude` | Claude | Dark  | Warm sand & terracotta, rounded 16px cards      |
 
 ## Font System
 
 Fonts are orthogonal to themes — any font works with any theme. Managed via `data-font` attribute on `<html>`.
 
-| ID | Font | Character |
-|----|------|-----------|
-| `sora` | Sora | Modern geometric sans-serif (default) |
-| `inter` | Inter | Clean and neutral |
-| `space-grotesk` | Space Grotesk | Technical and sharp |
-| `geist-mono` | Geist Mono | Monospaced |
+| ID              | Font          | Character                             |
+| --------------- | ------------- | ------------------------------------- |
+| `sora`          | Sora          | Modern geometric sans-serif (default) |
+| `inter`         | Inter         | Clean and neutral                     |
+| `space-grotesk` | Space Grotesk | Technical and sharp                   |
+| `geist-mono`    | Geist Mono    | Monospaced                            |
 
 To add a font: register in `font-registry.ts`, load in `app/layout.tsx` via `next/font/google`, add a `[data-font='<id>']` rule in `globals.css`.

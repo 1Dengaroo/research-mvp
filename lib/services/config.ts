@@ -28,5 +28,11 @@ export const serviceConfig = {
   apolloPerPage: 25,
 
   /** Apollo API base URL */
-  apolloBaseUrl: 'https://api.apollo.io/api/v1'
+  apolloBaseUrl: 'https://api.apollo.io/api/v1',
+
+  /** Model used for email generation */
+  emailModel: 'claude-haiku-4-5-20251001',
+
+  /** Max tokens for email generation */
+  emailMaxTokens: 1024
 } as const;

@@ -18,9 +18,11 @@ import { SignalBadge } from './signal-badge';
 import { CopyButton } from './copy-button.client';
 import { Button } from '@/components/ui/button';
 import { CompanyLogoWithFallback } from '@/components/company-logo';
+import { useResearchStore } from '@/lib/store/research-store';
 import type {
   CompanyResult,
   ComposeEmailParams,
+  ICPCriteria,
   TargetContact,
   SourceLink,
   DiscoveredCompanyPreview,
@@ -98,11 +100,13 @@ function ContactRow({
 function PersonRow({
   person,
   isEnriching,
-  onEnrich
+  onEnrich,
+  onCompose
 }: {
   person: ApolloPersonPreview;
   isEnriching: boolean;
   onEnrich: () => void;
+  onCompose?: () => void;
 }) {
   const displayName = person.is_enriched
     ? `${person.first_name} ${person.last_name}`
@@ -112,7 +116,17 @@ function PersonRow({
     <div className="space-y-0.5">
       <div className="flex items-center gap-1.5">
         {person.has_email && <Mail className="text-primary size-3 shrink-0" />}
-        <span className="text-sm font-medium">{displayName}</span>
+        {person.is_enriched && person.email && onCompose ? (
+          <button
+            type="button"
+            onClick={onCompose}
+            className="hover:text-primary cursor-pointer text-sm font-medium transition-colors"
+          >
+            {displayName}
+          </button>
+        ) : (
+          <span className="text-sm font-medium">{displayName}</span>
+        )}
         {person.is_enriched && person.linkedin_url && (
           <a
             href={person.linkedin_url}
@@ -132,9 +146,13 @@ function PersonRow({
           {person.email && (
             <div className="flex items-center gap-1">
               <AtSign className="text-muted-foreground size-3 shrink-0" />
-              <span className="text-muted-foreground hover:text-foreground min-w-0 truncate text-xs transition-colors">
+              <button
+                type="button"
+                onClick={onCompose}
+                className="text-muted-foreground hover:text-foreground min-w-0 cursor-pointer truncate text-xs transition-colors"
+              >
                 {person.email}
-              </span>
+              </button>
               <span className="shrink-0">
                 <CopyButton text={person.email} />
               </span>
@@ -228,15 +246,28 @@ export function CompanyRow({
   enrichingPersonIds?: string[];
 }) {
   const [contactsOpen, setContactsOpen] = useState(false);
+  const icp = useResearchStore((s) => s.icp);
   const isComplete = status === 'complete' && result !== null;
   const isResearching = status === 'researching';
 
   const composeFor = (contact: TargetContact) => {
     if (!result) return;
+    const fallbackIcp: ICPCriteria = icp ?? {
+      description: '',
+      industry_keywords: [],
+      min_employees: null,
+      max_employees: null,
+      min_funding_amount: null,
+      funding_stages: [],
+      hiring_signals: [],
+      tech_keywords: [],
+      company_examples: []
+    };
     onComposeEmail?.({
       company: result,
       contact,
-      initialBody: result.email_hook
+      initialBody: result.email_hook,
+      icp: fallbackIcp
     });
   };
 
@@ -343,12 +374,24 @@ export function CompanyRow({
       <div className="border-border min-w-0 border-r">
         {hasPeople ? (
           <div className="space-y-3 p-4">
-            {people.map((person, i) => (
+            {people.map((person) => (
               <PersonRow
                 key={person.apollo_person_id}
                 person={person}
                 isEnriching={enrichingPersonIds?.includes(person.apollo_person_id) ?? false}
                 onEnrich={() => onEnrichPerson?.(person.apollo_person_id, preview.name)}
+                onCompose={
+                  person.is_enriched && person.email && result
+                    ? () =>
+                        composeFor({
+                          name: `${person.first_name} ${person.last_name}`,
+                          title: person.title ?? '',
+                          email: person.email ?? null,
+                          linkedin_url: person.linkedin_url ?? '',
+                          is_decision_maker: false
+                        })
+                    : undefined
+                }
               />
             ))}
             <a

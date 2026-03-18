@@ -1,9 +1,12 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import type { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
-import { ThemeSettings } from '@/components/theme-settings';
-import { UserMenu } from '@/components/auth/user-menu.client';
+import { useAuthStore } from '@/lib/store/auth-store';
+import { useProfileStore } from '@/lib/store/profile-store';
+import { createClient } from '@/lib/supabase/client';
 
 function SignalMark({ className }: { className?: string }) {
   return (
@@ -21,9 +24,60 @@ function SignalMark({ className }: { className?: string }) {
   );
 }
 
+function UserAvatar() {
+  const [user, setUser] = useState<User | null>(null);
+  const openAuthModal = useAuthStore((s) => s.openAuthModal);
+  const openProfile = useProfileStore((s) => s.openProfile);
+
+  const configured = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabase = configured ? createClient() : null;
+
+  useEffect(() => {
+    if (!supabase) return;
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase]);
+
+  if (!user) {
+    return (
+      <Button variant="ghost" size="sm" onClick={openAuthModal}>
+        Sign in
+      </Button>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => openProfile()}
+      className="hover:ring-primary/30 rounded-full transition-all hover:ring-2"
+    >
+      {user.user_metadata?.avatar_url ? (
+        <img
+          src={user.user_metadata.avatar_url}
+          alt=""
+          className="size-7 rounded-full"
+          referrerPolicy="no-referrer"
+        />
+      ) : (
+        <div className="bg-primary/10 text-primary flex size-7 items-center justify-center rounded-full text-xs font-medium">
+          {(user.email?.[0] ?? '?').toUpperCase()}
+        </div>
+      )}
+    </button>
+  );
+}
+
 export function Header() {
   return (
-    <header className="border-border bg-card border-b">
+    <header className="border-border bg-card sticky top-0 z-50 border-b">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-2.5">
@@ -38,11 +92,11 @@ export function Header() {
           <Button asChild variant="ghost" size="sm">
             <Link href="/research">Research</Link>
           </Button>
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/emails">Emails</Link>
+          </Button>
         </div>
-        <div className="flex items-center gap-2">
-          <ThemeSettings />
-          <UserMenu />
-        </div>
+        <UserAvatar />
       </div>
     </header>
   );

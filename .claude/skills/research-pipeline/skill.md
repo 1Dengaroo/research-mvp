@@ -101,17 +101,17 @@ components/research/
 
 All tunable parameters in `lib/services/config.ts`:
 
-| Parameter               | Value                       | Purpose                                      |
-| ----------------------- | --------------------------- | -------------------------------------------- |
-| `fastModel`             | `claude-haiku-4-5-20251001` | ICP parsing + scoring (lightweight)          |
-| `researchModel`         | `claude-haiku-4-5-20251001` | Per-company research with web search         |
-| `maxSearchesPerCompany` | 2                           | Cap on web searches per research agent call  |
-| `researchMaxTokens`     | 4096                        | Max output tokens for research               |
-| `parseMaxTokens`        | 1024                        | Max output tokens for ICP parsing            |
-| `scoringMaxTokens`      | 2048                        | Max output tokens for company scoring        |
-| `scoringMinScore`       | 5                           | Minimum score (1-10) to include a company    |
-| `apolloPerPage`         | 25                          | Companies per Apollo API request             |
-| `apolloBaseUrl`         | `https://api.apollo.io/...` | Apollo API base URL                          |
+| Parameter               | Value                       | Purpose                                     |
+| ----------------------- | --------------------------- | ------------------------------------------- |
+| `fastModel`             | `claude-haiku-4-5-20251001` | ICP parsing + scoring (lightweight)         |
+| `researchModel`         | `claude-haiku-4-5-20251001` | Per-company research with web search        |
+| `maxSearchesPerCompany` | 2                           | Cap on web searches per research agent call |
+| `researchMaxTokens`     | 4096                        | Max output tokens for research              |
+| `parseMaxTokens`        | 1024                        | Max output tokens for ICP parsing           |
+| `scoringMaxTokens`      | 2048                        | Max output tokens for company scoring       |
+| `scoringMinScore`       | 5                           | Minimum score (1-10) to include a company   |
+| `apolloPerPage`         | 25                          | Companies per Apollo API request            |
+| `apolloBaseUrl`         | `https://api.apollo.io/...` | Apollo API base URL                         |
 
 ## Apollo Integration (Primary Discovery)
 
@@ -121,22 +121,24 @@ Apollo Organizations Search is the primary company discovery method. The strateg
 
 ### How Apollo Query is Built from ICP
 
-| ICP Field            | Apollo Parameter                         | Notes                                        |
-| -------------------- | ---------------------------------------- | -------------------------------------------- |
-| `industry_keywords`  | `q_organization_keyword_tags`            | Tags matching what a company does            |
-| Employee range       | `organization_num_employees_ranges`      | Mapped to Apollo's predefined ranges         |
-| `hiring_signals`     | `q_organization_job_titles`              | Active job postings filter                   |
-| `funding_stages`     | `organization_latest_funding_stage_cd`   | Apollo funding stage codes                   |
-| `min_funding_amount` | `latest_funding_amount_range[min]`       | Minimum funding threshold                    |
+| ICP Field            | Apollo Parameter                       | Notes                                |
+| -------------------- | -------------------------------------- | ------------------------------------ |
+| `industry_keywords`  | `q_organization_keyword_tags`          | Tags matching what a company does    |
+| Employee range       | `organization_num_employees_ranges`    | Mapped to Apollo's predefined ranges |
+| `hiring_signals`     | `q_organization_job_titles`            | Active job postings filter           |
+| `funding_stages`     | `organization_latest_funding_stage_cd` | Apollo funding stage codes           |
+| `min_funding_amount` | `latest_funding_amount_range[min]`     | Minimum funding threshold            |
 
 ### Apollo Response → DiscoveredCompany
 
 Each Apollo org is transformed into a `DiscoveredCompany` with:
+
 - `name`, `website`, `description`, `linkedin_url`, `logo_url`
 - `match_context`: JSON string of Apollo metadata (employee count, keywords, funding, departments)
 - `apollo_org_id`: Apollo organization ID (threaded through to `DiscoveredCompanyPreview` for people search)
 
 ### Environment Variable
+
 - `APOLLO_API_KEY` — required for discovery and people search
 
 ## Company Scoring (Claude)
@@ -179,6 +181,7 @@ For each confirmed company, Claude Haiku performs deep research:
 ### URL Verification
 
 Claude can hallucinate URLs. Defenses:
+
 1. **Server-side verification** — Extract URLs from `web_search_tool_result` blocks. Strip any URL not in this verified set.
 2. **Fallback links** — If a source category has no verified URLs, generate safe search URLs (LinkedIn Jobs, Crunchbase, Google News).
 3. **Prompt instruction** — "ONLY use URLs from search results, set null if unsure."
@@ -218,12 +221,14 @@ User clicks "Get Contact"
 ### Apollo API Response Shapes
 
 **mixed_people/api_search** returns obfuscated data:
-- `first_name`, `last_name_obfuscated` (e.g. "Hu***n")
+
+- `first_name`, `last_name_obfuscated` (e.g. "Hu\*\*\*n")
 - `has_email: boolean`, `has_direct_phone: "Yes" | "No"`
 - `organization.name` (nested, not flat `organization_name`)
 - No `email`, `phone_numbers`, or `linkedin_url` on this endpoint
 
 **people/match** returns full data:
+
 - `first_name`, `last_name`, `email`, `linkedin_url`
 - Phone via `person.contact.phone_numbers[].raw_number` (nested under contact)
 
@@ -254,6 +259,7 @@ interface PeopleSearchResult {
 ```
 
 ### Edge Cases
+
 - Custom-added companies (no `apollo_org_id`): skip in people search, show "No contacts available"
 - Empty people results: show "No contacts found"
 - Enrichment failure: error logged, loading state cleared
@@ -261,30 +267,36 @@ interface PeopleSearchResult {
 ## API Routes
 
 ### POST `/api/parse-icp`
+
 - **Input**: `{ input: string }`
 - **Output**: `{ icp: ICPCriteria }`
 - Calls `claudeICPParser.parse()`
 
 ### POST `/api/research` (SSE Stream)
+
 - **maxDuration**: 300s
 - **Two phases based on request body**:
 
 **Phase 1 — Discovery** (no `companies` in body):
+
 - Input: `{ icp }`
 - Calls `discoverCompanies()` → Apollo search → Claude scoring
 - Streams: `status`, `candidates`, `done`
 
 **Phase 2 — Research** (`companies` in body):
+
 - Input: `{ icp, companies: string[], candidates? }`
 - Calls `researchConfirmedCompanies()` → Claude research per company
 - Streams: `status`, `company` (per result), `done`
 
 ### POST `/api/people/search`
+
 - **Input**: `{ org_ids: string[], icp: ICPCriteria, companies: { name: string, apollo_org_id: string }[] }`
 - **Output**: `{ results: PeopleSearchResult[] }`
 - Calls `apolloPeopleSearch()` → groups by org name → `rankPeopleForCompany()` per company
 
 ### POST `/api/people/enrich`
+
 - **Input**: `{ person_id: string }`
 - **Output**: `{ person: { first_name, last_name, title, email, phone, linkedin_url } }`
 - Calls `apolloPersonEnrich()` — costs 1 Apollo credit
@@ -298,7 +310,7 @@ type ResearchStreamEvent =
   | { type: 'candidates'; data: DiscoveredCompanyPreview[] }
   | { type: 'company'; data: CompanyResult }
   | { type: 'done'; total: number }
-  | { type: 'error'; message: string }
+  | { type: 'error'; message: string };
 ```
 
 ## State Management (Zustand)
@@ -307,23 +319,24 @@ type ResearchStreamEvent =
 
 ### Key State
 
-| Field               | Type                        | Step    |
-| ------------------- | --------------------------- | ------- |
-| `step`              | `input/review/confirm/results` | Nav  |
-| `transcript`        | `string`                    | Step 1  |
-| `icp`               | `ICPCriteria \| null`       | Step 2  |
-| `candidates`        | `DiscoveredCompanyPreview[]`| Step 3  |
-| `selectedCompanies` | `string[]`                  | Step 3  |
-| `results`           | `CompanyResult[]`           | Step 4  |
-| `isExtracting`      | `boolean`                   | Loading |
-| `isDiscovering`     | `boolean`                   | Loading |
-| `isResearching`     | `boolean`                   | Loading |
-| `peopleResults`     | `Record<string, ApolloPersonPreview[]>` | Step 4 |
-| `isPeopleSearching` | `boolean`                   | Loading |
-| `enrichingPersonIds`| `string[]`                  | Loading |
-| `abortController`   | `AbortController \| null`   | Cancel  |
+| Field                | Type                                    | Step    |
+| -------------------- | --------------------------------------- | ------- |
+| `step`               | `input/review/confirm/results`          | Nav     |
+| `transcript`         | `string`                                | Step 1  |
+| `icp`                | `ICPCriteria \| null`                   | Step 2  |
+| `candidates`         | `DiscoveredCompanyPreview[]`            | Step 3  |
+| `selectedCompanies`  | `string[]`                              | Step 3  |
+| `results`            | `CompanyResult[]`                       | Step 4  |
+| `isExtracting`       | `boolean`                               | Loading |
+| `isDiscovering`      | `boolean`                               | Loading |
+| `isResearching`      | `boolean`                               | Loading |
+| `peopleResults`      | `Record<string, ApolloPersonPreview[]>` | Step 4  |
+| `isPeopleSearching`  | `boolean`                               | Loading |
+| `enrichingPersonIds` | `string[]`                              | Loading |
+| `abortController`    | `AbortController \| null`               | Cancel  |
 
 ### Key Actions
+
 - `extractICP()` → POST `/api/parse-icp` → sets ICP, advances to review
 - `discover()` → POST `/api/research` (phase 1) → sets candidates, advances to confirm
 - `research()` → POST `/api/research` (phase 2) → streams results + fires `searchPeopleAction()` in parallel
@@ -337,6 +350,7 @@ type ResearchStreamEvent =
 **File**: `lib/types.ts`
 
 ### ICPCriteria
+
 ```typescript
 {
   description: string
@@ -352,6 +366,7 @@ type ResearchStreamEvent =
 ```
 
 ### CompanySignal
+
 ```typescript
 {
   type: 'job_posting' | 'news' | 'funding' | 'product_launch' | 'other'
@@ -362,36 +377,37 @@ type ResearchStreamEvent =
 ```
 
 ### TargetContact
+
 ```typescript
 {
-  name: string
-  title: string
-  linkedin_url: string
-  email: string | null
-  is_decision_maker: boolean
+  name: string;
+  title: string;
+  linkedin_url: string;
+  email: string | null;
+  is_decision_maker: boolean;
 }
 ```
 
 ## Environment Variables
 
-| Variable           | Required | Purpose                          |
-| ------------------ | -------- | -------------------------------- |
-| `ANTHROPIC_API_KEY`| Yes      | All Claude AI tasks              |
-| `APOLLO_API_KEY`   | Yes      | Apollo company discovery         |
-| `PARALLEL_API_KEY` | No       | Alternative discovery (inactive) |
+| Variable            | Required | Purpose                          |
+| ------------------- | -------- | -------------------------------- |
+| `ANTHROPIC_API_KEY` | Yes      | All Claude AI tasks              |
+| `APOLLO_API_KEY`    | Yes      | Apollo company discovery         |
+| `PARALLEL_API_KEY`  | No       | Alternative discovery (inactive) |
 
 ## Cost Breakdown (Current)
 
-| Step              | Provider                   | Cost per request             |
-| ----------------- | -------------------------- | ---------------------------- |
-| ICP parsing       | Claude Haiku               | ~$0.001                      |
-| Apollo discovery  | Apollo Organizations API   | Free tier / per-credit       |
-| Company scoring   | Claude Haiku               | ~$0.005                      |
-| Research × N      | Claude Haiku + web_search  | ~$0.03/company               |
-| People search     | Apollo mixed_people API    | Free (obfuscated data)       |
-| People ranking    | Claude Haiku               | ~$0.001/company              |
-| Person enrich     | Apollo people/match        | 1 credit per person (on-demand) |
-| **Total (5 co.)** |                            | **~$0.17/request** + credits |
+| Step              | Provider                  | Cost per request                |
+| ----------------- | ------------------------- | ------------------------------- |
+| ICP parsing       | Claude Haiku              | ~$0.001                         |
+| Apollo discovery  | Apollo Organizations API  | Free tier / per-credit          |
+| Company scoring   | Claude Haiku              | ~$0.005                         |
+| Research × N      | Claude Haiku + web_search | ~$0.03/company                  |
+| People search     | Apollo mixed_people API   | Free (obfuscated data)          |
+| People ranking    | Claude Haiku              | ~$0.001/company                 |
+| Person enrich     | Apollo people/match       | 1 credit per person (on-demand) |
+| **Total (5 co.)** |                           | **~$0.17/request** + credits    |
 
 ## Cost Optimization History
 
