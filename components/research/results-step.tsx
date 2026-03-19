@@ -342,7 +342,7 @@ export function ResultsStep() {
               )}
             </div>
 
-            {displayCompanies.map((candidate, i) => {
+            {displayCompanies.map((candidate) => {
               const result = resultMap.get(candidate.name) ?? null;
               const isCurrentlyResearching = researchingCompany === candidate.name;
 
@@ -361,7 +361,6 @@ export function ResultsStep() {
                   preview={candidate}
                   result={result}
                   status={status}
-                  index={i}
                   onComposeEmail={setComposeParams}
                   people={peopleResults[candidate.name]}
                   isPeopleSearching={isPeopleSearching}

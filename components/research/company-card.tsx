@@ -242,7 +242,6 @@ export function CompanyRow({
   preview,
   result,
   status,
-  index,
   onComposeEmail,
   people,
   isPeopleSearching,
@@ -253,7 +252,6 @@ export function CompanyRow({
   preview: DiscoveredCompanyPreview;
   result: CompanyResult | null;
   status: RowStatus;
-  index: number;
   onComposeEmail?: (params: ComposeEmailParams) => void;
   people?: ApolloPersonPreview[];
   isPeopleSearching?: boolean;
