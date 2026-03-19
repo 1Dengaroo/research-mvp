@@ -351,7 +351,6 @@ export function EmailEditorPanel({
                   </SelectContent>
                 </Select>
               </div>
-
             </div>
 
             {/* Footer actions */}

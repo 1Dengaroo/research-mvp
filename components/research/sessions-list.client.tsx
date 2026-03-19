@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
 import { createSession, deleteSession } from '@/lib/api';
 import { formatRelativeDate } from '@/lib/utils';
 import type { ResearchSessionSummary } from '@/lib/types';
@@ -41,8 +42,8 @@ export function SessionsList({
     try {
       const session = await createSession();
       router.push(`/research/${session.id}`);
-    } catch (err) {
-      console.error('Failed to create session:', err);
+    } catch {
+      toast.error('Failed to create session');
       setIsCreating(false);
     }
   };
@@ -52,8 +53,9 @@ export function SessionsList({
     try {
       await deleteSession(id);
       setSessions((prev) => prev.filter((s) => s.id !== id));
-    } catch (err) {
-      console.error('Failed to delete session:', err);
+      toast.success('Session deleted');
+    } catch {
+      toast.error('Failed to delete session');
     } finally {
       setDeletingId(null);
     }

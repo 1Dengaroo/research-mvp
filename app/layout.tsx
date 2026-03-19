@@ -8,6 +8,7 @@ import { Header } from '@/components/header';
 import { AuthModal } from '@/components/auth/auth-modal.client';
 import { ProfileModal } from '@/components/profile-modal.client';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Toaster } from '@/components/ui/sonner';
 
 const sora = Sora({ subsets: ['latin'], variable: '--font-sora' });
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -41,6 +42,7 @@ export default function RootLayout({
               <AuthModal />
               <ProfileModal />
               {children}
+              <Toaster />
             </TooltipProvider>
           </FontProvider>
         </ThemeProvider>

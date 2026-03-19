@@ -28,6 +28,7 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { toast } from 'sonner';
 import { IcpPanelEditable } from './icp-panel-editable';
 import { createSession, deleteICP, updateICP, createICP, parseICP } from '@/lib/api';
 import { formatRelativeDate } from '@/lib/utils';
@@ -231,7 +232,9 @@ function CreateICPModal({
       setName(description.trim().slice(0, 40));
       setFormStep('review');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to analyze');
+      const msg = err instanceof Error ? err.message : 'Failed to analyze';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIsExtracting(false);
     }
@@ -242,9 +245,12 @@ function CreateICPModal({
     setIsSaving(true);
     try {
       const saved = await createICP(name.trim(), icp);
+      toast.success('Profile saved');
       onCreated(saved);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save');
+      const msg = err instanceof Error ? err.message : 'Failed to save';
+      setError(msg);
+      toast.error(msg);
       setIsSaving(false);
     }
   };
@@ -413,8 +419,9 @@ export function ICPList({
     try {
       await deleteICP(id);
       setICPs((prev) => prev.filter((i) => i.id !== id));
-    } catch (err) {
-      console.error('Failed to delete ICP:', err);
+      toast.success('Profile deleted');
+    } catch {
+      toast.error('Failed to delete profile');
     } finally {
       setDeletingId(null);
     }
@@ -424,8 +431,9 @@ export function ICPList({
     try {
       const updated = await updateICP(id, { name: newName });
       setICPs((prev) => prev.map((i) => (i.id === id ? updated : i)));
-    } catch (err) {
-      console.error('Failed to rename ICP:', err);
+      toast.success('Profile renamed');
+    } catch {
+      toast.error('Failed to rename profile');
     }
   };
 
@@ -439,8 +447,8 @@ export function ICPList({
         step: 'review'
       });
       router.push(`/research/${session.id}`);
-    } catch (err) {
-      console.error('Failed to create session from ICP:', err);
+    } catch {
+      toast.error('Failed to start research');
       setUsingId(null);
     }
   };

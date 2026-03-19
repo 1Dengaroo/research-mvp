@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Loader2, Send, Check, Search, Save } from 'lucide-react';
+import { Loader2, Send, Search, Save } from 'lucide-react';
+import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +16,6 @@ function SaveICPButton() {
   const saveICP = useICPStore((s) => s.saveICP);
   const [naming, setNaming] = useState(false);
   const [name, setName] = useState('');
-  const [saved, setSaved] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const defaultName = icp?.description?.slice(0, 40).trim() || '';
@@ -32,23 +32,13 @@ function SaveICPButton() {
     if (!finalName || !icp) return;
     try {
       await saveICP(finalName, icp);
-      setSaved(true);
+      toast.success('Saved to Profiles');
       setNaming(false);
       setName('');
-      setTimeout(() => setSaved(false), 3000);
-    } catch (err) {
-      console.error('Failed to save ICP:', err);
+    } catch {
+      toast.error('Failed to save profile');
     }
   };
-
-  if (saved) {
-    return (
-      <span className="text-primary flex items-center gap-1 text-xs">
-        <Check className="size-3" />
-        Saved to Profiles
-      </span>
-    );
-  }
 
   if (naming) {
     return (
@@ -68,7 +58,7 @@ function SaveICPButton() {
           className="h-6 w-44 text-xs"
         />
         <Button size="icon-xs" label="Save" onClick={handleSave}>
-          <Check className="size-3" />
+          <Save className="size-3" />
         </Button>
       </div>
     );
