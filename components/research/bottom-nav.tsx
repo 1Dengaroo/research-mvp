@@ -160,7 +160,13 @@ export function BottomNav() {
               <Button
                 size="sm"
                 onClick={approveStrategy}
-                disabled={isStrategizing || strategyMessages.length === 0}
+                disabled={
+                  isStrategizing ||
+                  !(
+                    strategyMessages.length > 0 ||
+                    (icp && (icp.description || icp.industry_keywords.length > 0))
+                  )
+                }
               >
                 Find Companies
                 <ChevronRight className="size-4" />
