@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle, XCircle, Mail } from 'lucide-react';
+import Link from 'next/link';
+import { CheckCircle, XCircle, Mail, ExternalLink } from 'lucide-react';
 import type { SentEmail } from '@/lib/types';
 
 function formatDate(dateStr: string) {
@@ -70,9 +71,21 @@ export function SentEmailsPage({ emails }: { emails: SentEmail[] }) {
                   </div>
                   <p className="text-muted-foreground mt-0.5 truncate text-xs">{email.subject}</p>
                 </div>
-                <span className="text-muted-foreground shrink-0 text-xs">
-                  {formatDate(email.created_at)}
-                </span>
+                <div className="flex shrink-0 items-center gap-2">
+                  {email.session_id && (
+                    <Link
+                      href={`/research/${email.session_id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                      title="View research session"
+                    >
+                      <ExternalLink className="size-3" />
+                    </Link>
+                  )}
+                  <span className="text-muted-foreground text-xs">
+                    {formatDate(email.created_at)}
+                  </span>
+                </div>
               </button>
             ))}
           </div>
@@ -101,6 +114,15 @@ export function SentEmailsPage({ emails }: { emails: SentEmail[] }) {
                     {selected.body}
                   </div>
                 </div>
+                {selected.session_id && (
+                  <Link
+                    href={`/research/${selected.session_id}`}
+                    className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs transition-colors"
+                  >
+                    <ExternalLink className="size-3" />
+                    View Session
+                  </Link>
+                )}
                 {selected.error_message && (
                   <p className="text-destructive text-xs">Error: {selected.error_message}</p>
                 )}

@@ -158,6 +158,7 @@ export interface ResearchSession {
   selected_companies: string[];
   results: CompanyResult[];
   people_results: Record<string, ApolloPersonPreview[]>;
+  email_sequences: Record<string, GeneratedEmailSequence>;
   status: 'in_progress' | 'completed';
   created_at: string;
   updated_at: string;
@@ -170,6 +171,16 @@ export interface ResearchSessionSummary {
   status: 'in_progress' | 'completed';
   icp_description: string | null;
   company_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EmailSignature {
+  id: string;
+  user_id: string;
+  name: string;
+  body: string;
+  is_default: boolean;
   created_at: string;
   updated_at: string;
 }

@@ -29,6 +29,7 @@ lib/services/pipeline.ts           ← Pipeline orchestrator
 lib/services/gmail.ts              ← Gmail OAuth + sending
 lib/store/research-store.ts        ← Zustand store (all state + actions + session persistence)
 lib/store/icp-store.ts             ← Saved ICP library state
+lib/store/signature-store.ts       ← Email signature CRUD state
 lib/store/profile-store.ts         ← Profile modal state
 lib/api.ts                         ← Client-side fetch wrappers
 middleware.ts                      ← Supabase auth + route protection

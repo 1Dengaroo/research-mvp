@@ -3,7 +3,8 @@ import type { CompanyResult, TargetContact, ICPCriteria } from '@/lib/types';
 export function buildEmailGenerationPrompt(
   company: CompanyResult,
   contact: TargetContact,
-  icp: ICPCriteria
+  icp: ICPCriteria,
+  senderFirstName?: string
 ): string {
   const signalsSummary = company.signals.map((s) => `- ${s.type}: ${s.title}`).join('\n');
   const contactFirstName = contact.name.split(' ')[0];
@@ -34,7 +35,7 @@ STEP 1 — Full email (under 120 words):
 - Tie that observation to a likely challenge or pain point they face
 - Position the sender's product as relevant to that challenge in 1-2 sentences
 - End with a low-friction question (NOT "want to chat?" or "can I get 15 min?")
-- Use "Best," or similar casual sign-off, then a placeholder line "[Your name]"
+- Use "Best," or similar casual sign-off, then a placeholder line "${senderFirstName ?? '[Your name]'}"
 
 STEP 2 — Follow-up (under 45 words):
 - Include "Hey ${contactFirstName} —" greeting
@@ -43,7 +44,7 @@ STEP 2 — Follow-up (under 45 words):
 - Do NOT repeat the same angle from step 1
 - Do NOT ask for a meeting
 - End naturally, optionally with a soft offer to share more
-- Sign off with "Best," and "[Your name]"
+- Sign off with "Best," and "${senderFirstName ?? '[Your name]'}"
 
 STEP 3 — Follow-up (under 60 words):
 - Include "Hey ${contactFirstName}," greeting
@@ -51,7 +52,7 @@ STEP 3 — Follow-up (under 60 words):
 - Try a different angle from steps 1 and 2: cost savings, developer experience, speed, or a different use case
 - Keep it casual, 2-3 sentences max
 - End with a simple question, NOT a meeting ask
-- Sign off with "Best," and "[Your name]"
+- Sign off with "Best," and "${senderFirstName ?? '[Your name]'}"
 
 Return ONLY valid JSON with this exact shape:
 {

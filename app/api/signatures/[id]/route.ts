@@ -1,31 +1,6 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const { data, error } = await supabase
-    .from('research_sessions')
-    .select('*')
-    .eq('id', id)
-    .eq('user_id', user.id)
-    .single();
-
-  if (error) {
-    return Response.json({ error: error.message }, { status: 404 });
-  }
-
-  return Response.json(data);
-}
-
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
@@ -38,36 +13,34 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   const body: Record<string, unknown> = await req.json();
-  const allowed = [
-    'name',
-    'step',
-    'transcript',
-    'icp',
-    'strategy_messages',
-    'candidates',
-    'selected_companies',
-    'results',
-    'people_results',
-    'email_sequences',
-    'status'
-  ];
-
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
-  for (const key of allowed) {
-    if (key in body) updates[key] = body[key];
+  if (typeof body.name === 'string') updates.name = body.name;
+  if (typeof body.body === 'string') updates.body = body.body;
+  if (typeof body.is_default === 'boolean') {
+    // Clear default on all other signatures first
+    if (body.is_default) {
+      await supabase
+        .from('email_signatures')
+        .update({ is_default: false, updated_at: new Date().toISOString() })
+        .eq('user_id', user.id)
+        .neq('id', id);
+    }
+    updates.is_default = body.is_default;
   }
 
-  const { error } = await supabase
-    .from('research_sessions')
+  const { data, error } = await supabase
+    .from('email_signatures')
     .update(updates)
     .eq('id', id)
-    .eq('user_id', user.id);
+    .eq('user_id', user.id)
+    .select()
+    .single();
 
   if (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
 
-  return Response.json({ success: true });
+  return Response.json(data);
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -82,7 +55,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   }
 
   const { error } = await supabase
-    .from('research_sessions')
+    .from('email_signatures')
     .delete()
     .eq('id', id)
     .eq('user_id', user.id);

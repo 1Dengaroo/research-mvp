@@ -25,6 +25,13 @@ ICP                Industry, company size, funding stage, hiring patterns, tech 
 Outreach Hooks     Signal-specific email openers referencing real company activity
 ```
 
+## Email Workflow
+
+- **Generation**: 3-email sequence generated via Claude, personalized per contact + signals. Sender's first name from auth profile replaces `[Your name]`.
+- **Persistence**: Sequences cached in store and persisted to session (`email_sequences` column). Reopening editor restores previous sequence without re-generating.
+- **Signatures**: Managed in Settings → Signatures. One default auto-selected. Appended to email body on send.
+- **Sending**: Gmail OAuth. Sent emails link back to originating session via "View Session" in sent emails page.
+
 ## Limitations (MVP)
 
 - No team collaboration

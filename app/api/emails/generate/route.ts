@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { serviceConfig } from '@/lib/services/config';
 import { buildEmailGenerationPrompt } from '@/lib/prompts/email-generation';
+import { createClient } from '@/lib/supabase/server';
 import type {
   CompanyResult,
   TargetContact,
@@ -27,8 +28,16 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const supabase = await createClient();
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
+    const fullName =
+      typeof user?.user_metadata?.full_name === 'string' ? user.user_metadata.full_name : '';
+    const senderFirstName = fullName.split(' ')[0] || undefined;
+
     const anthropic = new Anthropic();
-    const prompt = buildEmailGenerationPrompt(company, contact, icp);
+    const prompt = buildEmailGenerationPrompt(company, contact, icp, senderFirstName);
 
     const message = await anthropic.messages.create({
       model: serviceConfig.emailModel,

@@ -7,8 +7,10 @@ Saves ICPs, research sessions, and tracks contacted companies in Supabase.
 Three tables added via `supabase/migrations/20260318_persistence_tables.sql`:
 
 - **`saved_icps`** — User's saved ICP profiles. Fields: `id`, `user_id`, `name`, `icp` (jsonb), timestamps.
-- **`research_sessions`** — Full pipeline state snapshots. Fields: `id`, `user_id`, `name`, `step`, `transcript`, `icp`, `strategy_messages`, `candidates`, `selected_companies`, `results`, `people_results`, `status`, timestamps.
+- **`research_sessions`** — Full pipeline state snapshots. Fields: `id`, `user_id`, `name`, `step`, `transcript`, `icp`, `strategy_messages`, `candidates`, `selected_companies`, `results`, `people_results`, `email_sequences` (jsonb), `status`, timestamps.
 - **`contacted_companies`** — Tracks which contacts have been emailed. Fields: `id`, `user_id`, `company_name`, `contact_email`, `contact_name`, `session_id`, `sent_email_id`, timestamps. Unique on `(user_id, company_name, contact_email)`.
+
+- **`email_signatures`** — User's email signatures. Fields: `id`, `user_id`, `name`, `body`, `is_default`, timestamps. One default per user.
 
 All tables have RLS policies scoped to `auth.uid() = user_id`.
 
@@ -19,7 +21,8 @@ Sessions are created upfront from the sessions list (`/research`), then saved au
 1. **After ICP extraction** — Updates session name from ICP description, saves state (`PATCH /api/sessions/:id`)
 2. **After company discovery** — Saves candidates and selections
 3. **After each company research result** — Saves incrementally
-4. **After research completes** — Marks session `status: 'completed'`
+4. **After email sequence generated/edited** — Saves email sequences keyed by `companyName::contactEmail`
+5. **After research completes** — Marks session `status: 'completed'`
 
 Save state is shown via a `SaveIndicator` component (spinner while saving, checkmark when saved).
 
@@ -46,13 +49,21 @@ Save state is shown via a `SaveIndicator` component (spinner while saving, check
 - On dashboard mount, `loadContactedCompanies()` fetches all contacts and builds a `Map<company_name, email[]>`.
 - `CompanyRow` receives `contactedEmails` prop — shows "Contacted" badge on company header, "Sent" indicator on specific contacts.
 
+## Signature Management
+
+- **CRUD**: Settings → Signatures tab. Create, edit, delete, set default.
+- **Store**: `lib/store/signature-store.ts` — `useSignatureStore` with `loadSignatures()`, `createSignature()`, `updateSignature()`, `deleteSignature()`, `getDefault()`.
+- **Email editor**: Signature selector dropdown. Default signature auto-selected. Appended to email body on send.
+
 ## API Routes
 
-| Route                | Methods            | Purpose                                     |
-| -------------------- | ------------------ | ------------------------------------------- |
-| `/api/icps`          | GET, POST          | List all ICPs, create new ICP               |
-| `/api/icps/[id]`     | PATCH, DELETE      | Update or delete ICP                        |
-| `/api/sessions`      | GET, POST          | List session summaries, create session      |
-| `/api/sessions/[id]` | GET, PATCH, DELETE | Load full session, auto-save, delete        |
-| `/api/contacts`      | GET                | List all contacted companies for user       |
-| `/api/emails/send`   | POST               | (Modified) Also upserts contacted_companies |
+| Route                  | Methods            | Purpose                                     |
+| ---------------------- | ------------------ | ------------------------------------------- |
+| `/api/icps`            | GET, POST          | List all ICPs, create new ICP               |
+| `/api/icps/[id]`       | PATCH, DELETE      | Update or delete ICP                        |
+| `/api/sessions`        | GET, POST          | List session summaries, create session      |
+| `/api/sessions/[id]`   | GET, PATCH, DELETE | Load full session, auto-save, delete        |
+| `/api/signatures`      | GET, POST          | List all signatures, create new             |
+| `/api/signatures/[id]` | PATCH, DELETE      | Update or delete signature                  |
+| `/api/contacts`        | GET                | List all contacted companies for user       |
+| `/api/emails/send`     | POST               | (Modified) Also upserts contacted_companies |

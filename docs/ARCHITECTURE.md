@@ -14,6 +14,7 @@
 └── api/                API routes (SSE, REST)
     ├── icps/           Saved ICP CRUD
     ├── sessions/       Session CRUD + auto-save
+    ├── signatures/     Email signature CRUD
     └── contacts/       Contacted companies tracking
 
 /components             UI layer (feature-organized)
@@ -22,7 +23,7 @@
 ├── settings/           Settings page
 ├── auth/               Login/signup modals
 ├── landing/            Marketing components
-├── profile-modal       Profile/settings modal (appearance, connections, account)
+├── profile-modal       Profile/settings modal (appearance, connections, signatures, account)
 └── ui/                 shadcn/ui primitives
 
 /lib                    Core business logic
@@ -81,6 +82,6 @@ Claude Haiku             ICP parsing, scoring, research, ranking   ~$0.03/compan
 Apollo Organizations     Company discovery                         Free tier
 Apollo People Search     Contact search (obfuscated)               Free
 Apollo People Match      Contact enrichment                        1 credit/person
-Supabase                 Auth + sessions + ICPs + contacts + emails Free tier
+Supabase                 Auth + sessions + ICPs + contacts + emails + signatures Free tier
 Gmail API                Email sending via OAuth (gmail.send)       Free
 ```
