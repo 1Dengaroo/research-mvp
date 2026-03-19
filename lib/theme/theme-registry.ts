@@ -36,42 +36,6 @@ export const themes: ThemeDefinition[] = [
       tertiary: 'hsl(220, 50%, 58%)'
     }
   },
-  {
-    id: 'claude',
-    name: 'Claude',
-    description: 'Warm sand & terracotta',
-    isDark: true,
-    previewColors: {
-      bg: '#1a1614',
-      primary: 'hsl(24, 70%, 55%)',
-      secondary: 'hsl(15, 50%, 52%)',
-      tertiary: 'hsl(70, 30%, 42%)'
-    }
-  },
-  {
-    id: 'print',
-    name: 'Print',
-    description: 'Paper and ink',
-    isDark: false,
-    previewColors: {
-      bg: '#f2efea',
-      primary: 'hsl(218, 55%, 48%)',
-      secondary: 'hsl(200, 40%, 42%)',
-      tertiary: 'hsl(195, 25%, 45%)'
-    }
-  },
-  {
-    id: 'dusk',
-    name: 'Dusk',
-    description: 'Indigo, copper, and sage',
-    isDark: false,
-    previewColors: {
-      bg: '#f6f5f3',
-      primary: 'hsl(245, 42%, 40%)',
-      secondary: 'hsl(18, 48%, 52%)',
-      tertiary: 'hsl(155, 28%, 44%)'
-    }
-  }
 ];
 
 export const themeIds = themes.map((t) => t.id);

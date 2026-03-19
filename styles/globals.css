@@ -5,9 +5,6 @@
 /* Theme files */
 @import './themes/light.css';
 @import './themes/dark.css';
-@import './themes/claude.css';
-@import './themes/print.css';
-@import './themes/dusk.css';
 
 @custom-variant dark (&:is(.dark *));
 
