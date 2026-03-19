@@ -6,7 +6,68 @@ import { Card, CardContent } from '@/components/ui/card';
 import { CompanyRow, GRID_COLS } from './company-card';
 import { LoadingStatus } from './loading-status';
 import { useResearchStore } from '@/lib/store/research-store';
-import type { ICPCriteria, DiscoveredCompanyPreview } from '@/lib/types';
+import type { ICPCriteria, CompanyResult, DiscoveredCompanyPreview } from '@/lib/types';
+
+const SIGNAL_TYPES = ['job_posting', 'funding', 'news', 'product_launch'] as const;
+const SIGNAL_LABELS: Record<string, string> = {
+  job_posting: 'Job Posting',
+  funding: 'Funding',
+  news: 'News',
+  product_launch: 'Product Launch'
+};
+
+const SORT_OPTIONS = new Set(['signals', 'funding', 'name', 'contacted']);
+type SortOption = 'signals' | 'funding' | 'name' | 'contacted';
+
+function isSortOption(value: string): value is SortOption {
+  return SORT_OPTIONS.has(value);
+}
+
+function FilterSortBar({
+  activeFilters,
+  onToggleFilter,
+  sort,
+  onSortChange
+}: {
+  activeFilters: Set<string>;
+  onToggleFilter: (type: string) => void;
+  sort: SortOption;
+  onSortChange: (sort: SortOption) => void;
+}) {
+  return (
+    <div className="mb-3 flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap gap-1.5">
+        {SIGNAL_TYPES.map((type) => (
+          <button
+            key={type}
+            onClick={() => onToggleFilter(type)}
+            className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
+              activeFilters.has(type)
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {SIGNAL_LABELS[type]}
+          </button>
+        ))}
+      </div>
+      <div className="ml-auto">
+        <select
+          value={sort}
+          onChange={(e) => {
+            if (isSortOption(e.target.value)) onSortChange(e.target.value);
+          }}
+          className="bg-muted text-foreground rounded-md border-none px-2.5 py-1 text-xs"
+        >
+          <option value="signals">Signal Count</option>
+          <option value="funding">Funding Stage</option>
+          <option value="name">Company Name (A-Z)</option>
+          <option value="contacted">Contacted First</option>
+        </select>
+      </div>
+    </div>
+  );
+}
 
 function ICPSummary({ icp, onEditCriteria }: { icp: ICPCriteria; onEditCriteria?: () => void }) {
   const [expanded, setExpanded] = useState(false);
@@ -105,6 +166,47 @@ function ICPSummary({ icp, onEditCriteria }: { icp: ICPCriteria; onEditCriteria?
   );
 }
 
+const FUNDING_ORDER: Record<string, number> = {
+  'Series D+': 0,
+  'Series C': 1,
+  'Series B': 2,
+  'Series A': 3,
+  Seed: 4,
+  'Pre-Seed': 5
+};
+
+function sortCompanies(
+  companies: DiscoveredCompanyPreview[],
+  resultMap: Map<string, CompanyResult>,
+  sort: SortOption,
+  contactedEmails: (name: string) => string[]
+): DiscoveredCompanyPreview[] {
+  const sorted = [...companies];
+  sorted.sort((a, b) => {
+    const ra = resultMap.get(a.name);
+    const rb = resultMap.get(b.name);
+    switch (sort) {
+      case 'signals':
+        return (rb?.signals.length ?? 0) - (ra?.signals.length ?? 0);
+      case 'funding': {
+        const fa = FUNDING_ORDER[ra?.funding_stage ?? ''] ?? 99;
+        const fb = FUNDING_ORDER[rb?.funding_stage ?? ''] ?? 99;
+        return fa - fb;
+      }
+      case 'name':
+        return a.name.localeCompare(b.name);
+      case 'contacted': {
+        const ca = contactedEmails(a.name).length > 0 ? 0 : 1;
+        const cb = contactedEmails(b.name).length > 0 ? 0 : 1;
+        return ca - cb;
+      }
+      default:
+        return 0;
+    }
+  });
+  return sorted;
+}
+
 export function ResultsStep() {
   const icp = useResearchStore((s) => s.icp);
   const results = useResearchStore((s) => s.results);
@@ -121,23 +223,23 @@ export function ResultsStep() {
   const enrichingPersonIds = useResearchStore((s) => s.enrichingPersonIds);
   const enrichPersonAction = useResearchStore((s) => s.enrichPersonAction);
   const getContactedEmails = useResearchStore((s) => s.getContactedEmails);
+  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set(SIGNAL_TYPES));
+  const [sort, setSort] = useState<SortOption>('signals');
 
   const resultMap = useMemo(() => {
-    const map = new Map<string, (typeof results)[number]>();
+    const map = new Map<string, CompanyResult>();
     for (const r of results) {
       map.set(r.company_name, r);
     }
     return map;
   }, [results]);
 
-  // Show union of: all companies with results + selected candidates not yet researched
-  const displayCompanies = useMemo(() => {
+  const allCompanies = useMemo(() => {
     const seen = new Set<string>();
     const display: DiscoveredCompanyPreview[] = [];
     const candidateMap = new Map(candidates.map((c) => [c.name, c]));
     const selectedSet = new Set(selectedCompanies);
 
-    // 1. All companies with a result (always visible)
     for (const r of results) {
       seen.add(r.company_name);
       const candidate = candidateMap.get(r.company_name);
@@ -151,7 +253,6 @@ export function ResultsStep() {
       );
     }
 
-    // 2. Selected candidates not yet researched (pending/in-progress)
     for (const c of candidates) {
       if (selectedSet.has(c.name) && !seen.has(c.name)) {
         seen.add(c.name);
@@ -162,8 +263,35 @@ export function ResultsStep() {
     return display;
   }, [candidates, selectedCompanies, results]);
 
+  const displayCompanies = useMemo(() => {
+    const allActive = activeFilters.size === SIGNAL_TYPES.length;
+
+    // If all active, show everything; if none, show nothing
+    const filtered = allActive
+      ? allCompanies
+      : allCompanies.filter((c) => {
+          const result = resultMap.get(c.name);
+          if (!result) return true; // show pending companies always
+          return result.signals.some((s) => activeFilters.has(s.type));
+        });
+
+    return sortCompanies(filtered, resultMap, sort, getContactedEmails);
+  }, [allCompanies, activeFilters, sort, resultMap, getContactedEmails]);
+
+  const toggleFilter = (type: string) => {
+    setActiveFilters((prev) => {
+      const next = new Set(prev);
+      if (next.has(type)) {
+        next.delete(type);
+      } else {
+        next.add(type);
+      }
+      return next;
+    });
+  };
+
   const completedCount = results.length;
-  const totalCount = displayCompanies.length;
+  const totalCount = allCompanies.length;
 
   return (
     <>
@@ -181,7 +309,7 @@ export function ResultsStep() {
         <LoadingStatus statusMessage={statusMessage} subtitle="This usually takes 30–60 seconds" />
       )}
 
-      {displayCompanies.length > 0 && (
+      {allCompanies.length > 0 && (
         <div>
           <div className="mb-3 flex items-baseline justify-between">
             <h3 className="text-sm font-medium">
@@ -190,6 +318,15 @@ export function ResultsStep() {
                 : `${completedCount} companies researched`}
             </h3>
           </div>
+
+          {!isResearching && results.length > 0 && (
+            <FilterSortBar
+              activeFilters={activeFilters}
+              onToggleFilter={toggleFilter}
+              sort={sort}
+              onSortChange={setSort}
+            />
+          )}
 
           <div className="border-border bg-card overflow-x-auto rounded-[var(--card-radius)] border">
             <div className={`bg-muted/50 border-border grid ${GRID_COLS} border-b`}>
@@ -238,7 +375,7 @@ export function ResultsStep() {
         </div>
       )}
 
-      {!isResearching && !error && displayCompanies.length === 0 && (
+      {!isResearching && !error && allCompanies.length === 0 && (
         <div className="py-12 text-center">
           <p className="text-muted-foreground text-sm">
             No matching companies found. Try editing your ICP criteria.

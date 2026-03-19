@@ -7,7 +7,8 @@ import {
   searchPeople,
   enrichPerson,
   updateSession,
-  listContactedCompanies
+  listContactedCompanies,
+  listResearchedCompanies
 } from '@/lib/api';
 import type {
   ICPCriteria,
@@ -15,7 +16,8 @@ import type {
   ComposeEmailParams,
   DiscoveredCompanyPreview,
   ApolloPersonPreview,
-  StrategyMessage
+  StrategyMessage,
+  GeneratedEmailSequence
 } from '@/lib/types';
 
 type Step = 'input' | 'review' | 'confirm' | 'results';
@@ -66,6 +68,7 @@ interface ResearchState {
 
   // Email composer
   composeParams: ComposeEmailParams | null;
+  emailSequences: Record<string, GeneratedEmailSequence>;
 
   // Abort controller (not serializable, but fine for zustand)
   abortController: AbortController | null;
@@ -78,6 +81,9 @@ interface ResearchState {
 
   // Contact tracking
   contactedCompanies: Map<string, string[]>;
+
+  // Cross-session dedup
+  previouslyResearched: Set<string>;
 }
 
 interface ResearchActions {
@@ -113,6 +119,12 @@ interface ResearchActions {
 
   // Email
   setComposeParams: (params: ComposeEmailParams | null) => void;
+  saveEmailSequence: (
+    companyName: string,
+    contactEmail: string,
+    sequence: GeneratedEmailSequence
+  ) => void;
+  getEmailSequence: (companyName: string, contactEmail: string) => GeneratedEmailSequence | null;
 
   // Session persistence
   saveSession: () => Promise<void>;
@@ -122,6 +134,9 @@ interface ResearchActions {
   loadContactedCompanies: () => Promise<void>;
   isContactContacted: (companyName: string, email: string) => boolean;
   getContactedEmails: (companyName: string) => string[];
+
+  // Cross-session dedup
+  loadPreviouslyResearched: () => Promise<void>;
 }
 
 export type ResearchStore = ResearchState & ResearchActions;
@@ -171,12 +186,14 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
   statusMessage: '',
   error: null,
   composeParams: null,
+  emailSequences: {},
   abortController: null,
   sessionId: null,
   sessionName: 'Untitled Session',
   isSaving: false,
   lastSavedAt: null,
   contactedCompanies: new Map(),
+  previouslyResearched: new Set(),
 
   // Navigation
   setStep: (step) => set({ step }),
@@ -447,6 +464,7 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
         peopleResults: { ...state.peopleResults, ...newPeopleResults },
         isPeopleSearching: false
       }));
+      get().saveSession();
     } catch (err) {
       console.error('People search failed:', err);
       set({ isPeopleSearching: false });
@@ -454,8 +472,12 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
   },
 
   enrichPersonAction: async (personId: string, companyName: string) => {
-    const { enrichingPersonIds } = get();
+    const { enrichingPersonIds, peopleResults } = get();
     if (enrichingPersonIds.includes(personId)) return;
+
+    // Skip API call if already enriched (saves Apollo credits)
+    const existingPerson = peopleResults[companyName]?.find((p) => p.apollo_person_id === personId);
+    if (existingPerson?.is_enriched) return;
 
     set({ enrichingPersonIds: [...enrichingPersonIds, personId] });
 
@@ -482,6 +504,7 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
           enrichingPersonIds: state.enrichingPersonIds.filter((id) => id !== personId)
         };
       });
+      get().saveSession();
     } catch (err) {
       console.error('Person enrichment failed:', err);
       set((state) => ({
@@ -509,6 +532,7 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
       error: null,
       statusMessage: '',
       composeParams: null,
+      emailSequences: {},
       sessionId: null,
       sessionName: 'Untitled Session',
       isSaving: false,
@@ -524,6 +548,19 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
   // Email
   setComposeParams: (params) => set({ composeParams: params }),
 
+  saveEmailSequence: (companyName, contactEmail, sequence) => {
+    const key = `${companyName}::${contactEmail}`;
+    set((state) => ({
+      emailSequences: { ...state.emailSequences, [key]: sequence }
+    }));
+    get().saveSession();
+  },
+
+  getEmailSequence: (companyName, contactEmail) => {
+    const key = `${companyName}::${contactEmail}`;
+    return get().emailSequences[key] ?? null;
+  },
+
   // Session persistence
   saveSession: async () => {
     const {
@@ -537,6 +574,7 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
       selectedCompanies,
       results,
       peopleResults,
+      emailSequences,
       sessionName
     } = get();
     if (!sessionId || isSaving) return;
@@ -552,7 +590,8 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
         candidates,
         selected_companies: selectedCompanies,
         results,
-        people_results: peopleResults
+        people_results: peopleResults,
+        email_sequences: emailSequences
       });
       set({ lastSavedAt: new Date().toISOString() });
     } catch (err) {
@@ -587,5 +626,16 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
 
   getContactedEmails: (companyName: string) => {
     return get().contactedCompanies.get(companyName) ?? [];
+  },
+
+  // Cross-session dedup
+  loadPreviouslyResearched: async () => {
+    try {
+      const { sessionId } = get();
+      const companies = await listResearchedCompanies(sessionId ?? undefined);
+      set({ previouslyResearched: new Set(companies) });
+    } catch (err) {
+      console.error('Failed to load previously researched:', err);
+    }
   }
 }));

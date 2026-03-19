@@ -58,6 +58,7 @@ function hydrateStore(session: ResearchSession) {
     selectedCompanies: session.selected_companies || [],
     results: session.results || [],
     peopleResults: session.people_results || {},
+    emailSequences: session.email_sequences || {},
     lastSavedAt: session.updated_at,
     error: null
   });
@@ -81,17 +82,19 @@ export function ResearchDashboard({ session }: { session: ResearchSession }) {
   const strategyMessages = useResearchStore((s) => s.strategyMessages);
   const research = useResearchStore((s) => s.research);
   const loadContactedCompanies = useResearchStore((s) => s.loadContactedCompanies);
+  const loadPreviouslyResearched = useResearchStore((s) => s.loadPreviouslyResearched);
   const sessionId = useResearchStore((s) => s.sessionId);
   const sessionName = useResearchStore((s) => s.sessionName);
 
   const initRef = useRef(false);
 
-  // Load contacted companies on mount (async, doesn't affect initial render)
+  // Load contacted companies + previously researched on mount
   useEffect(() => {
     if (initRef.current) return;
     initRef.current = true;
     loadContactedCompanies();
-  }, [loadContactedCompanies]);
+    loadPreviouslyResearched();
+  }, [loadContactedCompanies, loadPreviouslyResearched]);
 
   // Cmd+Enter / Ctrl+Enter to advance
   useEffect(() => {
