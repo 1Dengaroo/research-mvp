@@ -10,8 +10,8 @@ interface ProfileStore {
 
 export const useProfileStore = create<ProfileStore>((set) => ({
   open: false,
-  tab: 'appearance',
-  openProfile: (tab) => set({ open: true, tab: tab ?? 'appearance' }),
+  tab: 'profile',
+  openProfile: (tab) => set({ open: true, tab: tab ?? 'profile' }),
   closeProfile: () => set({ open: false }),
   setTab: (tab) => set({ tab })
 }));

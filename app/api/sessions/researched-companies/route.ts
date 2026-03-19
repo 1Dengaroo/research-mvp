@@ -31,10 +31,11 @@ export async function GET(req: NextRequest) {
 
   const companies = new Set<string>();
   for (const row of data ?? []) {
-    const results = row.results as { company_name: string }[] | null;
-    if (Array.isArray(results)) {
-      for (const r of results) {
-        if (r.company_name) companies.add(r.company_name);
+    const results: unknown = row.results;
+    if (!Array.isArray(results)) continue;
+    for (const r of results) {
+      if (r && typeof r === 'object' && 'company_name' in r && typeof r.company_name === 'string') {
+        companies.add(r.company_name);
       }
     }
   }
