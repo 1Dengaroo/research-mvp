@@ -103,9 +103,6 @@ interface ResearchActions {
   // Step 3
   discover: () => Promise<void>;
   setSelectedCompanies: (companies: string[]) => void;
-  toggleCompany: (name: string) => void;
-  selectAll: () => void;
-  deselectAll: () => void;
 
   // Step 4
   research: () => Promise<void>;
@@ -132,7 +129,6 @@ interface ResearchActions {
 
   // Contact tracking
   loadContactedCompanies: () => Promise<void>;
-  isContactContacted: (companyName: string, email: string) => boolean;
   getContactedEmails: (companyName: string) => string[];
 
   // Cross-session dedup
@@ -336,24 +332,6 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
   },
 
   setSelectedCompanies: (companies) => set({ selectedCompanies: companies }),
-
-  toggleCompany: (name) => {
-    const { selectedCompanies } = get();
-    const selected = new Set(selectedCompanies);
-    if (selected.has(name)) {
-      selected.delete(name);
-    } else {
-      selected.add(name);
-    }
-    set({ selectedCompanies: [...selected] });
-  },
-
-  selectAll: () => {
-    const { candidates } = get();
-    set({ selectedCompanies: candidates.map((c) => c.name) });
-  },
-
-  deselectAll: () => set({ selectedCompanies: [] }),
 
   // Step 4: Research
   research: async () => {
@@ -617,11 +595,6 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
     } catch (err) {
       console.error('Failed to load contacted companies:', err);
     }
-  },
-
-  isContactContacted: (companyName: string, email: string) => {
-    const emails = get().contactedCompanies.get(companyName);
-    return emails?.includes(email) ?? false;
   },
 
   getContactedEmails: (companyName: string) => {

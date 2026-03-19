@@ -147,17 +147,6 @@ export function EmailEditorPanel({
     []
   );
 
-  // Persist edits to store when panel closes
-  useEffect(() => {
-    if (open || !params || !steps) return;
-    const updated = [...steps] as [GeneratedEmail, GeneratedEmail, GeneratedEmail];
-    updated[activeStep] = { subject, body };
-    useResearchStore
-      .getState()
-      .saveEmailSequence(params.company.company_name, contactKey, { emails: updated });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
-
   // Generate sequence when panel opens — restore from store if available
   useEffect(() => {
     if (!params || !open) return;
@@ -265,11 +254,23 @@ export function EmailEditorPanel({
     }
   }, [params, toEmail, subject, body, selectedSignature]);
 
+  // Persist edits to store + DB on close
+  const handleClose = useCallback(() => {
+    if (steps && params) {
+      const updated = [...steps] as [GeneratedEmail, GeneratedEmail, GeneratedEmail];
+      updated[activeStep] = { subject, body };
+      useResearchStore
+        .getState()
+        .saveEmailSequence(params.company.company_name, contactKey, { emails: updated });
+    }
+    onClose();
+  }, [steps, params, activeStep, subject, body, contactKey, onClose]);
+
   const company = params?.company;
   const contact = params?.contact;
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
       <DialogContent size="xl" className="flex h-[680px] flex-col gap-0 p-0">
         <DialogHeader className="border-border shrink-0 border-b px-6 py-4">
           <div className="flex items-center justify-between pr-8">
