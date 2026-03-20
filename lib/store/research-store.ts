@@ -311,13 +311,15 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
       const merged = new Map<string, DiscoveredCompanyPreview>();
       for (const c of existing) merged.set(c.name, c);
       for (const c of found) merged.set(c.name, c);
+      const MAX_AUTO_SELECTED = 5;
       const mergedCandidates = [...merged.values()];
-      // Auto-select new discoveries while preserving existing selections
+      // Auto-select top 5 from new discoveries, preserve existing selections
       const newNames = found.map((c) => c.name);
       const selectedSet = new Set([...existingSelected, ...newNames]);
+      const cappedSelected = [...selectedSet].slice(0, MAX_AUTO_SELECTED);
       set({
         candidates: mergedCandidates,
-        selectedCompanies: [...selectedSet],
+        selectedCompanies: cappedSelected,
         isDiscovering: false
       });
       // Auto-save after discovery

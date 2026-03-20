@@ -63,15 +63,10 @@ function isScoredEntryArray(value: unknown): value is ScoredEntry[] {
 /** Max companies per scoring batch to keep prompt size manageable */
 const SCORING_BATCH_SIZE = 30;
 
-/**
- * Score a single batch of companies. Returns scored entries with
- * indices remapped to the original array positions.
- */
 async function scoreBatch(
   client: Anthropic,
   companies: DiscoveredCompany[],
-  icp: ICPCriteria,
-  indexOffset: number
+  icp: ICPCriteria
 ): Promise<{ company: DiscoveredCompany; score: number; reason: string }[]> {
   const message = await client.messages.create({
     model: serviceConfig.fastModel,
@@ -127,9 +122,7 @@ export const claudeCompanyScorer: CompanyScorer = {
     }
 
     // Score all batches in parallel
-    const batchResults = await Promise.all(
-      batches.map((batch, i) => scoreBatch(client, batch, icp, i * SCORING_BATCH_SIZE))
-    );
+    const batchResults = await Promise.all(batches.map((batch) => scoreBatch(client, batch, icp)));
 
     // Merge, sort by score descending, and format
     const allScored = batchResults.flat();

@@ -32,12 +32,7 @@ const SIGNAL_LABELS: Record<string, string> = {
   product_launch: 'Product Launch'
 };
 
-const SORT_OPTIONS = new Set(['signals', 'funding', 'name', 'contacted']);
 type SortOption = 'signals' | 'funding' | 'name' | 'contacted';
-
-function isSortOption(value: string): value is SortOption {
-  return SORT_OPTIONS.has(value);
-}
 
 function FilterSortBar({
   activeFilters,
@@ -70,12 +65,7 @@ function FilterSortBar({
       </div>
       <div className="ml-auto flex items-center gap-1.5">
         <Label className="text-muted-foreground text-xs">Sort</Label>
-        <Select
-          value={sort}
-          onValueChange={(v) => {
-            if (isSortOption(v)) onSortChange(v);
-          }}
-        >
+        <Select value={sort} onValueChange={(v: SortOption) => onSortChange(v)}>
           <SelectTrigger className="h-7 w-auto gap-1.5 border-none px-2.5 text-xs">
             <SelectValue />
           </SelectTrigger>

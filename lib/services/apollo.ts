@@ -122,95 +122,43 @@ interface SearchStrategy {
 }
 
 /**
- * Build multiple search strategies from the ICP to maximize coverage.
- * Each strategy uses a different filter combination so we catch companies
- * that a single query would miss.
+ * Build search strategies from the ICP.
+ *
+ * Default: 1 broad query combining all available filters (1 API call).
+ * This maximizes results per credit. The Claude scorer handles ranking.
  */
 function buildStrategies(icp: ICPCriteria): SearchStrategy[] {
-  const strategies: SearchStrategy[] = [];
-
   const employeeRanges = buildEmployeeRangeFilters(icp.min_employees, icp.max_employees);
 
-  // Shared base filters applied to all strategies
-  const base: Record<string, unknown> = {
+  const payload: Record<string, unknown> = {
     per_page: serviceConfig.apolloPerPage
   };
+
   if (employeeRanges) {
-    base.organization_num_employees_ranges = employeeRanges;
+    payload.organization_num_employees_ranges = employeeRanges;
   }
 
-  // Strategy 1: Industry keywords (broadest — core ICP match)
-  if (icp.industry_keywords.length > 0) {
-    const payload: Record<string, unknown> = {
-      ...base,
-      q_organization_keyword_tags: icp.industry_keywords
-    };
-    if (icp.funding_stages.length > 0) {
-      payload.organization_latest_funding_stage_cd = icp.funding_stages.map((s) =>
-        s.toLowerCase().replace(/\s+/g, '_')
-      );
-    }
-    if (icp.min_funding_amount) {
-      payload['latest_funding_amount_range[min]'] = icp.min_funding_amount;
-    }
-    strategies.push({ label: 'industry keywords', payload });
+  // Combine industry + tech keywords into one keyword search for broader coverage
+  const allKeywords = [...icp.industry_keywords, ...icp.tech_keywords];
+  if (allKeywords.length > 0) {
+    payload.q_organization_keyword_tags = allKeywords;
   }
 
-  // Strategy 2: Hiring signals (companies actively hiring for relevant roles)
   if (icp.hiring_signals.length > 0) {
-    const payload: Record<string, unknown> = {
-      ...base,
-      q_organization_job_titles: icp.hiring_signals
-    };
-    // Add industry keywords as a loose filter to keep results relevant
-    if (icp.industry_keywords.length > 0) {
-      payload.q_organization_keyword_tags = icp.industry_keywords.slice(0, 3);
-    }
-    strategies.push({ label: 'hiring signals', payload });
+    payload.q_organization_job_titles = icp.hiring_signals;
   }
 
-  // Strategy 3: Tech keywords (companies using specific technologies)
-  if (icp.tech_keywords.length > 0) {
-    const payload: Record<string, unknown> = {
-      ...base,
-      q_organization_keyword_tags: icp.tech_keywords
-    };
-    if (icp.funding_stages.length > 0) {
-      payload.organization_latest_funding_stage_cd = icp.funding_stages.map((s) =>
-        s.toLowerCase().replace(/\s+/g, '_')
-      );
-    }
-    strategies.push({ label: 'tech keywords', payload });
+  if (icp.funding_stages.length > 0) {
+    payload.organization_latest_funding_stage_cd = icp.funding_stages.map((s) =>
+      s.toLowerCase().replace(/\s+/g, '_')
+    );
   }
 
-  // Strategy 4: Funding-focused (recently funded companies in the space)
-  if (icp.funding_stages.length > 0 && icp.industry_keywords.length > 0) {
-    const payload: Record<string, unknown> = {
-      ...base,
-      organization_latest_funding_stage_cd: icp.funding_stages.map((s) =>
-        s.toLowerCase().replace(/\s+/g, '_')
-      ),
-      q_organization_keyword_tags: icp.industry_keywords.slice(0, 2)
-    };
-    if (icp.min_funding_amount) {
-      payload['latest_funding_amount_range[min]'] = icp.min_funding_amount;
-    }
-    strategies.push({ label: 'funding stage', payload });
+  if (icp.min_funding_amount) {
+    payload['latest_funding_amount_range[min]'] = icp.min_funding_amount;
   }
 
-  // Fallback: if no strategies could be built, use whatever filters we have
-  if (strategies.length === 0) {
-    const payload: Record<string, unknown> = { ...base };
-    if (icp.industry_keywords.length > 0) {
-      payload.q_organization_keyword_tags = icp.industry_keywords;
-    }
-    if (icp.hiring_signals.length > 0) {
-      payload.q_organization_job_titles = icp.hiring_signals;
-    }
-    strategies.push({ label: 'combined', payload });
-  }
-
-  return strategies;
+  return [{ label: 'combined', payload }];
 }
 
 // ---------------------------------------------------------------------------

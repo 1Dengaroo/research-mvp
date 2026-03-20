@@ -25,10 +25,10 @@ export const serviceConfig = {
   scoringMinScore: 5,
 
   /** Apollo results per page (max 100) */
-  apolloPerPage: 25,
+  apolloPerPage: 100,
 
   /** Number of pages to fetch per Apollo search strategy */
-  apolloPagesPerStrategy: 2,
+  apolloPagesPerStrategy: 1,
 
   /** Max companies to pass to scoring after dedup across all strategies */
   apolloMaxCandidates: 75,

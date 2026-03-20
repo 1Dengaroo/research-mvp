@@ -36,7 +36,6 @@ export const claudeICPParser: ICPParser = {
     });
 
     const text = message.content[0].type === 'text' ? message.content[0].text : '';
-    console.log('[ICP Parse] Raw Claude response:', text);
 
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('Failed to parse ICP from input');
@@ -47,8 +46,6 @@ export const claudeICPParser: ICPParser = {
     // Default nullable fields the model may omit
     parsed.min_employees = parsed.min_employees ?? null;
     parsed.max_employees = parsed.max_employees ?? null;
-
-    console.log('[ICP Parse] Structured ICP:', JSON.stringify(parsed, null, 2));
 
     return parsed;
   }
