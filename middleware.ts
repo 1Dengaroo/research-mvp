@@ -1,5 +1,17 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { rateLimiters, rateLimitResponse } from '@/lib/rate-limit';
+
+/** Routes that consume expensive resources, keyed by limiter tier */
+const RATE_LIMITED_ROUTES: Record<string, keyof typeof rateLimiters> = {
+  '/api/research': 'ai',
+  '/api/parse-icp': 'ai',
+  '/api/emails/generate': 'ai',
+  '/api/strategy': 'ai',
+  '/api/people/search': 'api',
+  '/api/people/enrich': 'api',
+  '/api/emails/send': 'email'
+};
 
 export async function middleware(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -49,6 +61,15 @@ export async function middleware(request: NextRequest) {
     url.pathname = '/';
     url.searchParams.set('login', 'true');
     return NextResponse.redirect(url);
+  }
+
+  // Rate limit expensive API routes (user is authenticated at this point)
+  if (user) {
+    const tier = RATE_LIMITED_ROUTES[pathname];
+    if (tier) {
+      const result = rateLimiters[tier].check(user.id);
+      if (!result.success) return rateLimitResponse(result);
+    }
   }
 
   return supabaseResponse;
