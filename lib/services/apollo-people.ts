@@ -73,7 +73,8 @@ export async function apolloPeopleSearch(
   const responseText = await response.text();
 
   if (!response.ok) {
-    throw new Error(`Apollo People API error (${response.status}): ${responseText}`);
+    console.error(`[Apollo] People search failed (${response.status}):`, responseText);
+    throw new Error('People search failed. Please try again.');
   }
 
   let data: unknown;
@@ -86,9 +87,11 @@ export async function apolloPeopleSearch(
     }
     data = JSON.parse(jsonMatch[0]);
   } catch (parseErr) {
-    throw new Error(
-      `Apollo People API returned invalid JSON (status ${response.status}): ${responseText.slice(0, 200)}`
+    console.error(
+      `[Apollo] People search returned invalid JSON (${response.status}):`,
+      responseText.slice(0, 200)
     );
+    throw new Error('People search returned an unexpected response. Please try again.');
   }
   if (!isApolloPeopleSearchResponse(data)) {
     throw new Error('Unexpected Apollo People response shape');
@@ -148,7 +151,8 @@ export async function apolloPersonEnrich(personId: string): Promise<{
   const responseText = await response.text();
 
   if (!response.ok) {
-    throw new Error(`Apollo People Match API error (${response.status}): ${responseText}`);
+    console.error(`[Apollo] People match failed (${response.status}):`, responseText);
+    throw new Error('Person enrichment failed. Please try again.');
   }
 
   let data: unknown;
@@ -157,9 +161,11 @@ export async function apolloPersonEnrich(personId: string): Promise<{
     if (!jsonMatch) throw new Error('No JSON object found');
     data = JSON.parse(jsonMatch[0]);
   } catch {
-    throw new Error(
-      `Apollo People Match API returned invalid JSON (status ${response.status}): ${responseText.slice(0, 200)}`
+    console.error(
+      `[Apollo] People match returned invalid JSON (${response.status}):`,
+      responseText.slice(0, 200)
     );
+    throw new Error('Person enrichment returned an unexpected response. Please try again.');
   }
   if (!isApolloPersonMatchResponse(data)) {
     throw new Error('Unexpected Apollo People Match response shape');

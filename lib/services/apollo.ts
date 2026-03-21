@@ -83,7 +83,8 @@ async function apolloOrgSearch(
   const responseText = await response.text();
 
   if (!response.ok) {
-    throw new Error(`Apollo API error (${response.status}): ${responseText}`);
+    console.error(`[Apollo] Organization search failed (${response.status}):`, responseText);
+    throw new Error('Company search failed. Please try again.');
   }
 
   const data: unknown = JSON.parse(responseText);
