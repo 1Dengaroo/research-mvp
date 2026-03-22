@@ -4,8 +4,8 @@ const SIGNAL_COLORS: Record<string, { bg: string; text: string }> = {
   news: { bg: 'var(--signal-news-bg)', text: 'var(--signal-news-text)' },
   product_launch: { bg: 'var(--signal-product-bg)', text: 'var(--signal-product-text)' },
   other: {
-    bg: 'var(--signal-other-bg, hsl(0 0% 90%))',
-    text: 'var(--signal-other-text, hsl(0 0% 40%))'
+    bg: 'var(--signal-other-bg)',
+    text: 'var(--signal-other-text)'
   }
 };
 

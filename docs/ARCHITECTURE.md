@@ -7,31 +7,39 @@
 ```
 /app                    Routing shell only (server-only)
 ├── page.tsx            Landing
+├── dashboard/          Analytics dashboard (server-fetched)
 ├── research/           Sessions list (server-fetched)
 │   └── [id]/           Session dashboard (server-fetched, hydrated to client)
 ├── emails/             Sent emails history
 ├── settings/           Settings page (Gmail OAuth redirect target)
 └── api/                API routes (SSE, REST)
-    ├── icps/           Saved ICP CRUD
-    ├── sessions/       Session CRUD + auto-save
+    ├── icps/           Saved ICP CRUD + parse
+    ├── sessions/       Session CRUD + auto-save + researched companies
     ├── signatures/     Email signature CRUD
-    └── contacts/       Contacted companies tracking
+    ├── contacts/       Contacted companies tracking
+    ├── emails/         Generate + send emails
+    ├── gmail/          OAuth authorize, callback, disconnect, status
+    ├── people/         Apollo people search + enrich
+    ├── profile/        User profile CRUD
+    ├── research/       Research pipeline (SSE streaming)
+    └── strategy/       AI outreach strategy generation
 
 /components             UI layer (feature-organized)
 ├── research/           Pipeline UI (steps 1-4)
+├── dashboard/          Dashboard charts and widgets
 ├── emails/             Sent emails table
-├── settings/           Settings page
-├── auth/               Login/signup modals
+├── settings/           Settings tabs + profile modal
+├── auth/               Login/signup modals + auth provider
 ├── landing/            Marketing components
-├── profile-modal       Profile/settings modal (appearance, connections, signatures, account)
+├── shared/             Cross-feature components (company-logo)
 └── ui/                 shadcn/ui primitives
 
 /lib                    Core business logic
-├── services/           Pipeline services (swappable)
+├── services/           Pipeline services (swappable) + config
 ├── prompts/            Claude prompt templates
 ├── store/              Zustand state management
-├── supabase/           Auth client setup
-└── theme/              Theme system
+├── supabase/           Auth clients + queries/ (organized by domain)
+└── theme/              Theme + font system
 
 /styles                 Visual layer
 ├── globals.css         Tailwind bridge + base
@@ -66,7 +74,7 @@ Orchestrator: `lib/services/pipeline.ts`
 
 ```
 User transcript
-  → POST /api/parse-icp → Claude Haiku → ICPCriteria
+  → POST /api/icps/parse → Claude Haiku → ICPCriteria
     → POST /api/research (phase 1) → Apollo → Claude scoring → candidates[]
       → User confirms
         → POST /api/research (phase 2) → SSE stream:

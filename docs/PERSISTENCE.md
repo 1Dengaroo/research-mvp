@@ -57,13 +57,25 @@ Save state is shown via a `SaveIndicator` component (spinner while saving, check
 
 ## API Routes
 
-| Route                  | Methods            | Purpose                                     |
-| ---------------------- | ------------------ | ------------------------------------------- |
-| `/api/icps`            | GET, POST          | List all ICPs, create new ICP               |
-| `/api/icps/[id]`       | PATCH, DELETE      | Update or delete ICP                        |
-| `/api/sessions`        | GET, POST          | List session summaries, create session      |
-| `/api/sessions/[id]`   | GET, PATCH, DELETE | Load full session, auto-save, delete        |
-| `/api/signatures`      | GET, POST          | List all signatures, create new             |
-| `/api/signatures/[id]` | PATCH, DELETE      | Update or delete signature                  |
-| `/api/contacts`        | GET                | List all contacted companies for user       |
-| `/api/emails/send`     | POST               | (Modified) Also upserts contacted_companies |
+| Route                                | Methods            | Purpose                                  |
+| ------------------------------------ | ------------------ | ---------------------------------------- |
+| `/api/icps`                          | GET, POST          | List all ICPs, create new ICP            |
+| `/api/icps/[id]`                     | PATCH, DELETE      | Update or delete ICP                     |
+| `/api/icps/parse`                    | POST               | AI-powered ICP extraction from text      |
+| `/api/sessions`                      | GET, POST          | List session summaries, create session   |
+| `/api/sessions/[id]`                 | GET, PATCH, DELETE | Load full session, auto-save, delete     |
+| `/api/sessions/researched-companies` | GET                | Aggregated research history              |
+| `/api/signatures`                    | GET, POST          | List all signatures, create new          |
+| `/api/signatures/[id]`               | PATCH, DELETE      | Update or delete signature               |
+| `/api/contacts`                      | GET                | List all contacted companies for user    |
+| `/api/research`                      | POST               | Research pipeline (SSE streaming)        |
+| `/api/strategy`                      | POST               | AI outreach strategy generation          |
+| `/api/people/search`                 | POST               | Apollo people search + Claude ranking    |
+| `/api/people/enrich`                 | POST               | Apollo person enrichment (1 credit)      |
+| `/api/emails/generate`               | POST               | Claude email sequence generation         |
+| `/api/emails/send`                   | POST               | Gmail send + upserts contacted_companies |
+| `/api/profile`                       | GET, PATCH         | User profile CRUD                        |
+| `/api/gmail/authorize`               | GET                | Gmail OAuth initiation                   |
+| `/api/gmail/callback`                | GET                | Gmail OAuth callback                     |
+| `/api/gmail/disconnect`              | POST               | Gmail disconnection                      |
+| `/api/gmail/status`                  | GET                | Gmail connection status                  |

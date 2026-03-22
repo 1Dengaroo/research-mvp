@@ -1,38 +1,15 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Funnel, WeeklyEmail, Signal, UncontactedCompany } from '@/lib/types';
 import {
   getSessionsForDashboard,
   getSentEmailsForDashboard,
   getContactedCompaniesForDashboard
 } from '@/lib/supabase/queries';
 
-export interface DashboardFunnel {
-  sessions: number;
-  companies_researched: number;
-  companies_contacted: number;
-  emails_sent: number;
-}
-
-export interface WeeklyEmail {
-  week: string;
-  count: number;
-}
-
-export interface SignalCount {
-  type: string;
-  count: number;
-}
-
-export interface UncontactedCompany {
-  name: string;
-  session_id: string;
-  website: string | null;
-  logo_url: string | null;
-}
-
-export interface DashboardData {
-  funnel: DashboardFunnel;
+interface DashboardData {
+  funnel: Funnel;
   weeklyEmails: WeeklyEmail[];
-  topSignals: SignalCount[];
+  topSignals: Signal[];
   uncontacted: UncontactedCompany[];
 }
 

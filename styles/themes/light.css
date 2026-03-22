@@ -76,6 +76,8 @@
   --signal-news-text: hsl(35 55% 35%);
   --signal-product-bg: hsl(270 35% 50% / 0.08);
   --signal-product-text: hsl(270 30% 40%);
+  --signal-other-bg: hsl(0 0% 50% / 0.08);
+  --signal-other-text: hsl(0 0% 40%);
 
   /* shadcn bridge tokens */
   --background: #f7f7f5;

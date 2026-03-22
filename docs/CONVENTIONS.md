@@ -13,7 +13,7 @@
 - `as const` for union types, `unknown` + narrowing for unknowns
 - `interface` for objects, `type` for unions/intersections
 - Return types on all public functions and hooks
-- Non-trivial types → `<component>.types.ts`
+- All types → `lib/types.ts` (single source of truth)
 
 ## Tailwind
 
@@ -28,7 +28,7 @@
 - All styling themeable — no hardcoded colors, radii, shadows
 - Extract repeated JSX after second duplication
 - Feature-organized (`research/`, `auth/`) — never by type
-- Colocate: `.tsx`, `.types.ts`, `.test.tsx`, `.utils.ts`
+- Cross-feature components → `components/shared/`
 
 ## Formatting
 

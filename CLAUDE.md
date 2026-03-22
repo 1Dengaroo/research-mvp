@@ -1,4 +1,4 @@
-# Signal
+# Remes
 
 AI-powered outbound sales platform for SMBs. Monitors the web for buying signals, finds contacts, generates personalized outreach.
 
@@ -23,7 +23,7 @@ docs/
 
 ```
 lib/types.ts                       ← All TypeScript interfaces
-lib/services/config.ts             ← Models, limits, thresholds (one file to tune)
+lib/services/config.ts             ← Models, limits, thresholds, constants (one file to tune)
 lib/services/interfaces.ts         ← Swappable service contracts
 lib/services/pipeline.ts           ← Pipeline orchestrator
 lib/services/gmail.ts              ← Gmail OAuth + sending
@@ -31,8 +31,11 @@ lib/store/research-store.ts        ← Zustand store (all state + actions + sess
 lib/store/icp-store.ts             ← Saved ICP library state
 lib/store/signature-store.ts       ← Email signature CRUD state
 lib/store/profile-store.ts         ← Profile modal state
+lib/store/auth-store.ts            ← Auth modal state + user object
 lib/api.ts                         ← Client-side fetch wrappers
-middleware.ts                      ← Supabase auth + route protection
+lib/validation.ts                  ← Zod schemas for API request/response validation
+lib/supabase/queries/              ← Database queries organized by domain
+middleware.ts                      ← Supabase auth + route protection + rate limiting
 ```
 
 ## Rules
@@ -44,6 +47,19 @@ middleware.ts                      ← Supabase auth + route protection
 5. `shadcn/ui` first — before custom primitives
 6. Components organized by feature domain — never by type
 7. Run `npx prettier --write .` after code changes
+
+## File Placement
+
+1. Page shell → `app/<route>/page.tsx` (≤40 lines, no `'use client'`)
+2. API endpoint → `app/api/<resource>/<action>/route.ts`
+3. shadcn primitive → `components/ui/`
+4. TypeScript type/interface → `lib/types.ts`
+5. Component for 1 feature → `components/<feature>/`
+6. Component for 2+ features → `components/shared/`
+7. Global infrastructure (layout, error, providers) → `components/` root
+8. Tunable constant/config → `lib/services/config.ts`
+9. Prompt template → `lib/prompts/<descriptive-name>.ts`
+10. Service/business logic → `lib/services/`
 
 ## Principles
 
