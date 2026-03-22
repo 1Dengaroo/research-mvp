@@ -111,6 +111,13 @@ export function SentEmailsPage({ emails }: { emails: SentEmail[] }) {
               : `${emails.length} email${emails.length === 1 ? '' : 's'} sent`}
           </p>
         </div>
+        <Link
+          href="/research"
+          className="text-muted-foreground hover:text-foreground ml-auto flex items-center gap-1.5 text-xs transition-colors"
+        >
+          <Search className="size-3" />
+          Research
+        </Link>
       </div>
 
       {emails.length === 0 ? (

@@ -28,9 +28,9 @@ Open http://localhost:3000.
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start dev server |
+| Command         | Description      |
+| --------------- | ---------------- |
+| `npm run dev`   | Start dev server |
 | `npm run build` | Production build |
-| `npm test` | Run tests |
-| `npm run lint` | Lint with ESLint |
+| `npm test`      | Run tests        |
+| `npm run lint`  | Lint with ESLint |

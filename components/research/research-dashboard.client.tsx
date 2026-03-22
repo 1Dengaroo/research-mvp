@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Loader2, Check } from 'lucide-react';
+import Link from 'next/link';
+import { Loader2, Check, ChevronRight } from 'lucide-react';
 import { useResearchStore } from '@/lib/store/research-store';
 import { TranscriptStep } from './transcript-step';
 import { StrategyStep } from './strategy-step';
@@ -123,7 +124,16 @@ export function ResearchDashboard({ session }: { session: ResearchSession }) {
       <main className={`mx-auto ${MAX_WIDTH} px-4 pt-10 pb-24 md:px-6`}>
         {sessionId && (
           <div className="mb-4 flex items-center justify-between">
-            <h1 className="text-muted-foreground truncate text-sm font-medium">{sessionName}</h1>
+            <div className="flex min-w-0 items-center gap-1.5 text-sm">
+              <Link
+                href="/research"
+                className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
+              >
+                Research
+              </Link>
+              <ChevronRight className="text-border size-3 shrink-0" />
+              <span className="text-foreground truncate font-medium">{sessionName}</span>
+            </div>
             <SaveIndicator />
           </div>
         )}

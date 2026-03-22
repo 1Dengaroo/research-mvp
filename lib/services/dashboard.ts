@@ -1,18 +1,50 @@
-import { getAuthUser } from '@/lib/supabase/server';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
-export async function GET() {
-  const { supabase, user } = await getAuthUser();
-  if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+export interface DashboardFunnel {
+  sessions: number;
+  companies_researched: number;
+  companies_contacted: number;
+  emails_sent: number;
+}
 
-  const uid = user.id;
+export interface WeeklyEmail {
+  week: string;
+  count: number;
+}
 
+export interface SignalCount {
+  type: string;
+  count: number;
+}
+
+export interface UncontactedCompany {
+  name: string;
+  session_id: string;
+  website: string | null;
+  logo_url: string | null;
+}
+
+export interface DashboardData {
+  funnel: DashboardFunnel;
+  weeklyEmails: WeeklyEmail[];
+  topSignals: SignalCount[];
+  uncontacted: UncontactedCompany[];
+}
+
+export async function fetchDashboardData(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<DashboardData> {
   const [sessionsRes, emailsRes, contactedRes] = await Promise.all([
     supabase
       .from('research_sessions')
-      .select('id, status, results, candidates, selected_companies, created_at')
-      .eq('user_id', uid),
-    supabase.from('sent_emails').select('id, status, company_name, created_at').eq('user_id', uid),
-    supabase.from('contacted_companies').select('company_name').eq('user_id', uid)
+      .select('id, status, results, candidates, created_at')
+      .eq('user_id', userId),
+    supabase
+      .from('sent_emails')
+      .select('id, status, company_name, created_at')
+      .eq('user_id', userId),
+    supabase.from('contacted_companies').select('company_name').eq('user_id', userId)
   ]);
 
   const sessions = sessionsRes.data ?? [];
@@ -23,12 +55,7 @@ export async function GET() {
 
   let companiesResearched = 0;
   const signalCounts: Record<string, number> = {};
-  const uncontactedCompanies: {
-    name: string;
-    session_id: string;
-    website: string | null;
-    logo_url: string | null;
-  }[] = [];
+  const uncontacted: UncontactedCompany[] = [];
   const seenUncontacted = new Set<string>();
 
   for (const session of sessions) {
@@ -36,7 +63,6 @@ export async function GET() {
     const candidates = Array.isArray(session.candidates) ? session.candidates : [];
     companiesResearched += results.length;
 
-    // Build a lookup from candidates for website/logo
     const candidateMap = new Map<string, { website?: string; logo_url?: string }>();
     for (const c of candidates) {
       const cn = c as { name?: string; website?: string; logo_url?: string };
@@ -64,7 +90,7 @@ export async function GET() {
       ) {
         seenUncontacted.add(r.company_name);
         const candidate = candidateMap.get(r.company_name);
-        uncontactedCompanies.push({
+        uncontacted.push({
           name: r.company_name,
           session_id: session.id,
           website: r.website ?? candidate?.website ?? null,
@@ -75,10 +101,10 @@ export async function GET() {
   }
 
   const emailsSent = emails.filter((e) => e.status === 'sent').length;
-  const emailsFailed = emails.filter((e) => e.status === 'failed').length;
 
+  // Weekly activity (last 4 weeks)
   const now = new Date();
-  const weeklyEmails: { week: string; count: number }[] = [];
+  const weeklyEmails: WeeklyEmail[] = [];
   for (let i = 3; i >= 0; i--) {
     const weekStart = new Date(now);
     weekStart.setDate(weekStart.getDate() - (i + 1) * 7);
@@ -101,16 +127,15 @@ export async function GET() {
     .slice(0, 5)
     .map(([type, count]) => ({ type, count }));
 
-  return Response.json({
+  return {
     funnel: {
       sessions: sessions.length,
       companies_researched: companiesResearched,
       companies_contacted: contactedSet.size,
-      emails_sent: emailsSent,
-      emails_failed: emailsFailed
+      emails_sent: emailsSent
     },
-    weekly_emails: weeklyEmails,
-    top_signals: topSignals,
-    uncontacted: uncontactedCompanies.slice(0, 10)
-  });
+    weeklyEmails,
+    topSignals,
+    uncontacted: uncontacted.slice(0, 10)
+  };
 }

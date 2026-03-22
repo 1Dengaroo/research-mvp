@@ -1,7 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Loader2, ChevronRight, RotateCcw } from 'lucide-react';
+import { Loader2, ChevronRight, Mail, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -293,6 +294,12 @@ export function BottomNav() {
                   New Research
                 </Button>
               )}
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/emails">
+                  <Mail className="size-3.5" />
+                  <span className="hidden md:inline">Emails</span>
+                </Link>
+              </Button>
             </>
           )}
         </div>

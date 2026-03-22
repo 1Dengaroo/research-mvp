@@ -46,6 +46,7 @@ export async function middleware(request: NextRequest) {
 
   // Protect app routes and /api/* (except auth callbacks)
   const isProtected =
+    pathname.startsWith('/dashboard') ||
     pathname.startsWith('/research') ||
     pathname.startsWith('/settings') ||
     pathname.startsWith('/emails') ||
