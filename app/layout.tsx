@@ -7,7 +7,7 @@ import { FontProvider } from '@/lib/theme/font-provider';
 import { Header } from '@/components/header';
 import { AuthProvider } from '@/components/auth/auth-provider.client';
 import { AuthModal } from '@/components/auth/auth-modal.client';
-import { ProfileModal } from '@/components/profile-modal.client';
+import { ProfileModal } from '@/components/settings/profile-modal.client';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/sonner';
 import { Analytics } from '@vercel/analytics/next';

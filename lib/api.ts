@@ -158,7 +158,7 @@ export async function streamStrategy(
 // ---------------------------------------------------------------------------
 
 export async function parseICP(input: string, signal?: AbortSignal): Promise<ICPCriteria> {
-  const response = await postJson('/api/parse-icp', { input }, signal);
+  const response = await postJson('/api/icps/parse', { input }, signal);
   const data = (await response.json()) as { icp: ICPCriteria };
   return data.icp;
 }

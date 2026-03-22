@@ -32,7 +32,7 @@ import { toast } from 'sonner';
 import { IcpPanelEditable } from './icp-panel-editable';
 import { createSession, deleteICP, updateICP, createICP, parseICP } from '@/lib/api';
 import { formatRelativeDate } from '@/lib/utils';
-import { EXAMPLE_CUSTOMER_INPUT } from '@/lib/constants';
+import { EXAMPLE_CUSTOMER_INPUT } from '@/lib/services/config';
 import type { SavedICP, ICPCriteria } from '@/lib/types';
 
 function ICPRow({

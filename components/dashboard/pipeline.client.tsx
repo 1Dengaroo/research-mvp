@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowRight, ChevronRight } from 'lucide-react';
-import type { Funnel } from './types';
+import type { Funnel } from '@/lib/types';
 
 const FUNNEL_COLORS = [
   'border-primary',

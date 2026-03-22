@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { Building2, ExternalLink, X, Plus, RefreshCw, MapPin } from 'lucide-react';
-import { CompanyLogoWithFallback } from '@/components/company-logo';
+import { CompanyLogoWithFallback } from '@/components/shared/company-logo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LoadingStatus } from './loading-status';

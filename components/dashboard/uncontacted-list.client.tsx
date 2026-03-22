@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { CompanyLogoWithFallback } from '@/components/company-logo';
-import type { UncontactedCompany } from './types';
+import { CompanyLogoWithFallback } from '@/components/shared/company-logo';
+import type { UncontactedCompany } from '@/lib/types';
 
 export function UncontactedList({ companies }: { companies: UncontactedCompany[] }) {
   return (

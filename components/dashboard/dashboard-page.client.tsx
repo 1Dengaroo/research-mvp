@@ -9,7 +9,7 @@ import { SignalBreakdown } from './signal-breakdown.client';
 import { UncontactedList } from './uncontacted-list.client';
 import { ConversionBar } from './conversion-bar.client';
 import { MAX_WIDTH } from '@/lib/layout';
-import type { Funnel, WeeklyEmail, Signal, UncontactedCompany } from './types';
+import type { Funnel, WeeklyEmail, Signal, UncontactedCompany } from '@/lib/types';
 
 interface DashboardPageProps {
   funnel: Funnel;

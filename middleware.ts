@@ -5,7 +5,7 @@ import { rateLimiters, rateLimitResponse } from '@/lib/rate-limit';
 /** Routes that consume expensive resources, keyed by limiter tier */
 const RATE_LIMITED_ROUTES: Record<string, keyof typeof rateLimiters> = {
   '/api/research': 'ai',
-  '/api/parse-icp': 'ai',
+  '/api/icps/parse': 'ai',
   '/api/emails/generate': 'ai',
   '/api/strategy': 'ai',
   '/api/people/search': 'api',

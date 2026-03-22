@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import type { WeeklyEmail } from './types';
+import type { WeeklyEmail } from '@/lib/types';
 
 export function WeeklyChart({ data }: { data: WeeklyEmail[] }) {
   const max = Math.max(...data.map((d) => d.count), 1);

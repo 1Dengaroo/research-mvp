@@ -1,6 +1,6 @@
 'use client';
 
-import type { Signal } from './types';
+import type { Signal } from '@/lib/types';
 
 const SIGNAL_META: Record<string, { label: string; color: string }> = {
   job_posting: { label: 'Job Postings', color: 'bg-accent-secondary' },

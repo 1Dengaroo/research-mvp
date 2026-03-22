@@ -1,6 +1,6 @@
 'use client';
 
-import type { Funnel } from './types';
+import type { Funnel } from '@/lib/types';
 
 export function ConversionBar({ funnel }: { funnel: Funnel }) {
   if (funnel.companies_researched === 0) return null;

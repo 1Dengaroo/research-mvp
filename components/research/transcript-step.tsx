@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useResearchStore } from '@/lib/store/research-store';
 import { useICPStore } from '@/lib/store/icp-store';
-import { EXAMPLE_CUSTOMER_INPUT } from '@/lib/constants';
+import { EXAMPLE_CUSTOMER_INPUT } from '@/lib/services/config';
 
 function ICPPicker() {
   const icps = useICPStore((s) => s.icps);

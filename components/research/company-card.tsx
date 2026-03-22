@@ -16,7 +16,7 @@ import { SignalBadge } from './signal-badge';
 import { CopyButton } from './copy-button.client';
 import { EmailEditorDialog } from './email-editor-dialog.client';
 import { Button } from '@/components/ui/button';
-import { CompanyLogoWithFallback } from '@/components/company-logo';
+import { CompanyLogoWithFallback } from '@/components/shared/company-logo';
 import { useResearchStore } from '@/lib/store/research-store';
 import type {
   CompanyResult,

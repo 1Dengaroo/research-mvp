@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import type { ICPCriteria, CompanySignal } from '@/lib/types';
 import type { CompanyResearcher, CompanyResearchResult } from './interfaces';
 import { serviceConfig } from './config';
-import { buildResearchAgentPrompt } from '@/lib/prompts/research-agent';
+import { buildResearchAgentPrompt } from '@/lib/prompts/research-agent-prompt';
 
 function getClient(): Anthropic {
   const apiKey = process.env.ANTHROPIC_API_KEY;
