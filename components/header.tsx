@@ -60,6 +60,12 @@ function MobileNav() {
 
 function MobileNavSheet({ pathname }: { pathname: string }) {
   const [open, setOpen] = useState(false);
+  const linkClass = (active: boolean) =>
+    `rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
+      active
+        ? 'bg-muted text-foreground'
+        : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+    }`;
 
   return (
     <div className="md:hidden">
@@ -74,34 +80,13 @@ function MobileNavSheet({ pathname }: { pathname: string }) {
             <SheetDescription className="sr-only">Site navigation links</SheetDescription>
           </SheetHeader>
           <nav className="flex flex-col gap-1 px-4">
-            <Link
-              href="/dashboard"
-              className={`rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                pathname.startsWith('/dashboard')
-                  ? 'bg-muted text-foreground'
-                  : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
-              }`}
-            >
+            <Link href="/dashboard" className={linkClass(pathname.startsWith('/dashboard'))}>
               Dashboard
             </Link>
-            <Link
-              href="/research"
-              className={`rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                pathname.startsWith('/research')
-                  ? 'bg-muted text-foreground'
-                  : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
-              }`}
-            >
+            <Link href="/research" className={linkClass(pathname.startsWith('/research'))}>
               Research
             </Link>
-            <Link
-              href="/emails"
-              className={`rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                pathname.startsWith('/emails')
-                  ? 'bg-muted text-foreground'
-                  : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
-              }`}
-            >
+            <Link href="/emails" className={linkClass(pathname.startsWith('/emails'))}>
               Emails
             </Link>
           </nav>
@@ -111,7 +96,49 @@ function MobileNavSheet({ pathname }: { pathname: string }) {
   );
 }
 
+function LandingNav() {
+  return (
+    <>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="hidden md:inline-flex"
+        onClick={() => document.getElementById('use-cases')?.scrollIntoView({ behavior: 'smooth' })}
+      >
+        Use Cases
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="hidden md:inline-flex"
+        onClick={() => document.getElementById('faqs')?.scrollIntoView({ behavior: 'smooth' })}
+      >
+        FAQs
+      </Button>
+    </>
+  );
+}
+
+function AppNav() {
+  return (
+    <>
+      <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
+        <Link href="/dashboard">Dashboard</Link>
+      </Button>
+      <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
+        <Link href="/research">Research</Link>
+      </Button>
+      <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
+        <Link href="/emails">Emails</Link>
+      </Button>
+    </>
+  );
+}
+
 export function Header() {
+  const pathname = usePathname();
+  const isLanding = pathname === '/';
+
   return (
     <header
       className="sticky top-0 z-50 border-b"
@@ -132,19 +159,11 @@ export function Header() {
               Beta
             </span>
           </Link>
-          <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
-            <Link href="/dashboard">Dashboard</Link>
-          </Button>
-          <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
-            <Link href="/research">Research</Link>
-          </Button>
-          <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
-            <Link href="/emails">Emails</Link>
-          </Button>
+          {isLanding ? <LandingNav /> : <AppNav />}
         </div>
         <div className="flex items-center gap-2">
           <UserAvatar />
-          <MobileNav />
+          {!isLanding && <MobileNav />}
         </div>
       </div>
     </header>

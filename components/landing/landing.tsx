@@ -3,6 +3,12 @@
 import { useRouter } from 'next/navigation';
 import { ArrowRight, Radar, Users, Send, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '@/components/ui/accordion';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { MAX_WIDTH } from '@/lib/layout';
 
@@ -48,6 +54,49 @@ const SHOWCASE = [
     title: 'Emails that actually get replies',
     desc: 'Every email is grounded in the signal that triggered it — relevant, timely, and personal. Not another generic template.',
     image: '/showcase-outreach.png'
+  }
+];
+
+const FAQS = [
+  {
+    q: 'What is Remes and how does it work?',
+    a: 'Remes is an AI-powered platform that detects real-time buying signals — hiring surges, funding rounds, leadership changes, product launches — and uses them to craft deeply personalized outreach to your ideal customers. You describe your ideal customer, and Remes finds, researches, and engages them automatically.'
+  },
+  {
+    q: 'How is Remes different from other outreach tools?',
+    a: 'Most tools automate sending. Remes automates research. We detect real-time buying signals and use them to write emails that reference things happening at the prospect\'s company right now. The difference is an email that says "congrats on your funding" vs. one that knows you raised $8M from Craft to scale your GTM team.'
+  },
+  {
+    q: 'What reply rate can I expect?',
+    a: 'Reply rates vary by industry and offer, but our signal-driven approach consistently outperforms generic outreach by 3–5x. Most customers see meaningful pipeline activity by week 6.'
+  },
+  {
+    q: 'How much does Remes cost compared to hiring?',
+    a: 'Plans start at $1,497/month. A fully loaded sales hire costs $90K–$150K/year, takes 3–6 months to ramp, and turns over at 39% annually. Remes starts producing pipeline in 2 weeks and never quits. One closed deal typically pays for the entire annual subscription.'
+  },
+  {
+    q: 'What are buying signals?',
+    a: 'Buying signals are real-time indicators that a company is ready to buy — things like hiring surges, funding rounds, leadership changes, product launches, headcount growth, and LinkedIn activity from key decision-makers. Remes detects these automatically so you can reach prospects at the perfect moment.'
+  },
+  {
+    q: 'What types of buying signals does Remes detect?',
+    a: 'Anything you can describe. Typical buying signals include hiring surges, specific role postings, funding rounds, leadership changes and new executive hires, product launches and company announcements, headcount growth velocity, LinkedIn posts and engagement from key decision-makers, tech stack changes, and competitive movements. You are not limited to these categories. You can describe what buying intent looks like for your product and Remes will find it.'
+  },
+  {
+    q: 'Do you send emails from my account?',
+    a: 'Yes. Remes sends through your connected email account via official APIs. Emails appear in your Sent folder, replies come to your inbox, and everything threads naturally. Your prospects never know a tool was involved.'
+  },
+  {
+    q: 'How does Remes handle email deliverability?',
+    a: 'Remes handles the full deliverability stack: dedicated domains, automated mailbox warmup (typically 2-3 weeks for new mailboxes), reputation monitoring, and sending controls, so you land in the primary inbox, not spam.'
+  },
+  {
+    q: 'How is Remes different from ZoomInfo, Apollo, Instantly or Clay?',
+    a: 'Apollo and ZoomInfo are contact databases: they find leads but do not research or write outreach. Instantly is a campaign tool: you have to import a lead list and manually create a campaign. Clay requires building automations from scratch with a credit system that burns fast. Remes replaces Clay + Apollo + Instantly with one tool: buying signal monitoring, lead research, personalized outreach, and deliverability, all built in.'
+  },
+  {
+    q: 'Why is it called Remes?',
+    a: "It's a reference to Hermes, the Greek god of commerce, trade, and messengers. He was the original messenger who always knew where to go, who to talk to, and exactly what to say. Fast forward to today, and the best sign that your outreach actually worked? Those two little letters in your inbox: RE:. Remes."
   }
 ];
 
@@ -196,7 +245,7 @@ export function Landing() {
         </section>
 
         {/* ── Showcase ── */}
-        <section className="border-border border-t py-10 sm:py-14">
+        <section id="use-cases" className="border-border scroll-mt-16 border-t py-10 sm:py-14">
           <div className="mb-10 sm:mb-14">
             <span className="section-label text-muted-foreground">See it in action</span>
             <h2 className="text-foreground mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
@@ -233,6 +282,27 @@ export function Landing() {
               </div>
             ))}
           </div>
+        </section>
+
+        {/* ── FAQs ── */}
+        <section id="faqs" className="border-border scroll-mt-16 border-t py-10 sm:py-14">
+          <div className="mb-8 sm:mb-10">
+            <span className="section-label text-muted-foreground">FAQs</span>
+            <h2 className="text-foreground mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
+              Frequently asked questions
+            </h2>
+          </div>
+
+          <Accordion type="single" collapsible className="w-full">
+            {FAQS.map((faq, i) => (
+              <AccordionItem key={i} value={`faq-${i}`}>
+                <AccordionTrigger>{faq.q}</AccordionTrigger>
+                <AccordionContent>
+                  <p className="text-muted-foreground leading-relaxed">{faq.a}</p>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </section>
 
         {/* ── CTA ── */}
