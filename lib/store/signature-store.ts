@@ -10,6 +10,7 @@ import type { EmailSignature } from '@/lib/types';
 interface SignatureStore {
   signatures: EmailSignature[];
   isLoading: boolean;
+  loaded: boolean;
   loadSignatures: () => Promise<void>;
   createSignature: (name: string, body: string) => Promise<EmailSignature>;
   updateSignature: (
@@ -23,13 +24,14 @@ interface SignatureStore {
 export const useSignatureStore = create<SignatureStore>((set, get) => ({
   signatures: [],
   isLoading: false,
+  loaded: false,
 
   loadSignatures: async () => {
-    if (get().isLoading) return;
+    if (get().isLoading || get().loaded) return;
     set({ isLoading: true });
     try {
       const signatures = await listSignatures();
-      set({ signatures });
+      set({ signatures, loaded: true });
     } catch (err) {
       console.error('Failed to load signatures:', err);
     } finally {
