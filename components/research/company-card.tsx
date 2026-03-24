@@ -390,7 +390,7 @@ export function CompanyRow({
             <div className="space-y-3 p-4">
               {hasPeople && (
                 <div className="space-y-2">
-                  {(people ?? []).slice(0, 3).map((person) => {
+                  {(people ?? []).slice(0, 7).map((person) => {
                     const displayName = person.is_enriched
                       ? `${person.first_name} ${person.last_name}`
                       : `${person.first_name} ${person.last_name_obfuscated}`;

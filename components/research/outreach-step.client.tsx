@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Mail, Check } from 'lucide-react';
+import { useState, useMemo, useCallback } from 'react';
+import { Mail, Check, Square, CheckSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EmailEditorInline } from './email-editor-inline.client';
 import { useResearchStore } from '@/lib/store/research-store';
 import type { CompanyResult, ComposeEmailParams, TargetContact, ICPCriteria } from '@/lib/types';
+
+const MAX_SELECTED = 5;
 
 const EMPTY_ICP: ICPCriteria = {
   description: '',
@@ -33,7 +35,8 @@ export function OutreachStep() {
   const allPeopleResults = useResearchStore((s) => s.allPeopleResults);
   const icp = useResearchStore((s) => s.icp);
   const getContactedEmails = useResearchStore((s) => s.getContactedEmails);
-  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [activeKey, setActiveKey] = useState<string | null>(null);
 
   const contacts = useMemo(() => {
     const list: ComposableContact[] = [];
@@ -73,10 +76,41 @@ export function OutreachStep() {
     return map;
   }, [contacts]);
 
-  const selected = contacts.find((c) => c.key === selectedKey) ?? null;
+  const toggleContact = useCallback(
+    (key: string) => {
+      setSelectedKeys((prev) => {
+        const next = new Set(prev);
+        if (next.has(key)) {
+          next.delete(key);
+          if (activeKey === key) {
+            const remaining = [...next];
+            setActiveKey(remaining.length > 0 ? remaining[0] : null);
+          }
+        } else {
+          if (next.size >= MAX_SELECTED) return prev;
+          next.add(key);
+          setActiveKey(key);
+        }
+        return next;
+      });
+    },
+    [activeKey]
+  );
 
-  const composeParams: ComposeEmailParams | null = selected
-    ? { company: selected.result, contact: selected.contact, icp: icp ?? EMPTY_ICP }
+  const selectAll = useCallback(() => {
+    const keys = new Set(contacts.slice(0, MAX_SELECTED).map((c) => c.key));
+    setSelectedKeys(keys);
+    setActiveKey(contacts[0]?.key ?? null);
+  }, [contacts]);
+
+  const selectedContacts = useMemo(
+    () => contacts.filter((c) => selectedKeys.has(c.key)),
+    [contacts, selectedKeys]
+  );
+
+  const activeContact = contacts.find((c) => c.key === activeKey) ?? null;
+  const composeParams: ComposeEmailParams | null = activeContact
+    ? { company: activeContact.result, contact: activeContact.contact, icp: icp ?? EMPTY_ICP }
     : null;
 
   if (contacts.length === 0) {
@@ -102,10 +136,31 @@ export function OutreachStep() {
     <div className="flex flex-col gap-4 md:flex-row" style={{ minHeight: 'min(600px, 70vh)' }}>
       {/* Contact sidebar */}
       <div className="border-border bg-card w-full shrink-0 overflow-y-auto rounded-(--card-radius) border md:w-72 lg:w-80">
-        <div className="border-border border-b px-4 py-3">
+        <div className="border-border flex items-center justify-between border-b px-4 py-3">
           <p className="text-xs font-medium">
-            {contacts.length} {contacts.length === 1 ? 'contact' : 'contacts'} ready
+            {selectedKeys.size}/{MAX_SELECTED} selected
           </p>
+          {contacts.length <= MAX_SELECTED && selectedKeys.size < contacts.length && (
+            <button
+              type="button"
+              onClick={selectAll}
+              className="text-primary text-xs font-medium hover:underline"
+            >
+              Select All
+            </button>
+          )}
+          {selectedKeys.size > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedKeys(new Set());
+                setActiveKey(null);
+              }}
+              className="text-muted-foreground text-xs hover:underline"
+            >
+              Clear
+            </button>
+          )}
         </div>
         <div className="divide-border divide-y">
           {[...grouped.entries()].map(([companyName, companyContacts]) => {
@@ -117,27 +172,32 @@ export function OutreachStep() {
                 </div>
                 {companyContacts.map((c) => {
                   const isSent = contactedEmails.includes(c.contact.email ?? '');
-                  const isActive = selectedKey === c.key;
+                  const isSelected = selectedKeys.has(c.key);
+                  const isAtLimit = selectedKeys.size >= MAX_SELECTED && !isSelected;
                   return (
                     <button
                       key={c.key}
                       type="button"
-                      onClick={() => setSelectedKey(c.key)}
-                      className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors ${
-                        isActive ? 'bg-muted' : 'hover:bg-muted/50'
+                      onClick={() => toggleContact(c.key)}
+                      disabled={isAtLimit}
+                      className={`flex w-full items-center gap-2 px-4 py-2.5 text-left transition-colors ${
+                        isSelected ? 'bg-muted' : isAtLimit ? 'opacity-40' : 'hover:bg-muted/50'
                       }`}
                     >
+                      {isSelected ? (
+                        <CheckSquare className="text-primary size-4 shrink-0" />
+                      ) : (
+                        <Square className="text-muted-foreground/40 size-4 shrink-0" />
+                      )}
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">{c.contact.name}</p>
                         <p className="text-muted-foreground truncate text-xs">{c.contact.title}</p>
                       </div>
-                      {isSent ? (
+                      {isSent && (
                         <span className="text-muted-foreground flex items-center gap-0.5 text-[10px]">
                           <Check className="size-3" />
                           Sent
                         </span>
-                      ) : (
-                        <Mail className="text-muted-foreground/50 size-3.5 shrink-0" />
                       )}
                     </button>
                   );
@@ -148,18 +208,44 @@ export function OutreachStep() {
         </div>
       </div>
 
-      {/* Email editor */}
-      <div className="border-border bg-card min-h-0 flex-1 overflow-hidden rounded-(--card-radius) border">
-        {composeParams ? (
-          <EmailEditorInline key={selectedKey} params={composeParams} />
-        ) : (
-          <div className="flex h-full items-center justify-center p-8">
-            <div className="text-center">
-              <Mail className="text-muted-foreground/30 mx-auto mb-3 size-8" />
-              <p className="text-muted-foreground text-sm">Select a contact to compose an email</p>
-            </div>
+      {/* Email editor with tabs */}
+      <div className="border-border bg-card flex min-h-0 flex-1 flex-col overflow-hidden rounded-(--card-radius) border">
+        {/* Tabs */}
+        {selectedContacts.length > 0 && (
+          <div className="border-border flex shrink-0 gap-0 overflow-x-auto border-b">
+            {selectedContacts.map((c) => (
+              <button
+                key={c.key}
+                type="button"
+                onClick={() => setActiveKey(c.key)}
+                className={`shrink-0 border-b-2 px-4 py-2.5 text-xs font-medium transition-colors ${
+                  activeKey === c.key
+                    ? 'border-primary text-foreground'
+                    : 'text-muted-foreground hover:text-foreground border-transparent'
+                }`}
+              >
+                {c.contact.name.split(' ')[0]}{' '}
+                <span className="text-muted-foreground font-normal">
+                  {c.companyName.length > 15 ? c.companyName.slice(0, 15) + '...' : c.companyName}
+                </span>
+              </button>
+            ))}
           </div>
         )}
+
+        {/* Editor */}
+        <div className="min-h-0 flex-1">
+          {composeParams ? (
+            <EmailEditorInline key={activeKey} params={composeParams} />
+          ) : (
+            <div className="flex h-full items-center justify-center p-8">
+              <div className="text-center">
+                <Mail className="text-muted-foreground/30 mx-auto mb-3 size-8" />
+                <p className="text-muted-foreground text-sm">Select contacts to compose emails</p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
