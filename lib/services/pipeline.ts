@@ -97,12 +97,11 @@ export async function researchConfirmedCompanies(
   const COMPANY_TIMEOUT_MS = 90_000; // 90s per company
 
   const processCompany = async (companyName: string, index: number) => {
-    send({
-      type: 'status',
-      message: `Researching ${companyName} (${index + 1}/${companyNames.length})...`
-    });
-
     try {
+      send({
+        type: 'status',
+        message: `Researching ${companyName} (${index + 1}/${companyNames.length})...`
+      });
       const candidate = candidateMap.get(companyName);
 
       const researchPromise = config.companyResearcher.research(
@@ -115,11 +114,17 @@ export async function researchConfirmedCompanies(
         (message) => send({ type: 'status', message: `Researching ${companyName}: ${message}` })
       );
 
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('timeout')), COMPANY_TIMEOUT_MS)
-      );
+      let timer: ReturnType<typeof setTimeout>;
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error('timeout')), COMPANY_TIMEOUT_MS);
+      });
 
-      const research = await Promise.race([researchPromise, timeoutPromise]);
+      let research;
+      try {
+        research = await Promise.race([researchPromise, timeoutPromise]);
+      } finally {
+        clearTimeout(timer!);
+      }
 
       // Apollo people search handles contacts — skip Claude-inferred ones
       const contacts: {
@@ -160,11 +165,9 @@ export async function researchConfirmedCompanies(
     }
   };
 
-  // Process companies in parallel batches of 3
-  const BATCH_SIZE = 3;
-  for (let i = 0; i < companyNames.length; i += BATCH_SIZE) {
-    const batch = companyNames.slice(i, i + BATCH_SIZE);
-    await Promise.all(batch.map((name, j) => processCompany(name, i + j)));
+  // Process companies one at a time to stay within API rate limits
+  for (let i = 0; i < companyNames.length; i++) {
+    await processCompany(companyNames[i], i);
   }
   send({ type: 'done', total: completedCount });
 }
