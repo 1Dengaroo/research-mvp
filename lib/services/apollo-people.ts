@@ -45,21 +45,9 @@ function isApolloPersonMatchResponse(value: unknown): value is ApolloPersonMatch
 }
 
 /**
- * Search for people at given organizations via Apollo mixed_people search.
- * Groups results by organization name.
+ * Search for people at a single organization via Apollo mixed_people search.
  */
-export async function apolloPeopleSearch(
-  orgIds: string[]
-): Promise<Map<string, ApolloPersonPreview[]>> {
-  const apiKey = process.env.APOLLO_API_KEY;
-  if (!apiKey) throw new Error('APOLLO_API_KEY is not set');
-
-  const payload = {
-    organization_ids: orgIds,
-    per_page: 25,
-    page: 1
-  };
-
+async function searchPeopleForOrg(orgId: string, apiKey: string): Promise<ApolloPersonPreview[]> {
   const response = await fetch(`${serviceConfig.apolloBaseUrl}/mixed_people/api_search`, {
     method: 'POST',
     headers: {
@@ -67,54 +55,67 @@ export async function apolloPeopleSearch(
       'Cache-Control': 'no-cache',
       'x-api-key': apiKey
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify({
+      organization_ids: [orgId],
+      per_page: 25,
+      page: 1
+    })
   });
 
   const responseText = await response.text();
 
   if (!response.ok) {
-    console.error(`[Apollo] People search failed (${response.status}):`, responseText);
-    throw new Error('People search failed. Please try again.');
+    console.error(
+      `[Apollo] People search failed for org ${orgId} (${response.status}):`,
+      responseText
+    );
+    return [];
   }
 
   let data: unknown;
   try {
-    // Apollo sometimes returns trailing content after the JSON object.
-    // Extract the first complete JSON object to handle this safely.
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON object found');
-    }
+    if (!jsonMatch) throw new Error('No JSON object found');
     data = JSON.parse(jsonMatch[0]);
   } catch {
-    console.error(
-      `[Apollo] People search returned invalid JSON (${response.status}):`,
-      responseText.slice(0, 200)
-    );
-    throw new Error('People search returned an unexpected response. Please try again.');
-  }
-  if (!isApolloPeopleSearchResponse(data)) {
-    throw new Error('Unexpected Apollo People response shape');
+    console.error(`[Apollo] People search returned invalid JSON for org ${orgId}`);
+    return [];
   }
 
-  const grouped = new Map<string, ApolloPersonPreview[]>();
+  if (!isApolloPeopleSearchResponse(data)) return [];
 
-  for (const person of data.people) {
-    const orgName = person.organization?.name ?? 'Unknown';
-
-    const preview: ApolloPersonPreview = {
+  return data.people.map(
+    (person): ApolloPersonPreview => ({
       apollo_person_id: person.id,
       first_name: person.first_name,
       last_name_obfuscated: person.last_name_obfuscated,
       title: person.title,
-      organization_name: orgName,
+      organization_name: person.organization?.name ?? 'Unknown',
       has_email: person.has_email === true,
       has_direct_phone: person.has_direct_phone === 'Yes'
-    };
+    })
+  );
+}
 
-    const existing = grouped.get(orgName) ?? [];
-    existing.push(preview);
-    grouped.set(orgName, existing);
+/**
+ * Search for people at given organizations via Apollo mixed_people search.
+ * Makes one request per org so each company gets a full page of results.
+ */
+export async function apolloPeopleSearch(
+  orgIds: string[]
+): Promise<Map<string, ApolloPersonPreview[]>> {
+  const apiKey = process.env.APOLLO_API_KEY;
+  if (!apiKey) throw new Error('APOLLO_API_KEY is not set');
+
+  const results = await Promise.all(orgIds.map((id) => searchPeopleForOrg(id, apiKey)));
+
+  const grouped = new Map<string, ApolloPersonPreview[]>();
+  for (const people of results) {
+    for (const person of people) {
+      const existing = grouped.get(person.organization_name) ?? [];
+      existing.push(person);
+      grouped.set(person.organization_name, existing);
+    }
   }
 
   return grouped;
