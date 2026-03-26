@@ -95,7 +95,6 @@ function ContactCarousel({
   const person = sorted[activeIndex];
   if (!person) return null;
 
-  const isFirst = activeIndex === 0;
   const isEnriched = !!person.is_enriched;
   const displayName = isEnriched
     ? `${person.first_name} ${person.last_name}`
