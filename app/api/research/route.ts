@@ -4,7 +4,7 @@ import { discoverCompanies, researchConfirmedCompanies } from '@/lib/services/pi
 import { researchBodySchema, parseBody } from '@/lib/validation';
 import type { ResearchStreamEvent } from '@/lib/types';
 
-export const maxDuration = 300;
+export const maxDuration = 900;
 
 export async function POST(req: NextRequest) {
   const { user } = await getAuthUser();
