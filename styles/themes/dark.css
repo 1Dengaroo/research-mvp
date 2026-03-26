@@ -109,6 +109,14 @@
   --card-foreground: #e8e6e3;
   --popover: #171615;
   --popover-foreground: #e8e6e3;
+  --modal: #1a1918;
+  --modal-foreground: #e8e6e3;
+  --dropdown: #1a1918;
+  --dropdown-foreground: #e8e6e3;
+  --sheet: #1a1918;
+  --sheet-foreground: #e8e6e3;
+  --tabs: #1a1918;
+  --input-surface: #1a1918;
   --primary: #a48efa;
   --primary-foreground: #000000;
   --secondary: #242220;

@@ -46,6 +46,14 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-modal: var(--modal);
+  --color-modal-foreground: var(--modal-foreground);
+  --color-dropdown: var(--dropdown);
+  --color-dropdown-foreground: var(--dropdown-foreground);
+  --color-sheet: var(--sheet);
+  --color-sheet-foreground: var(--sheet-foreground);
+  --color-tabs: var(--tabs);
+  --color-input-surface: var(--input-surface);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);

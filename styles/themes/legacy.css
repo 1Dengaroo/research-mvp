@@ -104,6 +104,14 @@
   --card-foreground: rgba(0, 0, 0, 0.87);
   --popover: #ffffff;
   --popover-foreground: rgba(0, 0, 0, 0.87);
+  --modal: #ffffff;
+  --modal-foreground: rgba(0, 0, 0, 0.87);
+  --dropdown: #ffffff;
+  --dropdown-foreground: rgba(0, 0, 0, 0.87);
+  --sheet: #ffffff;
+  --sheet-foreground: rgba(0, 0, 0, 0.87);
+  --tabs: #ffffff;
+  --input-surface: #ffffff;
   --primary: #6f42d6;
   --primary-foreground: #ffffff;
   --secondary: #f5f4f2;

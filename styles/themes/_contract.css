@@ -78,6 +78,14 @@
  * --card-foreground       Card text
  * --popover               Popover surface
  * --popover-foreground    Popover text
+ * --modal                 Modal/dialog surface
+ * --modal-foreground      Modal/dialog text
+ * --dropdown              Dropdown menu surface
+ * --dropdown-foreground   Dropdown menu text
+ * --sheet                 Sheet/drawer surface
+ * --sheet-foreground      Sheet/drawer text
+ * --tabs                  Tabs list surface
+ * --input-surface         Input/textarea surface
  * --primary               Primary action color
  * --primary-foreground    Text on primary
  * --secondary             Secondary action color
