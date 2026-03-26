@@ -161,6 +161,7 @@ export interface ResearchSession {
   selected_companies: string[];
   results: CompanyResult[];
   people_results: Record<string, ApolloPersonPreview[]>;
+  all_people_results: Record<string, ApolloPersonPreview[]>;
   email_sequences: Record<string, GeneratedEmailSequence>;
   status: 'in_progress' | 'completed';
   created_at: string;

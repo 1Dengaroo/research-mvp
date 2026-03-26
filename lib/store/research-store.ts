@@ -562,6 +562,7 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
       selectedCompanies,
       results,
       peopleResults,
+      allPeopleResults,
       emailSequences,
       sessionName
     } = get();
@@ -579,6 +580,7 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
         selected_companies: selectedCompanies,
         results,
         people_results: peopleResults,
+        all_people_results: allPeopleResults,
         email_sequences: emailSequences
       });
       set({ lastSavedAt: new Date().toISOString() });

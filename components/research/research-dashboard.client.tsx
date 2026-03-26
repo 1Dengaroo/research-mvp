@@ -60,6 +60,7 @@ function hydrateStore(session: ResearchSession) {
     selectedCompanies: session.selected_companies || [],
     results: session.results || [],
     peopleResults: session.people_results || {},
+    allPeopleResults: session.all_people_results || {},
     emailSequences: session.email_sequences || {},
     lastSavedAt: session.updated_at,
     error: null
