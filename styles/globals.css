@@ -54,6 +54,7 @@
   --color-sheet-foreground: var(--sheet-foreground);
   --color-tabs: var(--tabs);
   --color-input-surface: var(--input-surface);
+  --color-chrome: var(--chrome);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);

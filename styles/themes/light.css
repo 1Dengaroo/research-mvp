@@ -5,7 +5,7 @@
  */
 
 [data-theme='light'] body {
-  background-color: #f4f2fb;
+  background-color: #f9f8fc;
 }
 
 [data-theme='light'] {
@@ -77,11 +77,10 @@
   /* Button shape — medium rounded */
   --button-radius: 0.5rem;
 
-  /* Header — solid purple-tinted */
-  --header-bg: #f4f2fb;
+  /* Chrome — header & bottom nav share component surface */
+  --chrome: #ffffff;
   --header-border: #ddd8ec;
   --header-backdrop: none;
-  --bottom-nav-bg: #f4f2fb;
   --bottom-nav-border: #ddd8ec;
   --bottom-nav-backdrop: none;
 
@@ -98,7 +97,7 @@
   --signal-other-text: hsl(265 10% 40%);
 
   /* shadcn bridge tokens */
-  --background: #f4f2fb;
+  --background: #f9f8fc;
   --foreground: #1e1535;
   --card: #ffffff;
   --card-foreground: #1e1535;

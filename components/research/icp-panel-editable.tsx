@@ -117,7 +117,7 @@ export function IcpPanelEditable({
   return (
     <Card className="!gap-0 !py-0">
       {header && (
-        <div className="bg-muted/50 border-border flex items-center justify-between border-b px-4 py-2.5">
+        <div className="bg-card border-border flex items-center justify-between border-b px-4 py-2.5">
           {header}
         </div>
       )}

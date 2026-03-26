@@ -96,9 +96,9 @@ export function BottomNav() {
     <div
       className="fixed right-0 bottom-0 left-0 border-t"
       style={{
-        backgroundColor: 'var(--bottom-nav-bg, hsl(var(--card) / 0.8))',
+        backgroundColor: 'var(--chrome)',
         borderColor: 'var(--bottom-nav-border, hsl(var(--border)))',
-        backdropFilter: 'var(--bottom-nav-backdrop, blur(8px))'
+        backdropFilter: 'var(--bottom-nav-backdrop, none)'
       }}
     >
       <div

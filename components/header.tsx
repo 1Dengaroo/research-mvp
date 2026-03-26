@@ -170,7 +170,7 @@ export function Header() {
     <header
       className="sticky top-0 z-50 border-b"
       style={{
-        backgroundColor: 'var(--header-bg, hsl(var(--card)))',
+        backgroundColor: 'var(--chrome)',
         borderColor: 'var(--header-border, hsl(var(--border)))',
         backdropFilter: 'var(--header-backdrop, none)'
       }}

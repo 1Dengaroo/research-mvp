@@ -73,6 +73,9 @@
  * --background            Page background
  * --foreground            Page foreground text
  *
+ * APP CHROME
+ * --chrome                Header & bottom nav surface (matches component bg)
+ *
  * COMPONENTS
  * --card                  Card surface
  * --card-foreground       Card text

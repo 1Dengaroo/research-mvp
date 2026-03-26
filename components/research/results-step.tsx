@@ -331,7 +331,7 @@ export function ResultsStep() {
           )}
 
           <Card className="!gap-0 overflow-x-auto !py-0 lg:overflow-x-auto">
-            <div className={`bg-muted/50 border-border hidden ${GRID_COLS} border-b lg:grid`}>
+            <div className={`bg-card border-border hidden ${GRID_COLS} border-b lg:grid`}>
               {['Company', 'Target Person', 'Buying Signal', 'Overview & Fit'].map(
                 (label, i, arr) => (
                   <div

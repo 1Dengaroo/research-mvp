@@ -77,13 +77,12 @@
   /* Button shape */
   --button-radius: 0.375rem;
 
-  /* Header — solid white, sand border */
-  --header-bg: #ffffff;
+  /* Chrome — header & bottom nav share component surface */
+  --chrome: #ffffff;
   --header-border: #e8e6e3;
   --header-backdrop: none;
-  --bottom-nav-bg: rgba(255, 255, 255, 0.92);
   --bottom-nav-border: #e8e6e3;
-  --bottom-nav-backdrop: blur(8px);
+  --bottom-nav-backdrop: none;
 
   /* Signal badges — muted pastels */
   --signal-job-bg: hsl(220 50% 52% / 0.08);

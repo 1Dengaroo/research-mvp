@@ -259,28 +259,9 @@ export function ConfirmStep() {
             </div>
           )}
 
-          {uniqueLocations.length > 1 && (
-            <div className="mb-3 flex shrink-0 flex-wrap items-center gap-1.5">
-              <MapPin className="text-muted-foreground size-3.5" />
-              <FilterChip
-                label="All"
-                active={locationFilter === null}
-                onClick={() => setLocationFilter(null)}
-              />
-              {uniqueLocations.map((loc) => (
-                <FilterChip
-                  key={loc}
-                  label={loc}
-                  active={locationFilter === loc}
-                  onClick={() => setLocationFilter(locationFilter === loc ? null : loc)}
-                />
-              ))}
-            </div>
-          )}
-
           <Card className="min-h-0 flex-1 !gap-0 !py-0">
             {/* Header */}
-            <div className="bg-muted/50 border-border flex shrink-0 items-center gap-4 border-b px-4 py-2.5">
+            <div className="bg-card border-border flex shrink-0 items-center gap-4 border-b px-4 py-2.5">
               {allFiltered && (
                 <button onClick={toggleAll}>
                   <Checkbox checked={allSelected} />
@@ -296,6 +277,24 @@ export function ConfirmStep() {
 
             {/* Scrollable rows */}
             <div className="min-h-0 flex-1 overflow-y-auto">
+              {uniqueLocations.length > 1 && (
+                <div className="border-border bg-card sticky top-0 z-10 flex flex-wrap items-center gap-1.5 border-b px-4 py-2">
+                  <MapPin className="text-muted-foreground size-3" />
+                  <FilterChip
+                    label="All"
+                    active={locationFilter === null}
+                    onClick={() => setLocationFilter(null)}
+                  />
+                  {uniqueLocations.map((loc) => (
+                    <FilterChip
+                      key={loc}
+                      label={loc}
+                      active={locationFilter === loc}
+                      onClick={() => setLocationFilter(locationFilter === loc ? null : loc)}
+                    />
+                  ))}
+                </div>
+              )}
               {isDiscovering &&
                 candidates.length === 0 &&
                 Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} index={i} />)}

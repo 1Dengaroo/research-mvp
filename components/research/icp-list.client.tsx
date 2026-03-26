@@ -277,7 +277,7 @@ function CreateICPModal({
 
             <div className="p-6">
               <Card className="!gap-0 !py-0">
-                <div className="bg-muted/50 border-border flex items-center justify-between border-b px-4 py-2.5">
+                <div className="bg-card border-border flex items-center justify-between border-b px-4 py-2.5">
                   <span className="text-muted-foreground section-label">Customer Profile</span>
                   {description.trim() && (
                     <span className="text-muted-foreground/60 text-xs">
