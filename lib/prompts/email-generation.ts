@@ -93,4 +93,3 @@ QUALITY CHECKLIST (verify before returning)
 - No em dashes: "-"
 - Sign-offs use first name only — no title, company, or contact info`;
 }
-

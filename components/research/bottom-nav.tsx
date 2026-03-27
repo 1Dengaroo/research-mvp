@@ -2,7 +2,18 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Loader2, ChevronRight, Mail, RotateCcw } from 'lucide-react';
+import {
+  Loader2,
+  ChevronRight,
+  Mail,
+  RotateCcw,
+  Check,
+  FileText,
+  Lightbulb,
+  Building2,
+  Users,
+  Send
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -18,19 +29,32 @@ import {
 import { useResearchStore } from '@/lib/store/research-store';
 import { MAX_WIDTH } from '@/lib/layout';
 
+type StepStatus = 'pending' | 'in-progress' | 'completed';
+
 function NavButton({
   label,
-  stepNumber,
+  icon: Icon,
   active,
   enabled,
+  status,
   onClick
 }: {
   label: string;
-  stepNumber: number;
+  icon: React.ComponentType<{ className?: string }>;
   active: boolean;
   enabled: boolean;
+  status: StepStatus;
   onClick: () => void;
 }) {
+  const mobileContent =
+    status === 'in-progress' ? (
+      <Loader2 className="size-3.5 animate-spin" />
+    ) : status === 'completed' ? (
+      <Check className="size-3.5" />
+    ) : (
+      <Icon className="size-3.5" />
+    );
+
   return (
     <>
       {/* Mobile: circular step indicator */}
@@ -40,25 +64,36 @@ function NavButton({
         className={`flex size-8 items-center justify-center rounded-full text-xs font-medium transition-colors md:hidden ${
           active
             ? 'bg-primary text-primary-foreground'
-            : enabled
-              ? 'bg-muted text-muted-foreground hover:text-foreground'
-              : 'bg-muted/50 text-muted-foreground/50 cursor-not-allowed'
+            : status === 'completed'
+              ? 'bg-primary/15 text-primary'
+              : enabled
+                ? 'bg-muted text-muted-foreground hover:text-foreground'
+                : 'bg-muted/50 text-muted-foreground/50 cursor-not-allowed'
         }`}
       >
-        {stepNumber}
+        {mobileContent}
       </button>
       {/* Desktop: full label */}
       <button
         onClick={() => enabled && onClick()}
         disabled={!enabled}
-        className={`hidden rounded-md px-2.5 py-1.5 transition-colors md:block ${
+        className={`hidden items-center gap-1.5 rounded-md px-2.5 py-1.5 transition-colors md:flex ${
           active
             ? 'bg-muted text-foreground font-medium'
-            : enabled
-              ? 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-              : 'text-muted-foreground/50 cursor-not-allowed'
+            : status === 'completed'
+              ? 'text-primary hover:bg-muted/50'
+              : enabled
+                ? 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                : 'text-muted-foreground/50 cursor-not-allowed'
         }`}
       >
+        {status === 'in-progress' ? (
+          <Loader2 className="size-3 animate-spin" />
+        ) : status === 'completed' ? (
+          <Check className="size-3" />
+        ) : (
+          <Icon className="size-3" />
+        )}
         {label}
       </button>
     </>
@@ -107,42 +142,47 @@ export function BottomNav() {
         {/* Left: step navigation */}
         <div className="flex items-center gap-1 text-xs">
           <NavButton
-            label="1. Describe"
-            stepNumber={1}
+            label="Describe"
+            icon={FileText}
             active={step === 'input'}
             enabled
+            status={isExtracting ? 'in-progress' : hasIcp ? 'completed' : 'pending'}
             onClick={() => setStep('input')}
           />
           <span className="text-border hidden md:inline">&mdash;</span>
           <NavButton
-            label="2. Strategy"
-            stepNumber={2}
+            label="Strategy"
+            icon={Lightbulb}
             active={step === 'review'}
             enabled={hasIcp}
+            status={isStrategizing ? 'in-progress' : hasCandidates ? 'completed' : 'pending'}
             onClick={() => setStep('review')}
           />
           <span className="text-border hidden md:inline">&mdash;</span>
           <NavButton
-            label="3. Companies"
-            stepNumber={3}
+            label="Companies"
+            icon={Building2}
             active={step === 'confirm'}
             enabled={hasCandidates || isDiscovering}
+            status={isDiscovering ? 'in-progress' : hasResults ? 'completed' : 'pending'}
             onClick={() => setStep('confirm')}
           />
           <span className="text-border hidden md:inline">&mdash;</span>
           <NavButton
-            label="4. Contacts"
-            stepNumber={4}
+            label="Contacts"
+            icon={Users}
             active={step === 'results'}
             enabled={hasResults || isResearching}
+            status={isResearching ? 'in-progress' : hasResults ? 'completed' : 'pending'}
             onClick={() => setStep('results')}
           />
           <span className="text-border hidden md:inline">&mdash;</span>
           <NavButton
-            label="5. Outreach"
-            stepNumber={5}
+            label="Outreach"
+            icon={Send}
             active={step === 'outreach'}
             enabled={hasResults}
+            status="pending"
             onClick={() => setStep('outreach')}
           />
         </div>

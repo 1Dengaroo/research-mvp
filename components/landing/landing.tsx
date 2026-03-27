@@ -1,7 +1,11 @@
 'use client';
 
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Play } from 'lucide-react';
+import { ArrowRight, ChevronDown, Play } from 'lucide-react';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Button } from '@/components/ui/button';
 import {
   Accordion,
@@ -11,25 +15,109 @@ import {
 } from '@/components/ui/accordion';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { MAX_WIDTH } from '@/lib/layout';
+import { AuroraCanvas } from './aurora-canvas';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const ROTATING_WORDS = [
+  'funding rounds',
+  'hiring surges',
+  'new launches',
+  'role changes',
+  'growth signals'
+];
+
+function RotatingWord() {
+  const [index, setIndex] = useState(0);
+  const wrapperRef = useRef<HTMLSpanElement>(null);
+  const wordRef = useRef<HTMLSpanElement>(null);
+  const measureRef = useRef<HTMLSpanElement>(null);
+
+  const cycle = useCallback(() => {
+    const word = wordRef.current;
+    const wrapper = wrapperRef.current;
+    const measure = measureRef.current;
+    if (!word || !wrapper || !measure) return;
+
+    const nextIndex = (index + 1) % ROTATING_WORDS.length;
+
+    // Measure the next word's width
+    measure.textContent = ROTATING_WORDS[nextIndex];
+    const nextWidth = measure.offsetWidth;
+
+    // Fade out current word
+    gsap.to(word, {
+      opacity: 0,
+      y: '-0.15em',
+      duration: 0.25,
+      ease: 'power2.in',
+      onComplete: () => {
+        setIndex(nextIndex);
+        gsap.set(word, { y: '0.15em' });
+        gsap.to(word, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' });
+      }
+    });
+
+    // Smoothly animate container width
+    gsap.to(wrapper, {
+      width: nextWidth,
+      duration: 0.4,
+      ease: 'power2.inOut'
+    });
+  }, [index]);
+
+  // Set initial width after mount
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    const word = wordRef.current;
+    if (wrapper && word) {
+      wrapper.style.width = `${word.offsetWidth}px`;
+    }
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(cycle, 2800);
+    return () => clearInterval(id);
+  }, [cycle]);
+
+  return (
+    <>
+      <span
+        ref={measureRef}
+        aria-hidden
+        className="pointer-events-none invisible absolute whitespace-nowrap"
+        style={{ font: 'inherit' }}
+      />
+      <span ref={wrapperRef} className="inline-block">
+        <span
+          ref={wordRef}
+          className="inline-block bg-linear-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text whitespace-nowrap text-transparent"
+        >
+          {ROTATING_WORDS[index]}
+        </span>
+      </span>
+    </>
+  );
+}
 
 const SHOWCASE = [
   {
     label: 'Signal Detection',
     title: 'Catch buying signals before your competitors',
     desc: 'Remes monitors job postings, funding rounds, and product launches across the web — surfacing the companies most likely to buy right now.',
-    image: '/showcase-signals.png'
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80'
   },
   {
     label: 'Contact Discovery',
     title: 'Find the right person instantly',
     desc: 'Automatically match signals to decision-makers with verified emails and LinkedIn profiles. No more guessing who to reach out to.',
-    image: '/showcase-contacts.png'
+    image: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&q=80'
   },
   {
     label: 'AI Outreach',
     title: 'Emails that actually get replies',
     desc: 'Every email is grounded in the signal that triggered it — relevant, timely, and personal. Not another generic template.',
-    image: '/showcase-outreach.png'
+    image: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&q=80'
   }
 ];
 
@@ -44,11 +132,11 @@ const FAQS = [
   },
   {
     q: 'What reply rate can I expect?',
-    a: 'Reply rates vary by industry and offer, but our signal-driven approach consistently outperforms generic outreach by 3–5x. Most customers see meaningful pipeline activity by week 6.'
+    a: 'Reply rates vary by industry and offer, but our signal-driven approach consistently outperforms generic outreach by 3\u20135x. Most customers see meaningful pipeline activity by week 6.'
   },
   {
     q: 'How much does Remes cost compared to hiring?',
-    a: 'Plans start at $1,497/month. A fully loaded sales hire costs $90K–$150K/year, takes 3–6 months to ramp, and turns over at 39% annually. Remes starts producing pipeline in 2 weeks and never quits. One closed deal typically pays for the entire annual subscription.'
+    a: 'Plans start at $1,497/month. A fully loaded sales hire costs $90K\u2013$150K/year, takes 3\u20136 months to ramp, and turns over at 39% annually. Remes starts producing pipeline in 2 weeks and never quits. One closed deal typically pays for the entire annual subscription.'
   },
   {
     q: 'What are buying signals?',
@@ -56,7 +144,7 @@ const FAQS = [
   },
   {
     q: 'What types of buying signals does Remes detect?',
-    a: 'Anything you can describe. Typical buying signals include hiring surges, specific role postings, funding rounds, leadership changes and new executive hires, product launches and company announcements, headcount growth velocity, LinkedIn posts and engagement from key decision-makers, tech stack changes, and competitive movements. You are not limited to these categories. You can describe what buying intent looks like for your product and Remes will find it.'
+    a: 'Anything you can describe. Typical buying signals include hiring surges, specific role postings, funding rounds, leadership changes and new executive hires, product launches and company announcements, headcount growth velocity, LinkedIn posts and engagement from key decision-makers, tech stack changes, and competitive movements. You are not limited to these categories.'
   },
   {
     q: 'Do you send emails from my account?',
@@ -68,7 +156,7 @@ const FAQS = [
   },
   {
     q: 'How is Remes different from ZoomInfo, Apollo, Instantly or Clay?',
-    a: 'Apollo and ZoomInfo are contact databases: they find leads but do not research or write outreach. Instantly is a campaign tool: you have to import a lead list and manually create a campaign. Clay requires building automations from scratch with a credit system that burns fast. Remes replaces Clay + Apollo + Instantly with one tool: buying signal monitoring, lead research, personalized outreach, and deliverability, all built in.'
+    a: 'Apollo and ZoomInfo are contact databases: they find leads but do not research or write outreach. Instantly is a campaign tool: you have to import a lead list and manually create a campaign. Clay requires building automations from scratch with a credit system that burns fast. Remes replaces Clay + Apollo + Instantly with one tool.'
   },
   {
     q: 'Why is it called Remes?',
@@ -80,6 +168,7 @@ export function Landing() {
   const user = useAuthStore((s) => s.user);
   const openAuthModal = useAuthStore((s) => s.openAuthModal);
   const router = useRouter();
+  const pageRef = useRef<HTMLDivElement>(null);
 
   const handleGetStarted = () => {
     if (user) {
@@ -89,122 +178,259 @@ export function Landing() {
     }
   };
 
+  useGSAP(
+    () => {
+      // Hero text stagger
+      gsap.fromTo(
+        '.hero-reveal',
+        { y: 60, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1.2, ease: 'power4.out', stagger: 0.15, delay: 0.2 }
+      );
+
+      // Scroll indicator — bounce + fade out on scroll
+      gsap.to('.scroll-indicator', {
+        y: 8,
+        repeat: -1,
+        yoyo: true,
+        duration: 1.5,
+        ease: 'power1.inOut'
+      });
+      gsap.to('.scroll-indicator', {
+        opacity: 0,
+        scrollTrigger: {
+          trigger: '.scroll-indicator',
+          start: 'top 90%',
+          end: 'top 70%',
+          scrub: true
+        }
+      });
+
+      // Section headings
+      gsap.utils.toArray<HTMLElement>('.section-heading').forEach((el) => {
+        gsap.fromTo(
+          el,
+          { y: 30, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 88%',
+              toggleActions: 'play none none reverse'
+            }
+          }
+        );
+      });
+
+      // Showcase — text and image enter separately with offset
+      gsap.utils.toArray<HTMLElement>('.showcase-item').forEach((el) => {
+        const text = el.querySelector('.showcase-text');
+        const image = el.querySelector('.showcase-image');
+
+        if (text) {
+          gsap.fromTo(
+            text,
+            { x: -30, opacity: 0 },
+            {
+              x: 0,
+              opacity: 1,
+              duration: 0.8,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: el,
+                start: 'top 82%',
+                toggleActions: 'play none none reverse'
+              }
+            }
+          );
+        }
+        if (image) {
+          gsap.fromTo(
+            image,
+            { x: 30, opacity: 0 },
+            {
+              x: 0,
+              opacity: 1,
+              duration: 0.8,
+              delay: 0.12,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: el,
+                start: 'top 82%',
+                toggleActions: 'play none none reverse'
+              }
+            }
+          );
+        }
+      });
+
+      // FAQ items — stagger in individually
+      gsap.utils.toArray<HTMLElement>('.faq-item').forEach((el, i) => {
+        gsap.fromTo(
+          el,
+          { y: 20, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            ease: 'power2.out',
+            delay: i * 0.06,
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 90%',
+              toggleActions: 'play none none reverse'
+            }
+          }
+        );
+      });
+
+      // CTA reveal
+      gsap.fromTo(
+        '.final-cta',
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '.final-cta',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+
+      // CTA glow pulse
+      gsap.to('.cta-glow', {
+        scale: 1.15,
+        opacity: 0.08,
+        repeat: -1,
+        yoyo: true,
+        duration: 3,
+        ease: 'sine.inOut'
+      });
+    },
+    { scope: pageRef }
+  );
+
   return (
-    <div className="relative flex flex-col overflow-hidden">
-      {/* Subtle dot background */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.025]"
-        style={{
-          backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)',
-          backgroundSize: '32px 32px'
-        }}
-      />
+    <div ref={pageRef} className="relative flex flex-col" style={{ background: '#0f0a1e' }}>
+      {/* ── Hero ── */}
+      <section className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden">
+        <div className="absolute inset-0">
+          <AuroraCanvas className="absolute inset-0" />
+        </div>
 
-      {/* Accent glow — top right */}
-      <div
-        className="pointer-events-none absolute -top-40 -right-40 h-[600px] w-[600px] rounded-full opacity-[0.04]"
-        style={{
-          background: 'radial-gradient(circle, oklch(var(--accent-primary)), transparent 70%)'
-        }}
-      />
-
-      {/* ── Hero with gradient background ── */}
-      <section
-        className="relative min-h-[90dvh] overflow-hidden"
-        style={{
-          background: 'linear-gradient(135deg, #6366f1 0%, #7c3aed 30%, #a855f7 65%, #d946ef 100%)'
-        }}
-      >
+        {/* Grain overlay */}
         <div
-          className="pointer-events-none absolute right-0 bottom-0 left-0 h-[60%]"
+          className="pointer-events-none absolute inset-0 opacity-20"
           style={{
-            background: 'linear-gradient(to bottom, transparent, var(--background))'
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E")`,
+            backgroundSize: '128px 128px'
           }}
         />
 
+        {/* Grid lines */}
         <div
-          className={`relative mx-auto flex w-full ${MAX_WIDTH} flex-col items-center px-6 pt-28 pb-24 text-center sm:pt-40 sm:pb-32`}
+          className="pointer-events-none absolute inset-0 opacity-3"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+            backgroundSize: '60px 60px'
+          }}
+        />
+
+        {/* Bottom fade */}
+        <div
+          className="pointer-events-none absolute right-0 bottom-0 left-0 h-[40%]"
+          style={{ background: 'linear-gradient(to bottom, transparent, #0f0a1e)' }}
+        />
+
+        <div
+          className={`relative z-10 mx-auto flex w-full ${MAX_WIDTH} flex-col items-center px-6 pt-32 pb-20 text-center sm:pt-40 sm:pb-28`}
         >
-          <div
-            className="animate-in fade-in fill-mode-both duration-500"
-            style={{ animationDelay: '0ms' }}
-          >
-            <span className="section-label text-white/70">AI-Powered Outbound</span>
+          <div className="hero-reveal">
+            <span className="inline-block rounded-full border border-violet-400/30 bg-violet-500/10 px-4 py-1.5 text-xs font-medium tracking-widest text-violet-300 uppercase backdrop-blur-sm">
+              AI-Powered Outbound
+            </span>
           </div>
 
-          <div
-            className="animate-in fade-in slide-in-from-bottom-4 fill-mode-both mt-5 duration-700"
-            style={{ animationDelay: '100ms' }}
-          >
-            <h1 className="max-w-3xl text-4xl leading-[1.08] font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-              The best time to reach out is{' '}
-              <span className="text-white/90 underline decoration-white/30 underline-offset-4">
-                right now
-              </span>
-            </h1>
-          </div>
+          <h1 className="hero-reveal mt-8 max-w-4xl text-4xl leading-tight font-bold tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-7xl">
+            Reach out the moment
+            <br />
+            you spot <RotatingWord />
+          </h1>
 
-          <div
-            className="animate-in fade-in slide-in-from-bottom-3 fill-mode-both mt-5 duration-700 sm:mt-6"
-            style={{ animationDelay: '200ms' }}
-          >
-            <p className="mx-auto max-w-lg text-base leading-relaxed text-white/80 sm:text-lg">
-              Remes monitors the web for buying signals and turns them into personalized outreach —
-              automatically.
-            </p>
-          </div>
+          <p className="hero-reveal mx-auto mt-6 max-w-xl text-base leading-relaxed text-white/70 sm:text-lg sm:leading-relaxed">
+            Remes detects buying signals across the web and crafts personalized outreach — so you
+            reach prospects at exactly the right moment.
+          </p>
 
-          <div
-            className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both mt-7 flex items-center gap-4 duration-700 sm:mt-8"
-            style={{ animationDelay: '300ms' }}
-          >
+          <div className="hero-reveal mt-10 flex flex-col items-center gap-4 sm:flex-row sm:gap-6">
             <Button
               size="lg"
-              className="gap-2 border-white/20 bg-white px-6 text-[#7c3aed] hover:bg-white/90"
+              className="gap-2 rounded-full border border-white/10 bg-white px-8 py-6 text-base font-semibold text-[#0f0a1e] shadow-2xl shadow-violet-500/20 transition-all duration-300 hover:bg-white/90 hover:shadow-violet-500/40"
               onClick={handleGetStarted}
             >
               Get started
               <ArrowRight className="size-4" />
             </Button>
-            <span className="text-xs text-white/60">No credit card required</span>
+            <span className="text-sm text-white/50">No credit card required</span>
           </div>
+        </div>
+
+        <div className="scroll-indicator absolute bottom-8 left-1/2 z-10 -translate-x-1/2">
+          <ChevronDown className="size-5 text-white/20" />
         </div>
       </section>
 
       <div className={`relative mx-auto flex w-full ${MAX_WIDTH} flex-col px-6`}>
         {/* ── Showcase ── */}
-        <section id="use-cases" className="scroll-mt-16 py-10 sm:py-14">
-          <div className="mb-10 sm:mb-14">
-            <span className="section-label text-muted-foreground">See it in action</span>
-            <h2 className="text-foreground mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
+        <section id="use-cases" className="scroll-mt-16 py-16 sm:py-24">
+          <div className="section-heading mb-10 sm:mb-14">
+            <span className="mb-3 inline-block rounded-full border border-violet-400/30 bg-violet-500/10 px-4 py-1.5 text-xs font-medium tracking-widest text-violet-300 uppercase backdrop-blur-sm">
+              See it in action
+            </span>
+            <h2 className="mt-4 text-2xl font-bold tracking-tight text-white sm:text-3xl">
               Built for modern sales teams
             </h2>
           </div>
 
-          <div className="flex flex-col gap-16 sm:gap-20">
+          <div className="flex flex-col gap-24 sm:gap-32">
             {SHOWCASE.map((item, i) => (
               <div
                 key={item.title}
-                className={`flex flex-col items-center gap-8 sm:gap-12 ${i % 2 === 1 ? 'sm:flex-row-reverse' : 'sm:flex-row'}`}
+                className={`showcase-item flex flex-col items-center gap-8 sm:gap-12 ${i % 2 === 1 ? 'sm:flex-row-reverse' : 'sm:flex-row'}`}
               >
                 {/* Text */}
-                <div className="flex-1">
-                  <span className="section-label text-primary">{item.label}</span>
-                  <h3 className="text-foreground mt-2 text-xl font-bold tracking-tight sm:text-2xl">
+                <div className="showcase-text flex-1">
+                  <span className="text-xs font-medium tracking-widest text-violet-400 uppercase">
+                    {item.label}
+                  </span>
+                  <h3 className="mt-2 text-xl font-bold tracking-tight text-white sm:text-2xl">
                     {item.title}
                   </h3>
-                  <p className="text-muted-foreground mt-3 max-w-md text-sm leading-relaxed sm:text-base">
+                  <p className="mt-3 max-w-md text-sm leading-relaxed text-white/70 sm:text-base">
                     {item.desc}
                   </p>
                 </div>
 
-                {/* Placeholder image/video */}
-                <div className="bg-muted border-border flex aspect-video w-full flex-1 items-center justify-center overflow-hidden rounded-xl border">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="bg-primary/10 flex size-10 items-center justify-center rounded-full">
-                      <Play className="text-primary size-4 translate-x-0.5" />
+                {/* Image */}
+                <div className="showcase-image group relative flex aspect-video w-full flex-1 items-center justify-center overflow-hidden rounded-2xl border border-white/8 bg-white/3 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-violet-500/10">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.image}
+                    alt=""
+                    className="absolute inset-0 size-full object-cover opacity-40 transition-opacity duration-500 group-hover:opacity-60"
+                  />
+                  <div className="relative flex flex-col items-center gap-2">
+                    <div className="flex size-12 items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-sm transition-transform duration-300 group-hover:scale-110">
+                      <Play className="size-5 translate-x-0.5 text-white/60" />
                     </div>
-                    <span className="text-muted-foreground text-xs">{item.label}</span>
+                    <span className="text-xs text-white/50">{item.label}</span>
                   </div>
                 </div>
               </div>
@@ -213,43 +439,58 @@ export function Landing() {
         </section>
 
         {/* ── FAQs ── */}
-        <section id="faqs" className="border-border scroll-mt-16 border-t py-10 sm:py-14">
-          <div className="mb-8 sm:mb-10">
-            <span className="section-label text-muted-foreground">FAQs</span>
-            <h2 className="text-foreground mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
+        <section id="faqs" className="scroll-mt-16 border-t border-white/6 py-16 sm:py-24">
+          <div className="section-heading mb-10 sm:mb-14">
+            <span className="mb-3 inline-block rounded-full border border-violet-400/30 bg-violet-500/10 px-4 py-1.5 text-xs font-medium tracking-widest text-violet-300 uppercase backdrop-blur-sm">
+              FAQs
+            </span>
+            <h2 className="mt-4 text-2xl font-bold tracking-tight text-white sm:text-3xl">
               Frequently asked questions
             </h2>
           </div>
 
-          <Accordion type="single" collapsible className="w-full">
-            {FAQS.map((faq, i) => (
-              <AccordionItem key={i} value={`faq-${i}`}>
-                <AccordionTrigger>{faq.q}</AccordionTrigger>
-                <AccordionContent>
-                  <p className="text-muted-foreground leading-relaxed">{faq.a}</p>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+          <div>
+            <Accordion type="single" collapsible className="w-full">
+              {FAQS.map((faq, i) => (
+                <AccordionItem key={i} value={`faq-${i}`} className="faq-item border-white/6">
+                  <AccordionTrigger className="text-left text-white/80 hover:text-white">
+                    {faq.q}
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <p className="leading-relaxed text-white/60">{faq.a}</p>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
         </section>
 
         {/* ── CTA ── */}
-        <section className="border-border border-t py-14 text-center sm:py-20">
-          <h2 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-            Stop missing buying signals
-          </h2>
-          <p className="text-muted-foreground mx-auto mt-3 max-w-md text-sm leading-relaxed sm:text-base">
-            Start detecting signals and generating outreach in minutes. No credit card required.
-          </p>
-          <Button size="lg" className="mt-7 gap-2 px-8" onClick={handleGetStarted}>
-            Get started free
-            <ArrowRight className="size-4" />
-          </Button>
+        <section className="relative overflow-hidden border-t border-white/6 py-20 text-center sm:py-28">
+          {/* Glow orb */}
+          <div className="cta-glow absolute top-1/2 left-1/2 size-125 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/10 blur-[120px]" />
+
+          <div className="final-cta relative z-10">
+            <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
+              Stop missing buying signals
+            </h2>
+            <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/60 sm:text-base">
+              Start detecting signals and generating outreach in minutes. No credit card required.
+            </p>
+            <Button
+              size="lg"
+              className="mt-8 gap-2 rounded-full border border-white/10 bg-white px-8 py-6 text-base font-semibold text-[#0f0a1e] shadow-2xl shadow-violet-500/20 transition-all duration-300 hover:bg-white/90 hover:shadow-violet-500/40"
+              onClick={handleGetStarted}
+            >
+              Get started free
+              <ArrowRight className="size-4" />
+            </Button>
+          </div>
         </section>
 
         {/* ── Footer ── */}
-        <footer className="border-border border-t py-6">
-          <p className="text-muted-foreground text-xs">&copy; {new Date().getFullYear()} Remes</p>
+        <footer className="border-t border-white/6 py-8">
+          <p className="text-xs text-white/50">&copy; {new Date().getFullYear()} Remes</p>
         </footer>
       </div>
     </div>

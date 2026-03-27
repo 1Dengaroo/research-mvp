@@ -5,6 +5,8 @@
 /* Theme files */
 @import './themes/light.css';
 @import './themes/dark.css';
+@import './themes/lavender.css';
+@import './themes/amethyst.css';
 @import './themes/legacy.css';
 
 @custom-variant dark (&:is(.dark *));

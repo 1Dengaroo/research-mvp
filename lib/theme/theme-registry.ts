@@ -37,6 +37,30 @@ export const themes: ThemeDefinition[] = [
     }
   },
   {
+    id: 'lavender',
+    name: 'Lavender',
+    description: 'Warm rosy-purple — soft, airy, gentle',
+    isDark: false,
+    previewColors: {
+      bg: '#f8f4fc',
+      primary: '#9040d0',
+      secondary: '#8c7a9e',
+      tertiary: '#7c5ccc'
+    }
+  },
+  {
+    id: 'amethyst',
+    name: 'Amethyst',
+    description: 'Deep violet-indigo — crisp, saturated, polished',
+    isDark: false,
+    previewColors: {
+      bg: '#f5f2fb',
+      primary: '#5b2ebd',
+      secondary: '#706490',
+      tertiary: '#5050c8'
+    }
+  },
+  {
     id: 'legacy',
     name: 'Legacy',
     description: 'Original — warm sand neutrals on white',
