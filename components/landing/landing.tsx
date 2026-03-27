@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback, type RefObject } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useGSAP } from '@gsap/react';
@@ -168,29 +168,6 @@ const FAQS = [
 ];
 
 function ShowcaseSection() {
-  const [active, setActive] = useState(0);
-  const videoRefs: RefObject<HTMLVideoElement | null>[] = [
-    useRef<HTMLVideoElement>(null),
-    useRef<HTMLVideoElement>(null),
-    useRef<HTMLVideoElement>(null)
-  ];
-
-  useEffect(() => {
-    videoRefs.forEach((ref, i) => {
-      const video = ref.current;
-      if (!video) return;
-      if (i === active) {
-        video.currentTime = 0;
-        video.play().catch(() => {});
-      } else {
-        video.pause();
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active]);
-
-  const item = SHOWCASE[active];
-
   return (
     <section id="use-cases" className="relative scroll-mt-16 py-16 sm:py-24">
       <div className="section-heading relative mb-10 sm:mb-14">
@@ -202,65 +179,46 @@ function ShowcaseSection() {
         </h2>
       </div>
 
-      {/* Tab pills */}
-      <div className="mb-8 flex flex-wrap gap-2">
-        {SHOWCASE.map((s, i) => (
-          <button
-            key={s.label}
-            type="button"
-            onClick={() => setActive(i)}
-            className={`rounded-full px-5 py-2 text-sm font-medium transition-all duration-300 ${
-              i === active
-                ? 'bg-white text-[#08080c] shadow-lg shadow-violet-500/20'
-                : 'border border-white/10 bg-white/5 text-white/60 hover:bg-white/10 hover:text-white/80'
-            }`}
+      <div className="flex flex-col gap-16 sm:gap-24">
+        {SHOWCASE.map((item, i) => (
+          <div
+            key={item.label}
+            className={`showcase-item flex flex-col gap-8 sm:gap-12 ${i % 2 === 1 ? 'sm:flex-row-reverse' : 'sm:flex-row'}`}
           >
-            {s.label}
-          </button>
-        ))}
-      </div>
+            {/* Video */}
+            <div className="relative aspect-video flex-[1.4] overflow-hidden rounded-2xl border border-white/8 bg-black/40">
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                poster={item.poster}
+                className="absolute inset-0 size-full object-cover"
+              >
+                <source src={item.video} type="video/mp4" />
+              </video>
+              <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.4)]" />
+            </div>
 
-      {/* Video + text */}
-      <div className="showcase-item flex flex-col gap-8 sm:flex-row sm:gap-12">
-        {/* Video */}
-        <div className="relative aspect-video flex-[1.4] overflow-hidden rounded-2xl border border-white/8 bg-black/40">
-          {SHOWCASE.map((s, i) => (
-            <video
-              key={s.label}
-              ref={videoRefs[i]}
-              muted
-              loop
-              playsInline
-              poster={s.poster}
-              className={`absolute inset-0 size-full object-cover transition-opacity duration-500 ${
-                i === active ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <source src={s.video} type="video/mp4" />
-            </video>
-          ))}
-
-          {/* Subtle vignette */}
-          <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.4)]" />
-        </div>
-
-        {/* Text */}
-        <div className="flex flex-1 flex-col justify-center">
-          <div className="mb-3 flex items-center gap-3">
-            <span className="flex size-7 items-center justify-center rounded-full border border-violet-400/30 bg-violet-500/10 text-xs font-semibold text-violet-300">
-              {active + 1}
-            </span>
-            <span className="text-xs font-medium tracking-widest text-violet-400 uppercase">
-              {item.label}
-            </span>
+            {/* Text */}
+            <div className="flex flex-1 flex-col justify-center">
+              <div className="mb-3 flex items-center gap-3">
+                <span className="flex size-7 items-center justify-center rounded-full border border-violet-400/30 bg-violet-500/10 text-xs font-semibold text-violet-300">
+                  {i + 1}
+                </span>
+                <span className="text-xs font-medium tracking-widest text-violet-400 uppercase">
+                  {item.label}
+                </span>
+              </div>
+              <h3 className="text-xl font-bold tracking-tight text-white sm:text-2xl lg:text-3xl">
+                {item.title}
+              </h3>
+              <p className="mt-3 max-w-md text-sm leading-relaxed text-white/60 sm:text-base">
+                {item.desc}
+              </p>
+            </div>
           </div>
-          <h3 className="text-xl font-bold tracking-tight text-white sm:text-2xl lg:text-3xl">
-            {item.title}
-          </h3>
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-white/60 sm:text-base">
-            {item.desc}
-          </p>
-        </div>
+        ))}
       </div>
     </section>
   );
@@ -530,7 +488,7 @@ export function Landing() {
               </h2>
             </div>
 
-            <div className="relative mx-auto max-w-2xl rounded-2xl border border-white/8 bg-white/[0.02] p-1">
+            <div className="relative mx-auto max-w-2xl rounded-2xl border border-white/8 bg-white/2 p-1">
               <Accordion type="single" collapsible className="w-full">
                 {FAQS.map((faq, i) => (
                   <AccordionItem
