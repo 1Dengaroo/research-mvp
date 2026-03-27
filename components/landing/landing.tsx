@@ -168,8 +168,63 @@ const FAQS = [
 ];
 
 function ShowcaseSection() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      gsap.utils.toArray<HTMLElement>('.showcase-item').forEach((el) => {
+        const video = el.querySelector('.showcase-video');
+        const text = el.querySelector('.showcase-text');
+        const isReversed = el.classList.contains('showcase-reversed');
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+          }
+        });
+
+        // Video slides in from its side
+        if (video) {
+          tl.fromTo(
+            video,
+            { x: isReversed ? 60 : -60, opacity: 0 },
+            { x: 0, opacity: 1, duration: 1, ease: 'power3.out' },
+            0
+          );
+        }
+
+        // Text fades up with slight delay
+        if (text) {
+          tl.fromTo(
+            text,
+            { y: 30, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' },
+            0.2
+          );
+        }
+      });
+
+      // Parallax drift on videos while scrolling
+      gsap.utils.toArray<HTMLElement>('.showcase-video').forEach((el) => {
+        gsap.to(el, {
+          y: -20,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 1.5
+          }
+        });
+      });
+    },
+    { scope: sectionRef }
+  );
+
   return (
-    <section id="use-cases" className="relative scroll-mt-16 py-16 sm:py-24">
+    <section ref={sectionRef} id="use-cases" className="relative scroll-mt-16 py-16 sm:py-24">
       <div className="section-heading relative mb-10 sm:mb-14">
         <span className="mb-3 inline-block rounded-full border border-violet-400/30 bg-violet-500/10 px-4 py-1.5 text-xs font-medium tracking-widest text-violet-300 uppercase backdrop-blur-sm">
           See it in action
@@ -183,10 +238,10 @@ function ShowcaseSection() {
         {SHOWCASE.map((item, i) => (
           <div
             key={item.label}
-            className={`showcase-item flex flex-col gap-8 sm:gap-12 ${i % 2 === 1 ? 'sm:flex-row-reverse' : 'sm:flex-row'}`}
+            className={`showcase-item flex flex-col gap-8 sm:gap-12 ${i % 2 === 1 ? 'showcase-reversed sm:flex-row-reverse' : 'sm:flex-row'}`}
           >
             {/* Video */}
-            <div className="relative aspect-video flex-[1.4] overflow-hidden rounded-2xl border border-white/8 bg-black/40">
+            <div className="showcase-video relative aspect-video flex-[1.4] overflow-hidden rounded-2xl border border-white/8 bg-black/40">
               <video
                 autoPlay
                 muted
@@ -201,7 +256,7 @@ function ShowcaseSection() {
             </div>
 
             {/* Text */}
-            <div className="flex flex-1 flex-col justify-center">
+            <div className="showcase-text flex flex-1 flex-col justify-center">
               <div className="mb-3 flex items-center gap-3">
                 <span className="flex size-7 items-center justify-center rounded-full border border-violet-400/30 bg-violet-500/10 text-xs font-semibold text-violet-300">
                   {i + 1}
