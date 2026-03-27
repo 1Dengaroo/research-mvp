@@ -29,7 +29,7 @@ function CollapsedTrigger() {
   if (isMobile || state === 'expanded') return null;
 
   return (
-    <SidebarTrigger className="bg-sidebar hover:bg-sidebar-accent text-sidebar-foreground border-sidebar-border fixed top-4 left-16 z-50 size-8 rounded-md border shadow-sm" />
+    <SidebarTrigger label="Open sidebar" className="bg-sidebar hover:bg-sidebar-accent text-sidebar-foreground border-sidebar-border fixed top-4 left-16 z-50 size-8 rounded-md border shadow-sm" />
   );
 }
 
@@ -43,7 +43,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
     <SidebarInset className="min-w-0 overflow-x-hidden">
       {isMobile && (
         <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
+          <SidebarTrigger label="Toggle sidebar" className="-ml-1" />
           <Breadcrumb>
             <BreadcrumbList>
               {isSubpage ? (

@@ -182,7 +182,7 @@ export function AppSidebar() {
               </span>
             </div>
           </Link>
-          <SidebarTrigger className="text-sidebar-foreground/40 hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:hidden" />
+          <SidebarTrigger label="Toggle sidebar" className="text-sidebar-foreground/40 hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:hidden" />
         </div>
       </SidebarHeader>
 
