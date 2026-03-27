@@ -277,7 +277,8 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
       for (const c of found) merged.set(c.name, c);
       const MAX_AUTO_SELECTED = 5;
       const mergedCandidates = [...merged.values()];
-      const newNames = found.map((c) => c.name);
+      const { previouslyResearched } = get();
+      const newNames = found.map((c) => c.name).filter((name) => !previouslyResearched.has(name));
       const selectedSet = new Set([...existingSelected, ...newNames]);
       const cappedSelected = [...selectedSet].slice(0, MAX_AUTO_SELECTED);
       set({
