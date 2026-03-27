@@ -43,9 +43,12 @@ export const claudeICPParser: ICPParser = {
     const parsed: unknown = JSON.parse(jsonMatch[0]);
     if (!isICPCriteria(parsed)) throw new Error('Invalid ICP shape from AI');
 
-    // Default nullable fields the model may omit
+    // Default fields the model may omit
     parsed.min_employees = parsed.min_employees ?? null;
     parsed.max_employees = parsed.max_employees ?? null;
+    parsed.min_funding_amount = parsed.min_funding_amount ?? null;
+    parsed.funding_stages = parsed.funding_stages ?? [];
+    parsed.locations = parsed.locations ?? [];
 
     return parsed;
   }

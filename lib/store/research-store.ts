@@ -108,6 +108,7 @@ function buildStrategyCallbacks(
   onChunk: (text: string) => void;
   onStatus: (message: string) => void;
   onIcpUpdate: (updates: Partial<ICPCriteria>) => void;
+  onSessionName: (name: string) => void;
 } {
   return {
     onChunk: (text) => {
@@ -121,6 +122,10 @@ function buildStrategyCallbacks(
     onIcpUpdate: (updates) => {
       const current = get().icp;
       if (current) set({ icp: { ...current, ...updates } });
+    },
+    onSessionName: (name) => {
+      set({ sessionName: name });
+      get().saveSession();
     }
   };
 }
@@ -172,11 +177,6 @@ export const useResearchStore = create<ResearchStore>((set, get) => ({
         isExtracting: false,
         strategyMessages: []
       });
-      const { sessionId } = get();
-      if (sessionId) {
-        const name = transcript.trim().slice(0, 60) || 'Untitled Session';
-        set({ sessionName: name });
-      }
       get().saveSession();
       get().generateStrategy();
     } catch (err) {

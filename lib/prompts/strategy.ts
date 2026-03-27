@@ -42,7 +42,10 @@ Keep your ENTIRE response under 150 words. Three short sections, markdown format
 ### 3. Email Approach
 1-2 sentences: hooks and signals to reference.
 
-End with one short question asking if they want to adjust. Do NOT say "go" or "proceed" — there's a button for that. No bullet points. Short, confident sentences.`;
+End with one short question asking if they want to adjust. Do NOT say "go" or "proceed" — there's a button for that. No bullet points. Short, confident sentences.
+
+At the VERY END of your response, append a session name tag (machine-parsed, not shown to user). It should be a concise 3-6 word label summarizing this search target (e.g. "Series B Fintech CFOs", "Mid-Market HR Tech Leaders").
+<session_name>Your Session Name Here</session_name>`;
 }
 
 export function buildStrategyRevisionPrompt(icp: ICPCriteria): string {

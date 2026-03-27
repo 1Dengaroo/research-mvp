@@ -11,7 +11,7 @@ import { ResultsStep } from './results-step';
 import { OutreachStep } from './outreach-step.client';
 import { BottomNav } from './bottom-nav';
 import { EditableName } from '@/components/shared/editable-name.client';
-import type { ResearchSession } from '@/lib/types';
+import type { ResearchSession, ICPCriteria } from '@/lib/types';
 import { MAX_WIDTH } from '@/lib/layout';
 
 function SaveIndicator() {
@@ -46,6 +46,22 @@ function toStep(value: string): 'input' | 'review' | 'confirm' | 'results' | 'ou
     : 'input';
 }
 
+function normalizeIcp(icp: ICPCriteria | null): ICPCriteria | null {
+  if (!icp) return null;
+  return {
+    ...icp,
+    industry_keywords: icp.industry_keywords ?? [],
+    funding_stages: icp.funding_stages ?? [],
+    hiring_signals: icp.hiring_signals ?? [],
+    tech_keywords: icp.tech_keywords ?? [],
+    company_examples: icp.company_examples ?? [],
+    locations: icp.locations ?? [],
+    min_employees: icp.min_employees ?? null,
+    max_employees: icp.max_employees ?? null,
+    min_funding_amount: icp.min_funding_amount ?? null
+  };
+}
+
 function hydrateStore(session: ResearchSession) {
   const state = useResearchStore.getState();
   if (state.sessionId === session.id) return;
@@ -55,7 +71,7 @@ function hydrateStore(session: ResearchSession) {
     sessionName: session.name,
     step: toStep(session.step || 'input'),
     transcript: session.transcript || '',
-    icp: session.icp,
+    icp: normalizeIcp(session.icp),
     strategyMessages: session.strategy_messages || [],
     candidates: session.candidates || [],
     selectedCompanies: session.selected_companies || [],

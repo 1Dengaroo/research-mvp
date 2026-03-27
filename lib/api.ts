@@ -82,6 +82,7 @@ interface StrategyCallbacks {
   onChunk: (text: string) => void;
   onStatus?: (message: string) => void;
   onIcpUpdate?: (updates: Partial<ICPCriteria>) => void;
+  onSessionName?: (name: string) => void;
 }
 
 type StrategyEvent =
@@ -112,11 +113,21 @@ function extractIcpUpdate(text: string): {
   }
 }
 
-/** Strip icp_update blocks (complete or partial) for display during streaming */
+/** Extract and strip <session_name> tag from text */
+function extractSessionName(text: string): { cleanText: string; sessionName: string | null } {
+  const match = text.match(/<session_name>\s*([\s\S]*?)\s*<\/session_name>/);
+  if (!match) return { cleanText: text, sessionName: null };
+  const cleanText = text.replace(/<session_name>[\s\S]*?<\/session_name>/g, '').trimEnd();
+  return { cleanText, sessionName: match[1].trim() || null };
+}
+
+/** Strip machine-parsed blocks (complete or partial) for display during streaming */
 function stripIcpUpdateForDisplay(text: string): string {
   return text
     .replace(/<icp_update>[\s\S]*?<\/icp_update>/g, '')
     .replace(/<icp_update>[\s\S]*$/g, '')
+    .replace(/<session_name>[\s\S]*?<\/session_name>/g, '')
+    .replace(/<session_name>[\s\S]*$/g, '')
     .trimEnd();
 }
 
@@ -146,9 +157,14 @@ export async function streamStrategy(
     }
   });
 
-  const { cleanText, updates } = extractIcpUpdate(fullText);
+  const { cleanText: afterIcp, updates } = extractIcpUpdate(fullText);
   if (updates) {
     callbacks.onIcpUpdate?.(updates);
+  }
+
+  const { cleanText, sessionName } = extractSessionName(afterIcp);
+  if (sessionName) {
+    callbacks.onSessionName?.(sessionName);
   }
 
   return cleanText;
