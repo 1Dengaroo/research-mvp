@@ -56,7 +56,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="antialiased">
-        <ThemeProvider defaultTheme="light">
+        <ThemeProvider defaultTheme="periwinkle">
           <FontProvider>
             <TooltipProvider>
               <AuthProvider>

@@ -71,6 +71,102 @@ export const themes: ThemeDefinition[] = [
       secondary: '#7a7774',
       tertiary: 'hsl(220, 50%, 48%)'
     }
+  },
+  {
+    id: 'periwinkle',
+    name: 'Periwinkle',
+    description: 'Dreamy blue-violet — soft, hazy, gentle twilight',
+    isDark: false,
+    previewColors: {
+      bg: '#f6f5fc',
+      primary: '#6366f1',
+      secondary: '#7e7c9a',
+      tertiary: '#8b5cf6'
+    }
+  },
+  {
+    id: 'periwinkle-dark',
+    name: 'Periwinkle Dark',
+    description: 'Deep blue-violet — midnight twilight, dreamy',
+    isDark: true,
+    previewColors: {
+      bg: '#0f0e1a',
+      primary: '#8b8ef8',
+      secondary: '#7e7c9a',
+      tertiary: '#a78bfa'
+    }
+  },
+  {
+    id: 'seafoam',
+    name: 'Seafoam',
+    description: 'Coastal calm — soft teal-green, breezy, serene',
+    isDark: false,
+    previewColors: {
+      bg: '#f4faf9',
+      primary: '#2ba89a',
+      secondary: '#6e8e8a',
+      tertiary: '#3b82a0'
+    }
+  },
+  {
+    id: 'iris',
+    name: 'Iris',
+    description: 'Soft indigo garden — muted, elegant, contemplative',
+    isDark: false,
+    previewColors: {
+      bg: '#f6f3fc',
+      primary: '#6b3dc0',
+      secondary: '#847498',
+      tertiary: '#8b40d0'
+    }
+  },
+  {
+    id: 'sage',
+    name: 'Sage',
+    description: 'Muted forest — earthy green, grounded, quiet',
+    isDark: false,
+    previewColors: {
+      bg: '#f5f8f4',
+      primary: '#4a8c5c',
+      secondary: '#6e8874',
+      tertiary: '#3a8a6a'
+    }
+  },
+  {
+    id: 'ocean',
+    name: 'Ocean',
+    description: 'Deep still water — soft navy-blue, calm, focused',
+    isDark: false,
+    previewColors: {
+      bg: '#f4f6fc',
+      primary: '#3b5ec0',
+      secondary: '#6e7896',
+      tertiary: '#5050c8'
+    }
+  },
+  {
+    id: 'mint',
+    name: 'Mint',
+    description: 'Fresh spearmint — cool green-cyan, crisp, clean',
+    isDark: false,
+    previewColors: {
+      bg: '#f2faf6',
+      primary: '#28a07a',
+      secondary: '#608c78',
+      tertiary: '#2a90a0'
+    }
+  },
+  {
+    id: 'wisteria',
+    name: 'Wisteria',
+    description: 'Purple-blue twilight — dusky, romantic, atmospheric',
+    isDark: false,
+    previewColors: {
+      bg: '#f7f4fc',
+      primary: '#7c42c8',
+      secondary: '#867498',
+      tertiary: '#5c5cc8'
+    }
   }
 ];
 
