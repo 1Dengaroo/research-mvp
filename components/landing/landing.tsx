@@ -552,7 +552,7 @@ export function Landing() {
             </span>
           </div>
 
-          <h1 className="hero-reveal mt-8 max-w-4xl text-4xl leading-tight font-bold tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-7xl">
+          <h1 className="hero-reveal mt-8 max-w-5xl text-4xl leading-tight font-bold tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-7xl">
             Deep research. Right Contacts.
             <br />
             <span className="bg-linear-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
