@@ -134,7 +134,7 @@ export function Landing() {
   );
 
   return (
-    <div ref={pageRef} className="relative flex flex-col" style={{ background: '#08080c' }}>
+    <div ref={pageRef} className="relative flex flex-col overflow-x-hidden" style={{ background: '#08080c' }}>
       <LandingHeader />
 
       {/* ── Hero ── */}
