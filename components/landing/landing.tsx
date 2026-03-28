@@ -548,24 +548,21 @@ export function Landing() {
         >
           <div className="hero-reveal">
             <span className="inline-block rounded-full border border-violet-400/30 bg-violet-500/10 px-4 py-1.5 text-xs font-medium tracking-widest text-violet-300 uppercase backdrop-blur-sm">
-              AI-Powered Outbound
+              Outbound on Auto-Pilot
             </span>
           </div>
 
           <h1 className="hero-reveal mt-8 max-w-4xl text-4xl leading-tight font-bold tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-7xl">
-            Deep research.
-            <br />
-            Right contacts.
+            Deep research. Right Contacts. Outreach that converts
             <br />
             <span className="bg-linear-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
-              Emails that convert.
+              Outreach that converts.
             </span>
           </h1>
 
           <p className="hero-reveal mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/60 sm:text-lg sm:leading-relaxed">
-            Remes scans the web for buying signals from companies aligned with your ideal customer,
-            maps contacts at every account, and crafts hyper-personalized outreach so you have
-            outbound on auto-pilot.
+            Remes scans for buying signals from companies using your ideal customer criteria,
+            maps contacts at every account, and crafts hyper-personalized outreach.
           </p>
 
           <div className="hero-reveal mt-10 flex flex-col items-center gap-4 sm:flex-row sm:gap-6">
