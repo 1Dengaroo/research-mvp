@@ -55,25 +55,25 @@ export function MockSignalDashboard() {
   ];
 
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-white/[0.08] bg-[#0c0d0f] shadow-[0_0_30px_rgba(255,255,255,0.04),0_0_60px_rgba(255,255,255,0.02)]">
+    <div className="w-full overflow-hidden rounded-xl border border-white/8 bg-[#0c0d0f] shadow-[0_0_30px_rgba(255,255,255,0.04),0_0_60px_rgba(255,255,255,0.02)]">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/[0.04] px-5 py-3">
+      <div className="flex items-center justify-between border-b border-white/4 px-5 py-3">
         <div className="flex items-center gap-3">
           <div className="h-2 w-2 rounded-full bg-green-400/70 shadow-[0_0_6px_rgba(74,222,128,0.4)]" />
           <span className="text-xs font-medium text-white/60">2 companies matched</span>
         </div>
-        <div className="rounded-md bg-white/[0.04] px-2.5 py-1 text-[10px] text-white/30">
+        <div className="rounded-md bg-white/4 px-2.5 py-1 text-[10px] text-white/30">
           B2B SaaS · 50–500 employees
         </div>
       </div>
 
       {/* Company rows */}
-      <div className="divide-y divide-white/[0.03]">
+      <div className="divide-y divide-white/3">
         {companies.map((c, i) => (
           <div key={i} className="px-5 py-4">
             {/* Company header */}
             <div className="flex items-center gap-3">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.06] text-[10px] font-semibold text-white/50">
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/6 text-[10px] font-semibold text-white/50">
                 {c.name.slice(0, 2)}
               </div>
               <div className="min-w-0 flex-1">
@@ -100,7 +100,7 @@ export function MockSignalDashboard() {
                       {s.phrases.map((p) => (
                         <span
                           key={p}
-                          className="rounded-full bg-white/[0.04] px-1.5 py-0.5 text-[9px] text-white/25"
+                          className="rounded-full bg-white/4 px-1.5 py-0.5 text-[9px] text-white/25"
                         >
                           {p}
                         </span>
@@ -159,19 +159,19 @@ export function MockContactList() {
   ];
 
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-white/[0.08] bg-[#0c0d0f] shadow-[0_0_30px_rgba(255,255,255,0.04),0_0_60px_rgba(255,255,255,0.02)]">
+    <div className="w-full overflow-hidden rounded-xl border border-white/8 bg-[#0c0d0f] shadow-[0_0_30px_rgba(255,255,255,0.04),0_0_60px_rgba(255,255,255,0.02)]">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/[0.04] px-5 py-3">
+      <div className="flex items-center justify-between border-b border-white/4 px-5 py-3">
         <span className="text-xs font-medium text-white/60">Contacts</span>
         <span className="text-[10px] text-white/25">2 of 4 enriched</span>
       </div>
 
       {/* Contacts */}
-      <div className="divide-y divide-white/[0.03]">
+      <div className="divide-y divide-white/3">
         {contacts.map((c, i) => (
           <div key={i} className="flex items-center gap-4 px-5 py-3.5">
             {/* Avatar */}
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-xs font-medium text-white/40">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/6 text-xs font-medium text-white/40">
               {c.name
                 .split(' ')
                 .map((n) => n[0])
@@ -202,7 +202,7 @@ export function MockContactList() {
             {c.enriched ? (
               <span className="hidden shrink-0 text-[11px] text-white/25 sm:block">{c.email}</span>
             ) : (
-              <span className="shrink-0 rounded-full bg-white/[0.06] px-2.5 py-1 text-[10px] font-medium text-white/40">
+              <span className="shrink-0 rounded-full bg-white/6 px-2.5 py-1 text-[10px] font-medium text-white/40">
                 Get Contact
               </span>
             )}
@@ -215,9 +215,9 @@ export function MockContactList() {
 
 export function MockEmailPreview() {
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-white/[0.08] bg-[#0c0d0f] shadow-[0_0_30px_rgba(255,255,255,0.04),0_0_60px_rgba(255,255,255,0.02)]">
+    <div className="w-full overflow-hidden rounded-xl border border-white/8 bg-[#0c0d0f] shadow-[0_0_30px_rgba(255,255,255,0.04),0_0_60px_rgba(255,255,255,0.02)]">
       {/* Email header with sequence tabs */}
-      <div className="flex items-center justify-between border-b border-white/[0.04] px-5 py-3">
+      <div className="flex items-center justify-between border-b border-white/4 px-5 py-3">
         <div className="flex items-center gap-2">
           <span className="text-xs font-medium text-white/60">Campfire</span>
           <span className="text-[10px] text-white/25">Rachel Torres · Head of Revenue</span>
@@ -226,17 +226,17 @@ export function MockEmailPreview() {
           <span className="rounded-md bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/60">
             Email 1
           </span>
-          <span className="rounded-md bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/25">
+          <span className="rounded-md bg-white/3 px-2 py-0.5 text-[10px] text-white/25">
             Email 2
           </span>
-          <span className="rounded-md bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/25">
+          <span className="rounded-md bg-white/3 px-2 py-0.5 text-[10px] text-white/25">
             Email 3
           </span>
         </div>
       </div>
 
       {/* Email fields */}
-      <div className="space-y-0 divide-y divide-white/[0.03] border-b border-white/[0.04]">
+      <div className="space-y-0 divide-y divide-white/3 border-b border-white/4">
         <div className="flex items-center gap-3 px-5 py-2.5">
           <span className="text-[11px] text-white/25">To</span>
           <span className="text-xs text-white/60">rachel@campfire.com</span>
@@ -266,7 +266,7 @@ export function MockEmailPreview() {
       </div>
 
       {/* Best practices note */}
-      <div className="border-t border-white/[0.04] px-5 py-2">
+      <div className="border-t border-white/4 px-5 py-2">
         <p className="text-[10px] leading-relaxed text-white/20">
           Built on proven frameworks · Plain text · Under 80 words · No jargon · Signal-led opener ·
           One clear CTA
@@ -274,9 +274,9 @@ export function MockEmailPreview() {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center justify-between border-t border-white/[0.04] px-5 py-3">
+      <div className="flex items-center justify-between border-t border-white/4 px-5 py-3">
         <div className="flex items-center gap-2">
-          <div className="rounded-full bg-white/[0.04] px-3 py-1.5 text-[10px] text-white/30">
+          <div className="rounded-full bg-white/4 px-3 py-1.5 text-[10px] text-white/30">
             Regenerate
           </div>
           <div className="flex items-center gap-1 text-[10px] text-white/20">

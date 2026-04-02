@@ -85,7 +85,7 @@ export function Landing() {
     >
       {/* Noise texture overlay */}
       <div
-        className="pointer-events-none fixed inset-0 z-[1] opacity-[0.025]"
+        className="pointer-events-none fixed inset-0 z-1 opacity-[0.025]"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
           backgroundRepeat: 'repeat',
@@ -135,7 +135,7 @@ export function Landing() {
           className={`relative z-10 mx-auto flex w-full ${MAX_WIDTH} flex-col items-start px-6 pt-32 pb-20 sm:pt-40 sm:pb-28`}
         >
           <div className="hero-reveal">
-            <span className="inline-block rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-1.5 text-xs font-medium tracking-widest text-white/50 uppercase backdrop-blur-sm">
+            <span className="inline-block rounded-full border border-white/8 bg-white/3 px-4 py-1.5 text-xs font-medium tracking-widest text-white/50 uppercase backdrop-blur-sm">
               Outbound on Auto-Pilot
             </span>
           </div>
@@ -179,7 +179,7 @@ export function Landing() {
             <Button
               variant="ghost"
               size="lg"
-              className="rounded-full border border-white/[0.08] px-8 py-6 text-sm font-medium text-white/40 transition-all duration-200 hover:border-white/[0.15] hover:bg-white/[0.03] hover:text-white/70"
+              className="rounded-full border border-white/8 px-8 py-6 text-sm font-medium text-white/40 transition-all duration-200 hover:border-white/15 hover:bg-white/3 hover:text-white/70"
               onClick={() => setDemoOpen(true)}
             >
               Book a demo
@@ -314,7 +314,7 @@ export function Landing() {
         <div className={`relative mx-auto flex w-full ${MAX_WIDTH} flex-col px-6`}>
           {/* Gradient divider */}
           <div className="flex justify-center">
-            <div className="h-px w-2/3 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+            <div className="h-px w-2/3 bg-linear-to-r from-transparent via-white/6 to-transparent" />
           </div>
 
           {/* 1. The Problem — word-by-word scroll reveal */}
@@ -322,7 +322,7 @@ export function Landing() {
 
           {/* Gradient divider */}
           <div className="flex justify-center">
-            <div className="h-px w-2/3 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+            <div className="h-px w-2/3 bg-linear-to-r from-transparent via-white/6 to-transparent" />
           </div>
 
           {/* 2. How it works — side-by-side mock UIs */}
@@ -330,7 +330,7 @@ export function Landing() {
 
           {/* Gradient divider */}
           <div className="flex justify-center">
-            <div className="h-px w-2/3 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+            <div className="h-px w-2/3 bg-linear-to-r from-transparent via-white/6 to-transparent" />
           </div>
 
           {/* 3. Signals grid */}
@@ -339,7 +339,7 @@ export function Landing() {
           {/* ── FAQs ── */}
           <section id="faqs" className="relative scroll-mt-16 py-24 sm:py-36">
             <div className="absolute inset-x-0 top-0 flex justify-center">
-              <div className="h-px w-2/3 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+              <div className="h-px w-2/3 bg-linear-to-r from-transparent via-white/6 to-transparent" />
             </div>
 
             <div className="grid gap-12 lg:grid-cols-[1fr_2fr] lg:gap-20">
@@ -361,11 +361,7 @@ export function Landing() {
               <div>
                 <Accordion type="single" collapsible className="w-full">
                   {FAQS.map((faq, i) => (
-                    <AccordionItem
-                      key={i}
-                      value={`faq-${i}`}
-                      className="faq-item border-white/[0.06]"
-                    >
+                    <AccordionItem key={i} value={`faq-${i}`} className="faq-item border-white/6">
                       <AccordionTrigger className="py-5 text-left text-[15px] leading-snug font-normal text-white/70 no-underline transition-colors duration-150 hover:text-white hover:no-underline [&>svg]:text-white/20">
                         {faq.q}
                       </AccordionTrigger>
@@ -382,7 +378,7 @@ export function Landing() {
           {/* ── CTA ── */}
           <section className="relative overflow-hidden py-24 sm:py-36">
             <div className="absolute inset-x-0 top-0 flex justify-center">
-              <div className="h-px w-2/3 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+              <div className="h-px w-2/3 bg-linear-to-r from-transparent via-white/6 to-transparent" />
             </div>
 
             {/* White glow behind CTA */}
@@ -419,7 +415,7 @@ export function Landing() {
                 <Button
                   variant="ghost"
                   size="lg"
-                  className="rounded-full border border-white/[0.08] px-8 py-6 text-sm font-medium text-white/40 transition-all duration-200 hover:border-white/[0.15] hover:bg-white/[0.03] hover:text-white/70"
+                  className="rounded-full border border-white/8 px-8 py-6 text-sm font-medium text-white/40 transition-all duration-200 hover:border-white/15 hover:bg-white/3 hover:text-white/70"
                   onClick={() => setDemoOpen(true)}
                 >
                   Book a demo
@@ -431,7 +427,7 @@ export function Landing() {
           {/* ── Footer ── */}
           <footer className="py-8">
             <div className="mb-8 flex justify-center">
-              <div className="h-px w-full bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+              <div className="h-px w-full bg-linear-to-r from-transparent via-white/6 to-transparent" />
             </div>
             <p className="text-xs text-white/35">
               &copy; {new Date().getFullYear()} Remes. All rights reserved.
