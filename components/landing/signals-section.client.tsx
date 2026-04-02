@@ -30,10 +30,10 @@ export function SignalsSection() {
             return (
               <div
                 key={signal.source}
-                className="signal-card group relative col-span-full rounded-xl border border-white/[0.08] bg-white/[0.02] transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.03] hover:shadow-[0_0_30px_rgba(255,255,255,0.03)]"
+                className="signal-card group relative col-span-full rounded-xl border border-white/8 bg-white/2 transition-all duration-300 hover:border-white/12 hover:bg-white/3 hover:shadow-[0_0_30px_rgba(255,255,255,0.03)]"
               >
                 <div className="relative flex items-center gap-5 px-6 py-5">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white/[0.04]">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white/4">
                     <Sparkles className="size-5 text-white/50" />
                   </div>
                   <div className="flex flex-col gap-1">
@@ -48,7 +48,7 @@ export function SignalsSection() {
           return (
             <div
               key={signal.source}
-              className="signal-card group relative overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] transition-all duration-300 hover:border-white/[0.10] hover:bg-white/[0.03] hover:shadow-[0_0_30px_rgba(255,255,255,0.03)]"
+              className="signal-card group relative overflow-hidden rounded-xl border border-white/6 bg-white/2 transition-all duration-300 hover:border-white/10 hover:bg-white/3 hover:shadow-[0_0_30px_rgba(255,255,255,0.03)]"
             >
               {/* Top accent line — white glow */}
               <div

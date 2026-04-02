@@ -122,7 +122,7 @@ export function ShowcaseSection() {
       <div className="relative">
         {/* Vertical connecting line */}
         <div className="absolute top-0 bottom-0 left-1/2 hidden -translate-x-1/2 lg:block">
-          <div className="showcase-line h-full w-px origin-top bg-gradient-to-b from-white/[0.08] via-white/[0.04] to-transparent" />
+          <div className="showcase-line h-full w-px origin-top bg-linear-to-b from-white/8 via-white/4 to-transparent" />
         </div>
 
         <div className="flex flex-col gap-24 sm:gap-32 lg:gap-40">
@@ -140,7 +140,7 @@ export function ShowcaseSection() {
                 {/* Text side */}
                 <div className={`showcase-text ${!isEven ? 'lg:[direction:ltr]' : ''}`}>
                   <div className="mb-4 flex items-center gap-3">
-                    <span className="flex size-8 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] text-xs font-medium text-white/50">
+                    <span className="flex size-8 items-center justify-center rounded-full border border-white/8 bg-white/3 text-xs font-medium text-white/50">
                       {step.step}
                     </span>
                     <span className="text-xs font-medium tracking-wider text-white/40 uppercase">
