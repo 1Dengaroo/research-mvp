@@ -1,6 +1,6 @@
 'use client';
 
-import { Building2, DollarSign, ExternalLink, Linkedin, Loader2, RotateCw } from 'lucide-react';
+import { Building2, DollarSign, Linkedin, Loader2, RotateCw } from 'lucide-react';
 import { SignalBadge } from './signal-badge';
 import { ContactCarousel } from './contact-carousel';
 import { Button } from '@/components/ui/button';
