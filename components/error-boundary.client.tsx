@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -32,7 +33,7 @@ export function ErrorBoundary({
           Try again
         </Button>
         <Button variant="outline" size="sm" asChild>
-          <a href="/">Back to home</a>
+          <Link href="/">Back to home</Link>
         </Button>
       </div>
     </div>
@@ -137,7 +138,7 @@ export function GlobalErrorBoundary({
             >
               Try again
             </button>
-            <a
+            <Link
               href="/"
               style={{
                 padding: '0.625rem 1.25rem',
@@ -153,7 +154,7 @@ export function GlobalErrorBoundary({
               }}
             >
               Back to home
-            </a>
+            </Link>
           </div>
         </div>
       </body>
