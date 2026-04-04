@@ -17,9 +17,9 @@
   --surface-elevated: 0.99 0.005 268;
   --surface-overlay: 0.12 0.008 268;
 
-  --border-default: 0.91 0.016 268;
-  --border-subtle: 0.93 0.01 268;
-  --border-strong: 0.82 0.024 268;
+  --border-default: 0.88 0.018 268;
+  --border-subtle: 0.91 0.012 268;
+  --border-strong: 0.79 0.026 268;
 
   --text-primary: 0.16 0.014 268;
   --text-secondary: 0.4 0.01 268;
@@ -67,6 +67,7 @@
   /* ── Cards ── */
 
   --card-radius: 16px;
+  --card-border: 1px solid var(--border);
   --card-border-width: 1px;
   --card-border-opacity: 0.4;
   --card-shadow: var(--elevation-sm);
@@ -91,9 +92,9 @@
   /* ── Chrome ── */
 
   --chrome: #ffffff;
-  --header-border: #ddd8ed;
+  --header-border: #d4cee4;
   --header-backdrop: blur(12px);
-  --bottom-nav-border: #ddd8ed;
+  --bottom-nav-border: #d4cee4;
   --bottom-nav-backdrop: blur(12px);
 
   /* ── shadcn bridge tokens ── */
@@ -122,8 +123,8 @@
   --accent-foreground: #1c1a30;
   --destructive: hsl(0 65% 50%);
   --destructive-foreground: #ffffff;
-  --border: #ddd8ed;
-  --input: #d8d4ea;
+  --border: #d4cee4;
+  --input: #cec8de;
   --ring: #6366f1;
   --radius: 0.75rem;
 
@@ -143,6 +144,6 @@
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #ecedf8;
   --sidebar-accent-foreground: #1c1a30;
-  --sidebar-border: #e4e2f2;
+  --sidebar-border: #d9d4ea;
   --sidebar-ring: #6366f1;
 }

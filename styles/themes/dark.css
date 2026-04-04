@@ -23,9 +23,9 @@
   --surface-overlay: 0.07 0 0;
 
   /* Neutral gray borders */
-  --border-default: 0.24 0 0;
-  --border-subtle: 0.2 0 0;
-  --border-strong: 0.34 0 0;
+  --border-default: 0.28 0 0;
+  --border-subtle: 0.23 0 0;
+  --border-strong: 0.38 0 0;
 
   /* Neutral text */
   --text-primary: 0.93 0 0;
@@ -74,6 +74,7 @@
   /* ── Cards ── */
 
   --card-radius: 16px;
+  --card-border: 1px solid var(--border);
   --card-border-width: 1px;
   --card-border-opacity: 0.3;
   --card-shadow: var(--elevation-sm);
@@ -98,9 +99,9 @@
   /* ── Chrome ── */
 
   --chrome: #181818;
-  --header-border: #2a2a2a;
+  --header-border: #333333;
   --header-backdrop: blur(12px);
-  --bottom-nav-border: #2a2a2a;
+  --bottom-nav-border: #333333;
   --bottom-nav-backdrop: blur(12px);
 
   /* ── shadcn bridge tokens ── */
@@ -129,8 +130,8 @@
   --accent-foreground: #e4e4e4;
   --destructive: hsl(0 65% 55%);
   --destructive-foreground: #ffffff;
-  --border: #2a2a2a;
-  --input: #2a2a2a;
+  --border: #333333;
+  --input: #333333;
   --ring: #8b8ef8;
   --radius: 0.75rem;
 
@@ -150,6 +151,6 @@
   --sidebar-primary-foreground: #0e0e0e;
   --sidebar-accent: #1c1c1c;
   --sidebar-accent-foreground: #ececec;
-  --sidebar-border: #232323;
+  --sidebar-border: #2a2a2a;
   --sidebar-ring: #8b8ef8;
 }
