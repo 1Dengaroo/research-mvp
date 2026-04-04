@@ -1,15 +1,13 @@
 import { NextRequest } from 'next/server';
-import { getAuthUser } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/supabase/server';
 import { signatureUpdateBodySchema, parseBody } from '@/lib/validation';
 import { clearDefaultSignatures, updateSignature, deleteSignature } from '@/lib/supabase/queries';
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { supabase, user } = await getAuthUser();
-
-  if (!user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireAuth();
+  if (auth instanceof Response) return auth;
+  const { supabase, user } = auth;
 
   const parsed = parseBody(signatureUpdateBodySchema, await req.json());
   if (!parsed.success) return parsed.response;
@@ -35,11 +33,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { supabase, user } = await getAuthUser();
-
-  if (!user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireAuth();
+  if (auth instanceof Response) return auth;
+  const { supabase, user } = auth;
 
   const { error } = await deleteSignature(supabase, id, user.id);
 

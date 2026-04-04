@@ -5,6 +5,18 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Extract the first JSON object from a string (e.g. an LLM response).
+ * Returns `null` when no `{…}` block is found.
+ */
+export function extractJson(text: string): Record<string, unknown> | null {
+  const match = text.match(/\{[\s\S]*\}/);
+  if (!match) return null;
+  const parsed: unknown = JSON.parse(match[0]);
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) return null;
+  return parsed as Record<string, unknown>;
+}
+
 export function formatRelativeDate(dateStr: string): string {
   const date = new Date(dateStr);
   const now = new Date();

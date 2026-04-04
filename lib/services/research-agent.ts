@@ -3,6 +3,7 @@ import type { ICPCriteria, CompanySignal } from '@/lib/types';
 import type { CompanyResearcher, CompanyResearchResult } from './interfaces';
 import { serviceConfig } from './config';
 import { buildResearchAgentPrompt } from '@/lib/prompts/research-agent-prompt';
+import { extractJson } from '@/lib/utils';
 
 function getClient(): Anthropic {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -187,12 +188,10 @@ export const claudeResearchAgent: CompanyResearcher = {
     // Strip all <cite> tags, keep inner text
     const cleanText = fullText.replace(/<cite[^>]*>([\s\S]*?)<\/cite>/g, '$1');
 
-    const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+    const parsed = extractJson(cleanText);
+    if (!parsed) {
       throw new Error(`Research agent failed for ${companyName}`);
     }
-
-    const parsed = JSON.parse(jsonMatch[0]);
 
     // Strip citations from string fields too
     const stripCites = (s: string) => s.replace(/<cite[^>]*>([\s\S]*?)<\/cite>/g, '$1');

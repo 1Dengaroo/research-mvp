@@ -1,15 +1,13 @@
 import { NextRequest } from 'next/server';
-import { getAuthUser } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/supabase/server';
 import { getGmailClient, sendEmail } from '@/lib/services/gmail';
 import { emailSendBodySchema, parseBody } from '@/lib/validation';
 import { insertSentEmail, insertFailedEmail, upsertContact } from '@/lib/supabase/queries';
 
 export async function POST(req: NextRequest) {
-  const { supabase, user } = await getAuthUser();
-
-  if (!user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireAuth();
+  if (auth instanceof Response) return auth;
+  const { supabase, user } = auth;
 
   const parsed = parseBody(emailSendBodySchema, await req.json());
   if (!parsed.success) return parsed.response;

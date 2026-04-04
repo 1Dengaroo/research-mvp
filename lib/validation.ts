@@ -127,44 +127,6 @@ const emailSequenceLoose = z.object({
 // Record key — company names and compound keys like "Company::email"
 const recordKey = z.string().max(1_000);
 
-// Strict domain schemas — for validating user-authored input to the LLM
-export const targetContactSchema = z.object({
-  name: shortStr,
-  title: shortStr,
-  linkedin_url: urlStr,
-  email: shortStr.nullable(),
-  is_decision_maker: z.boolean()
-});
-
-export const companyResultSchema = z.object({
-  company_name: shortStr,
-  industry: shortStr,
-  funding_stage: shortStr,
-  amount_raised: shortStr,
-  website: urlStr.nullable(),
-  linkedin_url: urlStr,
-  logo_url: urlStr,
-  signals: z.array(companySignalLoose).max(50),
-  match_reason: mediumStr,
-  company_overview: mediumStr,
-  contacts: z.array(targetContactLoose).max(50),
-  sources: z.object({
-    jobs: z.array(sourceLinkLoose).max(50),
-    funding: z.array(sourceLinkLoose).max(50),
-    news: z.array(sourceLinkLoose).max(50)
-  })
-});
-
-export const candidateSchema = z.object({
-  name: shortStr,
-  website: urlStr.optional(),
-  description: mediumStr.optional(),
-  linkedin_url: urlStr.optional(),
-  logo_url: urlStr.optional(),
-  apollo_org_id: shortStr.optional(),
-  location: shortStr.optional()
-});
-
 // API request schemas
 export const createIcpBodySchema = z.object({
   name: shortStr.min(1),
