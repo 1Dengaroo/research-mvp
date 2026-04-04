@@ -15,7 +15,7 @@ export default function NotFound() {
 
       {/* 404 with gradient text */}
       <p
-        className="text-9xl font-extrabold tracking-tighter"
+        className="text-8xl font-extrabold tracking-tighter sm:text-9xl"
         style={{
           background: 'linear-gradient(135deg, #6366f1, #7c3aed, #a855f7, #d946ef)',
           WebkitBackgroundClip: 'text',
