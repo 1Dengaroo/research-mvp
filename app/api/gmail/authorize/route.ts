@@ -1,4 +1,4 @@
-import { getAuthUser } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/supabase/server';
 import { getGoogleAuthUrl } from '@/lib/services/gmail';
 
 export async function GET() {
@@ -6,12 +6,9 @@ export async function GET() {
     return Response.json({ error: 'Gmail OAuth not configured' }, { status: 500 });
   }
 
-  const { user } = await getAuthUser();
+  const auth = await requireAuth();
+  if (auth instanceof Response) return auth;
 
-  if (!user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const url = getGoogleAuthUrl(user.id);
+  const url = getGoogleAuthUrl(auth.user.id);
   return Response.json({ url });
 }

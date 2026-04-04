@@ -1,14 +1,12 @@
 import { NextRequest } from 'next/server';
-import { getAuthUser } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/supabase/server';
 import { sessionCreateBodySchema, parseBody } from '@/lib/validation';
 import { listSessions, createSession } from '@/lib/supabase/queries';
 
 export async function GET() {
-  const { supabase, user } = await getAuthUser();
-
-  if (!user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireAuth();
+  if (auth instanceof Response) return auth;
+  const { supabase, user } = auth;
 
   const { data, error } = await listSessions(supabase, user.id);
 
@@ -31,11 +29,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const { supabase, user } = await getAuthUser();
-
-  if (!user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireAuth();
+  if (auth instanceof Response) return auth;
+  const { supabase, user } = auth;
 
   const parsed = parseBody(sessionCreateBodySchema, await req.json());
   if (!parsed.success) return parsed.response;

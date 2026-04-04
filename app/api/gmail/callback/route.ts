@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/supabase/server';
 import { exchangeCodeForTokens } from '@/lib/services/gmail';
 import { upsertGmailConnection } from '@/lib/supabase/queries';
 
@@ -11,9 +11,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL('/?error=missing_params', req.url));
   }
 
-  const { supabase, user } = await getAuthUser();
+  const auth = await requireAuth();
+  if (auth instanceof Response) {
+    return NextResponse.redirect(new URL('/?error=auth_mismatch', req.url));
+  }
+  const { supabase, user } = auth;
 
-  if (!user || user.id !== state) {
+  if (user.id !== state) {
     return NextResponse.redirect(new URL('/?error=auth_mismatch', req.url));
   }
 

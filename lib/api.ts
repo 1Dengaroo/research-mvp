@@ -14,6 +14,7 @@ import type {
   ContactedCompany,
   EmailSignature
 } from '@/lib/types';
+import { extractJson } from '@/lib/utils';
 
 class ApiError extends Error {
   constructor(
@@ -310,10 +311,10 @@ export async function streamEmailSequence(
     }
   }
 
-  const jsonMatch = accumulated.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new ApiError('Failed to parse email response', 0);
+  const parsed = extractJson(accumulated);
+  if (!parsed) throw new ApiError('Failed to parse email response', 0);
 
-  const sequence: GeneratedEmailSequence = JSON.parse(jsonMatch[0]);
+  const sequence = parsed as GeneratedEmailSequence;
   if (!sequence.emails || sequence.emails.length !== 3) {
     throw new ApiError('Invalid email sequence format', 0);
   }

@@ -1,12 +1,10 @@
-import { getAuthUser } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/supabase/server';
 import { listContacts } from '@/lib/supabase/queries';
 
 export async function GET() {
-  const { supabase, user } = await getAuthUser();
-
-  if (!user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const auth = await requireAuth();
+  if (auth instanceof Response) return auth;
+  const { supabase, user } = auth;
 
   const { data, error } = await listContacts(supabase, user.id);
 

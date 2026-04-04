@@ -3,6 +3,7 @@ import type { ICPCriteria } from '@/lib/types';
 import type { ICPParser } from './interfaces';
 import { serviceConfig } from './config';
 import { buildParseICPPrompt } from '@/lib/prompts/parse-icp';
+import { extractJson } from '@/lib/utils';
 
 function getClient(): Anthropic {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -37,10 +38,8 @@ export const claudeICPParser: ICPParser = {
 
     const text = message.content[0].type === 'text' ? message.content[0].text : '';
 
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('Failed to parse ICP from input');
-
-    const parsed: unknown = JSON.parse(jsonMatch[0]);
+    const parsed: unknown = extractJson(text);
+    if (!parsed) throw new Error('Failed to parse ICP from input');
     if (!isICPCriteria(parsed)) throw new Error('Invalid ICP shape from AI');
 
     // Default fields the model may omit

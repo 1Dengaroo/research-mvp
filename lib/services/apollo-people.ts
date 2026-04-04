@@ -1,5 +1,6 @@
 import { serviceConfig } from './config';
 import type { ApolloPersonPreview } from '@/lib/types';
+import { extractJson } from '@/lib/utils';
 
 interface ApolloPersonResult {
   id: string;
@@ -78,9 +79,8 @@ async function searchPeopleForOrg(
 
   let data: unknown;
   try {
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('No JSON object found');
-    data = JSON.parse(jsonMatch[0]);
+    data = extractJson(responseText);
+    if (!data) throw new Error('No JSON object found');
   } catch {
     console.error(`[Apollo] People search returned invalid JSON for org ${orgId}`);
     return [];
@@ -163,9 +163,8 @@ export async function apolloPersonEnrich(personId: string): Promise<{
 
   let data: unknown;
   try {
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('No JSON object found');
-    data = JSON.parse(jsonMatch[0]);
+    data = extractJson(responseText);
+    if (!data) throw new Error('No JSON object found');
   } catch {
     console.error(
       `[Apollo] People match returned invalid JSON (${response.status}):`,

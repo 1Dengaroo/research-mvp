@@ -1,13 +1,13 @@
 import { NextRequest } from 'next/server';
-import { getAuthUser } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/supabase/server';
 import { apolloPeopleSearch, apolloPersonEnrich } from '@/lib/services/apollo-people';
 import { rankPeopleForCompany } from '@/lib/services/people-ranking';
 import { peopleSearchBodySchema, parseBody } from '@/lib/validation';
 import type { PeopleSearchResult } from '@/lib/types';
 
 export async function POST(req: NextRequest) {
-  const { user } = await getAuthUser();
-  if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await requireAuth();
+  if (auth instanceof Response) return auth;
 
   const parsed = parseBody(peopleSearchBodySchema, await req.json());
   if (!parsed.success) return parsed.response;

@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { serviceConfig } from '@/lib/services/config';
 import { buildEmailGenerationPrompt } from '@/lib/prompts/email-generation';
-import { getAuthUser } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/supabase/server';
 import { emailGenerateBodySchema, parseBody } from '@/lib/validation';
 import { getProfile } from '@/lib/supabase/queries';
 
@@ -17,8 +17,9 @@ export async function POST(req: NextRequest) {
   const { company, contact, icp } = parsed.data;
 
   try {
-    const { supabase, user } = await getAuthUser();
-    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await requireAuth();
+    if (auth instanceof Response) return auth;
+    const { supabase, user } = auth;
 
     const { data: profile } = await getProfile(supabase, user.id);
     const fullName =

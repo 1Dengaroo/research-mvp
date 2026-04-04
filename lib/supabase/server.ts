@@ -35,3 +35,21 @@ export async function getAuthUser(): Promise<{ supabase: SupabaseClient; user: U
   } = await supabase.auth.getUser();
   return { supabase, user };
 }
+
+/**
+ * Get authenticated user or return a 401 Response.
+ * Use in API route handlers:
+ *   const auth = await requireAuth();
+ *   if (auth instanceof Response) return auth;
+ *   const { supabase, user } = auth;
+ */
+export async function requireAuth(): Promise<{ supabase: SupabaseClient; user: User } | Response> {
+  const supabase = await createClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  return { supabase, user };
+}
