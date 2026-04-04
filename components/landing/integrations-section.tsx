@@ -1,5 +1,3 @@
-import { Focusable } from '@/components/shared/focusable';
-
 const INTEGRATIONS = [
   {
     name: 'Gmail',
@@ -73,12 +71,9 @@ export function IntegrationsSection() {
         <p className="text-landing-fg-muted mb-1 text-xs font-medium tracking-widest uppercase">
           Integrations
         </p>
-        <Focusable
-          as="h2"
-          className="text-landing-fg text-xl font-semibold tracking-tight sm:text-2xl"
-        >
+        <h2 className="text-landing-fg text-xl font-semibold tracking-tight sm:text-2xl">
           Works with your stack
-        </Focusable>
+        </h2>
         <p className="text-landing-fg-secondary mt-2 max-w-md text-sm leading-relaxed">
           Remes plugs into the tools you already use — no migration, no setup headaches.
         </p>

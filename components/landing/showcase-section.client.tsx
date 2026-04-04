@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
-import { Focusable } from '@/components/shared/focusable';
 import { MockSignalDashboard, MockContactList, MockEmailPreview } from './mock-dashboard.client';
 
 const STEPS = [
@@ -56,13 +55,12 @@ export function ShowcaseSection() {
         <p className="text-landing-fg-muted mb-3 text-xs font-medium tracking-widest uppercase">
           How it works
         </p>
-        <Focusable
-          as="h2"
+        <h2
           className="text-landing-fg text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl"
           style={{ textWrap: 'balance' }}
         >
           From signal to sent in minutes
-        </Focusable>
+        </h2>
         <p className="text-landing-fg-secondary mt-3 max-w-md text-sm leading-relaxed">
           Three steps. Fully automated. No manual research required.
         </p>
@@ -82,13 +80,12 @@ export function ShowcaseSection() {
                   {step.label}
                 </span>
               </div>
-              <Focusable
-                as="h3"
+              <h3
                 className="text-landing-fg text-xl font-semibold tracking-tight sm:text-2xl"
                 style={{ textWrap: 'balance' }}
               >
                 {step.title}
-              </Focusable>
+              </h3>
               <p className="text-landing-fg-secondary mt-3 max-w-lg text-sm leading-relaxed">
                 {step.desc}
               </p>

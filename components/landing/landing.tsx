@@ -11,7 +11,6 @@ import { MAX_WIDTH } from '@/lib/layout';
 import { FAQS } from './landing-constants';
 import { AuroraCanvas } from './aurora-canvas';
 import { PrimaryCta, SecondaryCta } from './cta-buttons.client';
-import { Focusable } from '@/components/shared/focusable';
 import { GradientText } from './gradient-text';
 import { IntegrationsSection } from './integrations-section';
 import { StorySection } from './story-section.client';
@@ -86,13 +85,12 @@ export function Landing() {
             </span>
           </div>
 
-          <Focusable
-            as="h1"
+          <h1
             className="leading-hero text-landing-fg mt-8 max-w-3xl animate-[hero-fade-in_0.8s_ease-out_0.27s_both] text-3xl font-medium tracking-tight sm:text-4xl lg:text-5xl xl:text-6xl"
             style={{ textWrap: 'balance' }}
           >
             Deep Research. Right Contacts. <GradientText>Outreach that Converts.</GradientText>
-          </Focusable>
+          </h1>
 
           <p
             className="text-landing-fg-secondary mt-6 max-w-xl animate-[hero-fade-in_0.8s_ease-out_0.39s_both] text-sm leading-relaxed sm:text-base sm:leading-relaxed"
@@ -286,13 +284,12 @@ export function Landing() {
                 <p className="text-landing-fg-muted mb-3 text-xs font-medium tracking-widest uppercase">
                   Support
                 </p>
-                <Focusable
-                  as="h2"
+                <h2
                   className="text-landing-fg text-2xl font-semibold tracking-tight sm:text-3xl"
                   style={{ textWrap: 'balance' }}
                 >
                   Frequently asked questions
-                </Focusable>
+                </h2>
                 <p className="text-landing-fg-secondary mt-3 max-w-sm text-sm leading-relaxed">
                   Everything you need to know about Remes and how it fits into your sales workflow.
                 </p>
@@ -336,13 +333,12 @@ export function Landing() {
             />
 
             <div className="final-cta relative z-10 flex flex-col items-center text-center">
-              <Focusable
-                as="h2"
+              <h2
                 className="text-landing-fg text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl"
                 style={{ textWrap: 'balance' }}
               >
                 Stop missing buying <GradientText>signals</GradientText>
-              </Focusable>
+              </h2>
               <p className="text-landing-fg-secondary mx-auto mt-4 max-w-md text-sm leading-relaxed sm:text-base">
                 Start detecting signals and generating outreach in minutes.
               </p>

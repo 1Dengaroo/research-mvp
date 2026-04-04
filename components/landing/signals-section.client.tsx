@@ -1,7 +1,6 @@
 'use client';
 
 import { Sparkles } from 'lucide-react';
-import { Focusable } from '@/components/shared/focusable';
 import { SIGNALS } from './landing-constants';
 import { RotatingWord } from './rotating-word.client';
 
@@ -12,13 +11,12 @@ export function SignalsSection() {
         <p className="text-landing-fg-muted mb-3 text-xs font-medium tracking-widest uppercase">
           Signals
         </p>
-        <Focusable
-          as="h2"
+        <h2
           className="text-landing-fg text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl xl:text-[2.75rem]"
           style={{ textWrap: 'balance' }}
         >
           Reach out the moment you spot <RotatingWord />
-        </Focusable>
+        </h2>
         <p className="text-landing-fg-secondary mt-4 max-w-lg text-sm leading-relaxed sm:text-base">
           Remes monitors dozens of data sources in real time. Here are some of the signals you can
           track.
