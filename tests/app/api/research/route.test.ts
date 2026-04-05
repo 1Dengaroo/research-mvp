@@ -1,12 +1,13 @@
 jest.mock('@/lib/supabase/server', () => ({ requireAuth: jest.fn() }));
-jest.mock('@/lib/services/research/pipeline', () => ({
+jest.mock('@/lib/services/research', () => ({
+  ...jest.requireActual('@/lib/services/research'),
   discoverCompanies: jest.fn(),
   researchConfirmedCompanies: jest.fn()
 }));
 
 import { POST } from '@/app/api/research/route';
 import { requireAuth } from '@/lib/supabase/server';
-import { discoverCompanies, researchConfirmedCompanies } from '@/lib/services/research/pipeline';
+import { discoverCompanies, researchConfirmedCompanies } from '@/lib/services/research';
 import { mockAuthSuccess, mockAuthFailure, validIcp } from '@/tests/helpers';
 
 const mockAuth = requireAuth as jest.MockedFunction<typeof requireAuth>;

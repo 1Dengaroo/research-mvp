@@ -1,152 +1,34 @@
-export interface ICPCriteria {
-  description: string;
-  industry_keywords: string[];
-  min_employees: number | null;
-  max_employees: number | null;
-  min_funding_amount: number | null;
-  funding_stages: string[];
-  hiring_signals: string[];
-  tech_keywords: string[];
-  company_examples: string[];
-  locations: string[];
-}
+// Re-export all domain types from their canonical locations.
+// New code should import from the domain directly (e.g., '@/lib/services/icp/types').
 
-export interface SourceLink {
-  title: string;
-  url: string;
-}
-
-export interface CompanySignal {
-  type: 'job_posting' | 'news' | 'funding' | 'product_launch' | 'other';
-  title: string;
-  key_phrases: string[];
-  source_url?: string;
-}
-
-export interface TargetContact {
-  name: string;
-  title: string;
-  linkedin_url: string;
-  email: string | null;
-  is_decision_maker: boolean;
-}
-
-export interface CompanyResult {
-  company_name: string;
-  industry: string;
-  funding_stage: string;
-  amount_raised: string;
-  website: string | null;
-  linkedin_url: string;
-  logo_url: string;
-  signals: CompanySignal[];
-  match_reason: string;
-  company_overview: string;
-  contacts: TargetContact[];
-  /** Raw sources grouped by category for linking in the UI */
-  sources: {
-    jobs: SourceLink[];
-    funding: SourceLink[];
-    news: SourceLink[];
-  };
-}
-
-export interface ComposeEmailParams {
-  company: CompanyResult;
-  contact: TargetContact;
-  icp: ICPCriteria;
-}
-
-export interface GeneratedEmail {
-  subject: string;
-  body: string;
-}
-
-export interface GeneratedEmailSequence {
-  emails: [GeneratedEmail, GeneratedEmail, GeneratedEmail];
-}
-
-export interface SentEmail {
-  id: string;
-  user_id: string;
-  recipient_email: string;
-  recipient_name: string;
-  subject: string;
-  body: string;
-  company_name: string;
-  contact_name: string;
-  status: 'sent' | 'failed';
-  error_message: string | null;
-  gmail_message_id: string | null;
-  session_id: string | null;
-  created_at: string;
-}
-
-export interface SendEmailRequest {
-  to: string;
-  subject: string;
-  body: string;
-  companyName: string;
-  contactName: string;
-  sessionId?: string;
-}
-
-export interface DiscoveredCompanyPreview {
-  name: string;
-  website?: string;
-  description?: string;
-  linkedin_url?: string;
-  logo_url?: string;
-  apollo_org_id?: string;
-  location?: string;
-}
-
-export interface ApolloPersonPreview {
-  apollo_person_id: string;
-  first_name: string;
-  last_name_obfuscated: string;
-  title: string | null;
-  organization_name: string;
-  has_email: boolean;
-  has_direct_phone: boolean;
-  last_name?: string;
-  email?: string;
-  phone?: string;
-  linkedin_url?: string;
-  is_enriched?: boolean;
-}
-
-export interface PeopleSearchResult {
-  company_name: string;
-  apollo_org_id: string;
-  ranked_people: ApolloPersonPreview[];
-}
-
-export interface StrategyMessage {
-  role: 'assistant' | 'user';
-  content: string;
-}
-
-export type ResearchStreamEvent =
-  | { type: 'status'; message: string }
-  | { type: 'icp'; data: ICPCriteria }
-  | { type: 'candidates'; data: DiscoveredCompanyPreview[] }
-  | { type: 'company'; data: CompanyResult }
-  | { type: 'done'; total: number }
-  | { type: 'error'; message: string };
+export type { ICPCriteria, SavedICP } from './services/icp/types';
+export type {
+  SourceLink,
+  CompanySignal,
+  TargetContact,
+  CompanyResult,
+  DiscoveredCompanyPreview,
+  ResearchStreamEvent
+} from './services/research/types';
+export type { ApolloPersonPreview, PeopleSearchResult } from './services/people/types';
+export type {
+  GeneratedEmail,
+  GeneratedEmailSequence,
+  SentEmail,
+  SendEmailRequest,
+  ComposeEmailParams
+} from './services/email/types';
+export type { StrategyMessage } from './services/strategy/types';
 
 // ---------------------------------------------------------------------------
-// Persistence
+// Persistence — shared DB row shapes (not domain-specific)
 // ---------------------------------------------------------------------------
 
-export interface SavedICP {
-  id: string;
-  user_id: string;
-  name: string;
-  icp: ICPCriteria;
-  created_at: string;
-  updated_at: string;
-}
+import type { ICPCriteria } from './services/icp/types';
+import type { DiscoveredCompanyPreview, CompanyResult } from './services/research/types';
+import type { ApolloPersonPreview } from './services/people/types';
+import type { GeneratedEmailSequence } from './services/email/types';
+import type { StrategyMessage } from './services/strategy/types';
 
 export interface ResearchSession {
   id: string;

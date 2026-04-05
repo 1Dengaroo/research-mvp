@@ -1,51 +1,65 @@
 import { z } from 'zod';
 
+// Re-export route utilities (canonical location: lib/route-utils.ts)
+export { parseBody, requireEnvVars } from './route-utils';
+
+// Re-export all domain schemas for backwards compatibility.
+// New code should import from the domain directly (e.g., '@/lib/services/icp/schemas').
+export {
+  icpCriteriaSchema,
+  createIcpBodySchema,
+  updateIcpBodySchema,
+  parseIcpBodySchema
+} from './services/icp/schemas';
+export { strategyMessageSchema, strategyBodySchema } from './services/strategy/schemas';
+export { researchBodySchema } from './services/research/schemas';
+export {
+  peopleSearchBodySchema,
+  peopleBulkBodySchema,
+  peopleEnrichBodySchema
+} from './services/people/schemas';
+export { emailGenerateBodySchema, emailSendBodySchema } from './services/email/schemas';
+
 // ---------------------------------------------------------------------------
-// Primitives — reusable bounded strings and arrays
+// Schemas for domains without a service folder (profile, sessions, signatures)
 // ---------------------------------------------------------------------------
 
-/** String capped at a reasonable length to prevent payload bloat */
 const shortStr = z.string().max(500);
 const mediumStr = z.string().max(5_000);
 const longStr = z.string().max(50_000);
 const urlStr = z.string().max(2_000);
 
-/** Array of short strings, capped at a sane count */
 function strArray(maxItems: number) {
   return z.array(shortStr).max(maxItems);
 }
 
-// ---------------------------------------------------------------------------
-// Domain schemas — strict variants for user-authored input
-// ---------------------------------------------------------------------------
+const recordKey = z.string().max(1_000);
 
-export const icpCriteriaSchema = z.object({
-  description: mediumStr,
-  industry_keywords: strArray(50),
-  min_employees: z.number().nullable(),
-  max_employees: z.number().nullable(),
-  min_funding_amount: z.number().nullable(),
-  funding_stages: strArray(20),
-  hiring_signals: strArray(50),
-  tech_keywords: strArray(50),
-  company_examples: strArray(50),
-  locations: strArray(50).default([])
-});
+// Re-import domain schemas needed for session body
+import { icpCriteriaSchema } from './services/icp/schemas';
+import { strategyMessageSchema } from './services/strategy/schemas';
 
-export const strategyMessageSchema = z.object({
-  role: z.enum(['assistant', 'user']),
-  content: longStr
-});
-
-// Domain schemas — loose variants for server-produced data
-//
-// These are stored in sessions after being produced by our own pipeline.
-// Use .loose() so we don't silently strip fields if the pipeline
-// adds new ones before the schema is updated.
-const sourceLinkLoose = z
+const candidateLoose = z
   .object({
-    title: shortStr,
-    url: urlStr
+    name: shortStr,
+    website: urlStr.optional(),
+    description: mediumStr.optional(),
+    linkedin_url: urlStr.optional(),
+    logo_url: urlStr.optional(),
+    apollo_org_id: shortStr.optional(),
+    location: shortStr.optional()
+  })
+  .loose();
+
+const apolloPersonLoose = z
+  .object({
+    apollo_person_id: shortStr,
+    first_name: shortStr,
+    last_name_obfuscated: shortStr,
+    title: shortStr.nullable(),
+    organization_name: shortStr,
+    has_email: z.boolean(),
+    has_direct_phone: z.boolean()
   })
   .loose();
 
@@ -57,6 +71,8 @@ const companySignalLoose = z
     source_url: urlStr.optional()
   })
   .loose();
+
+const sourceLinkLoose = z.object({ title: shortStr, url: urlStr }).loose();
 
 const targetContactLoose = z
   .object({
@@ -89,53 +105,10 @@ const companyResultLoose = z
   })
   .loose();
 
-const candidateLoose = z
-  .object({
-    name: shortStr,
-    website: urlStr.optional(),
-    description: mediumStr.optional(),
-    linkedin_url: urlStr.optional(),
-    logo_url: urlStr.optional(),
-    apollo_org_id: shortStr.optional(),
-    location: shortStr.optional()
-  })
-  .loose();
-
-const apolloPersonLoose = z
-  .object({
-    apollo_person_id: shortStr,
-    first_name: shortStr,
-    last_name_obfuscated: shortStr,
-    title: shortStr.nullable(),
-    organization_name: shortStr,
-    has_email: z.boolean(),
-    has_direct_phone: z.boolean()
-  })
-  .loose();
-
-const generatedEmailLoose = z
-  .object({
-    subject: shortStr,
-    body: longStr
-  })
-  .loose();
+const generatedEmailLoose = z.object({ subject: shortStr, body: longStr }).loose();
 
 const emailSequenceLoose = z.object({
   emails: z.tuple([generatedEmailLoose, generatedEmailLoose, generatedEmailLoose])
-});
-
-// Record key — company names and compound keys like "Company::email"
-const recordKey = z.string().max(1_000);
-
-// API request schemas
-export const createIcpBodySchema = z.object({
-  name: shortStr.min(1),
-  icp: icpCriteriaSchema
-});
-
-export const updateIcpBodySchema = z.object({
-  name: shortStr.optional(),
-  icp: icpCriteriaSchema.optional()
 });
 
 export const sessionCreateBodySchema = z.object({
@@ -165,30 +138,9 @@ export const sessionUpdateBodySchema = z.object({
   status: z.enum(['in_progress', 'completed']).optional()
 });
 
-export const strategyBodySchema = z.object({
-  icp: icpCriteriaSchema,
-  messages: z.array(strategyMessageSchema).max(200).optional()
-});
-
-export const researchBodySchema = z.object({
-  icp: icpCriteriaSchema,
-  companies: z.array(shortStr).max(200).optional(),
-  candidates: z.array(candidateLoose).max(200).optional()
-});
-
-export const emailGenerateBodySchema = z.object({
-  company: companyResultLoose,
-  contact: targetContactLoose,
-  icp: icpCriteriaSchema
-});
-
-export const emailSendBodySchema = z.object({
-  to: z.string().email().max(320),
-  subject: shortStr.min(1),
-  body: longStr.min(1),
-  companyName: shortStr,
-  contactName: shortStr,
-  sessionId: shortStr.optional()
+export const profileUpdateBodySchema = z.object({
+  full_name: shortStr,
+  company_name: shortStr.optional()
 });
 
 export const signatureCreateBodySchema = z.object({
@@ -201,73 +153,3 @@ export const signatureUpdateBodySchema = z.object({
   body: mediumStr.optional(),
   is_default: z.boolean().optional()
 });
-
-export const profileUpdateBodySchema = z.object({
-  full_name: shortStr,
-  company_name: shortStr.optional()
-});
-
-export const peopleSearchBodySchema = z.object({
-  org_ids: z.array(shortStr).max(200),
-  icp: icpCriteriaSchema,
-  companies: z
-    .array(
-      z.object({
-        name: shortStr,
-        apollo_org_id: shortStr
-      })
-    )
-    .max(200)
-});
-
-export const peopleBulkBodySchema = z.object({
-  companies: z
-    .array(
-      z.object({
-        name: shortStr,
-        apollo_org_id: shortStr
-      })
-    )
-    .max(200)
-});
-
-export const peopleEnrichBodySchema = z.object({
-  person_id: shortStr.min(1)
-});
-
-export const parseIcpBodySchema = z.object({
-  input: longStr.min(1)
-});
-
-// Helper — check required env vars, return 500 on missing
-export function requireEnvVars(...vars: string[]): Response | null {
-  const missing = vars.filter((v) => !process.env[v]);
-  if (missing.length === 0) return null;
-  console.error('[Config] Missing environment variables:', missing.join(', '));
-  return Response.json(
-    {
-      error: { code: 'SERVICE_UNAVAILABLE', message: 'Required service configuration is missing' }
-    },
-    { status: 500 }
-  );
-}
-
-// Helper — parse and return 400 on failure
-export function parseBody<T>(
-  schema: z.ZodType<T>,
-  data: unknown
-): { success: true; data: T } | { success: false; response: Response } {
-  const result = schema.safeParse(data);
-  if (result.success) {
-    return { success: true, data: result.data };
-  }
-  const issues = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ');
-  console.error('[Validation]', issues);
-  return {
-    success: false,
-    response: Response.json(
-      { error: { code: 'VALIDATION_ERROR', message: `Validation failed: ${issues}` } },
-      { status: 400 }
-    )
-  };
-}

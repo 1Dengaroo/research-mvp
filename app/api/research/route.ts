@@ -1,61 +1,57 @@
 import { NextRequest } from 'next/server';
-import { requireAuth } from '@/lib/supabase/server';
-import { discoverCompanies, researchConfirmedCompanies } from '@/lib/services/research/pipeline';
-import { researchBodySchema, parseBody } from '@/lib/validation';
-import type { ResearchStreamEvent } from '@/lib/types';
+import { withAuth, jsonError, parseBody } from '@/lib/route-utils';
+import {
+  researchBodySchema,
+  discoverCompanies,
+  researchConfirmedCompanies
+} from '@/lib/services/research';
+import type { ResearchStreamEvent } from '@/lib/services/research';
 
 export const maxDuration = 300;
 
-export async function POST(req: NextRequest) {
-  const auth = await requireAuth();
-  if (auth instanceof Response) return auth;
+export const POST = (req: NextRequest) =>
+  withAuth(async () => {
+    const parsed = parseBody(researchBodySchema, await req.json());
+    if (!parsed.success) return parsed.response;
 
-  const parsed = parseBody(researchBodySchema, await req.json());
-  if (!parsed.success) return parsed.response;
+    const { icp, companies, candidates } = parsed.data;
 
-  const { icp, companies, candidates } = parsed.data;
+    const missing: string[] = [];
+    if (!process.env.ANTHROPIC_API_KEY) missing.push('ANTHROPIC_API_KEY');
+    if (!process.env.APOLLO_API_KEY && !companies) missing.push('APOLLO_API_KEY');
 
-  const missing: string[] = [];
-  if (!process.env.ANTHROPIC_API_KEY) missing.push('ANTHROPIC_API_KEY');
-  if (!process.env.APOLLO_API_KEY && !companies) missing.push('APOLLO_API_KEY');
+    if (missing.length > 0) {
+      console.error('[Config] Missing environment variables:', missing.join(', '));
+      return jsonError('SERVICE_UNAVAILABLE', 'Required service configuration is missing', 500);
+    }
 
-  if (missing.length > 0) {
-    console.error('[Config] Missing environment variables:', missing.join(', '));
-    return Response.json(
-      {
-        error: { code: 'SERVICE_UNAVAILABLE', message: 'Required service configuration is missing' }
-      },
-      { status: 500 }
-    );
-  }
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        const send = (event: ResearchStreamEvent) => {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
+        };
 
-  const encoder = new TextEncoder();
-  const stream = new ReadableStream({
-    async start(controller) {
-      const send = (event: ResearchStreamEvent) => {
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
-      };
-
-      try {
-        if (companies) {
-          await researchConfirmedCompanies(companies, icp, send, undefined, candidates);
-        } else {
-          await discoverCompanies(icp, send);
+        try {
+          if (companies) {
+            await researchConfirmedCompanies(companies, icp, send, undefined, candidates);
+          } else {
+            await discoverCompanies(icp, send);
+          }
+        } catch (err) {
+          const message = err instanceof Error ? err.message : 'Unknown error';
+          send({ type: 'error', message });
+        } finally {
+          controller.close();
         }
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Unknown error';
-        send({ type: 'error', message });
-      } finally {
-        controller.close();
       }
-    }
-  });
+    });
 
-  return new Response(stream, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      Connection: 'keep-alive'
-    }
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive'
+      }
+    });
   });
-}

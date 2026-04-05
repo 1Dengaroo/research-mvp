@@ -1,11 +1,12 @@
 jest.mock('@/lib/supabase/server', () => ({ requireAuth: jest.fn() }));
-jest.mock('@/lib/services/email/sending', () => ({
+jest.mock('@/lib/services/email', () => ({
+  ...jest.requireActual('@/lib/services/email'),
   sendAndRecordEmail: jest.fn()
 }));
 
 import { POST } from '@/app/api/emails/send/route';
 import { requireAuth } from '@/lib/supabase/server';
-import { sendAndRecordEmail } from '@/lib/services/email/sending';
+import { sendAndRecordEmail } from '@/lib/services/email';
 import { mockAuthSuccess, mockAuthFailure, expectError } from '@/tests/helpers';
 
 const mockAuth = requireAuth as jest.MockedFunction<typeof requireAuth>;

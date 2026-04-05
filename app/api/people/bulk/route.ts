@@ -1,33 +1,21 @@
 import { NextRequest } from 'next/server';
-import { requireAuth } from '@/lib/supabase/server';
-import { apolloPeopleSearch } from '@/lib/services/people/apollo';
-import { peopleBulkBodySchema, parseBody, requireEnvVars } from '@/lib/validation';
+import { withAuth, jsonError, parseBody, requireEnvVars } from '@/lib/route-utils';
+import { peopleBulkBodySchema, bulkSearchPeople } from '@/lib/services/people';
 
-export async function POST(req: NextRequest) {
-  const auth = await requireAuth();
-  if (auth instanceof Response) return auth;
+export const POST = (req: NextRequest) =>
+  withAuth(async () => {
+    const parsed = parseBody(peopleBulkBodySchema, await req.json());
+    if (!parsed.success) return parsed.response;
 
-  const parsed = parseBody(peopleBulkBodySchema, await req.json());
-  if (!parsed.success) return parsed.response;
+    const envError = requireEnvVars('APOLLO_API_KEY');
+    if (envError) return envError;
 
-  const { companies } = parsed.data;
-
-  const envError = requireEnvVars('APOLLO_API_KEY');
-  if (envError) return envError;
-
-  try {
-    const orgIds = companies.map((c) => c.apollo_org_id);
-    const peopleByOrg = await apolloPeopleSearch(orgIds, 10);
-
-    const results = companies.map((company) => ({
-      company_name: company.name,
-      people: peopleByOrg.get(company.name) ?? []
-    }));
-
-    return Response.json({ results });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Bulk people search failed';
-    console.error('[People Bulk]', message);
-    return Response.json({ error: { code: 'INTERNAL_ERROR', message } }, { status: 500 });
-  }
-}
+    try {
+      const results = await bulkSearchPeople(parsed.data.companies);
+      return Response.json({ results });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Bulk people search failed';
+      console.error('[People Bulk]', message);
+      return jsonError('INTERNAL_ERROR', message, 500);
+    }
+  });

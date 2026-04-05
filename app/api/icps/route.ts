@@ -1,43 +1,23 @@
 import { NextRequest } from 'next/server';
-import { requireAuth } from '@/lib/supabase/server';
-import { createIcpBodySchema, parseBody } from '@/lib/validation';
+import { withAuth, jsonError, parseBody } from '@/lib/route-utils';
+import { createIcpBodySchema } from '@/lib/services/icp';
 import { listICPs, createICP } from '@/lib/supabase/queries';
 
-export async function GET() {
-  const auth = await requireAuth();
-  if (auth instanceof Response) return auth;
-  const { supabase, user } = auth;
+export const GET = () =>
+  withAuth(async (supabase, user) => {
+    const { data, error } = await listICPs(supabase, user.id);
+    if (error) return jsonError('INTERNAL_ERROR', error.message, 500);
+    return Response.json({ icps: data });
+  });
 
-  const { data, error } = await listICPs(supabase, user.id);
+export const POST = (req: NextRequest) =>
+  withAuth(async (supabase, user) => {
+    const parsed = parseBody(createIcpBodySchema, await req.json());
+    if (!parsed.success) return parsed.response;
 
-  if (error) {
-    return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: error.message } },
-      { status: 500 }
-    );
-  }
+    const { name, icp } = parsed.data;
+    const { data, error } = await createICP(supabase, user.id, name, icp);
+    if (error) return jsonError('INTERNAL_ERROR', error.message, 500);
 
-  return Response.json({ icps: data });
-}
-
-export async function POST(req: NextRequest) {
-  const auth = await requireAuth();
-  if (auth instanceof Response) return auth;
-  const { supabase, user } = auth;
-
-  const parsed = parseBody(createIcpBodySchema, await req.json());
-  if (!parsed.success) return parsed.response;
-
-  const { name, icp } = parsed.data;
-
-  const { data, error } = await createICP(supabase, user.id, name, icp);
-
-  if (error) {
-    return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: error.message } },
-      { status: 500 }
-    );
-  }
-
-  return Response.json(data, { status: 201 });
-}
+    return Response.json(data, { status: 201 });
+  });
