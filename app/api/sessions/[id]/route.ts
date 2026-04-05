@@ -1,58 +1,32 @@
 import { NextRequest } from 'next/server';
-import { requireAuth } from '@/lib/supabase/server';
-import { sessionUpdateBodySchema, parseBody } from '@/lib/validation';
+import { withAuth, jsonError, parseBody } from '@/lib/route-utils';
+import { sessionUpdateBodySchema } from '@/lib/validation';
 import { getSession, updateSession, deleteSession } from '@/lib/supabase/queries';
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const auth = await requireAuth();
-  if (auth instanceof Response) return auth;
-  const { supabase, user } = auth;
+export const GET = (_req: NextRequest, { params }: { params: Promise<{ id: string }> }) =>
+  withAuth(async (supabase, user) => {
+    const { id } = await params;
+    const { data, error } = await getSession(supabase, id, user.id);
+    if (error) return jsonError('NOT_FOUND', error.message, 404);
+    return Response.json(data);
+  });
 
-  const { data, error } = await getSession(supabase, id, user.id);
+export const PATCH = (req: NextRequest, { params }: { params: Promise<{ id: string }> }) =>
+  withAuth(async (supabase, user) => {
+    const { id } = await params;
+    const parsed = parseBody(sessionUpdateBodySchema, await req.json());
+    if (!parsed.success) return parsed.response;
 
-  if (error) {
-    return Response.json({ error: { code: 'NOT_FOUND', message: error.message } }, { status: 404 });
-  }
+    const { error } = await updateSession(supabase, id, user.id, parsed.data);
+    if (error) return jsonError('INTERNAL_ERROR', error.message, 500);
 
-  return Response.json(data);
-}
+    return Response.json({ success: true });
+  });
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const auth = await requireAuth();
-  if (auth instanceof Response) return auth;
-  const { supabase, user } = auth;
-
-  const parsed = parseBody(sessionUpdateBodySchema, await req.json());
-  if (!parsed.success) return parsed.response;
-
-  const { error } = await updateSession(supabase, id, user.id, parsed.data);
-
-  if (error) {
-    return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: error.message } },
-      { status: 500 }
-    );
-  }
-
-  return Response.json({ success: true });
-}
-
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const auth = await requireAuth();
-  if (auth instanceof Response) return auth;
-  const { supabase, user } = auth;
-
-  const { error } = await deleteSession(supabase, id, user.id);
-
-  if (error) {
-    return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: error.message } },
-      { status: 500 }
-    );
-  }
-
-  return Response.json({ success: true });
-}
+export const DELETE = (_req: NextRequest, { params }: { params: Promise<{ id: string }> }) =>
+  withAuth(async (supabase, user) => {
+    const { id } = await params;
+    const { error } = await deleteSession(supabase, id, user.id);
+    if (error) return jsonError('INTERNAL_ERROR', error.message, 500);
+    return Response.json({ success: true });
+  });

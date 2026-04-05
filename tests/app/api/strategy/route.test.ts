@@ -1,16 +1,17 @@
 jest.mock('@/lib/supabase/server', () => ({ requireAuth: jest.fn() }));
-jest.mock('@/lib/validation', () => ({
-  ...jest.requireActual('@/lib/validation'),
+jest.mock('@/lib/route-utils', () => ({
+  ...jest.requireActual('@/lib/route-utils'),
   requireEnvVars: jest.fn()
 }));
-jest.mock('@/lib/services/strategy/stream', () => ({
+jest.mock('@/lib/services/strategy', () => ({
+  ...jest.requireActual('@/lib/services/strategy'),
   streamStrategy: jest.fn()
 }));
 
 import { POST } from '@/app/api/strategy/route';
 import { requireAuth } from '@/lib/supabase/server';
-import { requireEnvVars } from '@/lib/validation';
-import { streamStrategy } from '@/lib/services/strategy/stream';
+import { requireEnvVars } from '@/lib/route-utils';
+import { streamStrategy } from '@/lib/services/strategy';
 import { mockAuthSuccess, mockAuthFailure, validIcp } from '@/tests/helpers';
 
 const mockAuth = requireAuth as jest.MockedFunction<typeof requireAuth>;

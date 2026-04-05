@@ -1,16 +1,17 @@
 jest.mock('@/lib/supabase/server', () => ({ requireAuth: jest.fn() }));
-jest.mock('@/lib/validation', () => ({
-  ...jest.requireActual('@/lib/validation'),
+jest.mock('@/lib/route-utils', () => ({
+  ...jest.requireActual('@/lib/route-utils'),
   requireEnvVars: jest.fn()
 }));
-jest.mock('@/lib/services/people/apollo', () => ({
+jest.mock('@/lib/services/people', () => ({
+  ...jest.requireActual('@/lib/services/people'),
   apolloPersonEnrich: jest.fn()
 }));
 
 import { POST } from '@/app/api/people/enrich/route';
 import { requireAuth } from '@/lib/supabase/server';
-import { requireEnvVars } from '@/lib/validation';
-import { apolloPersonEnrich } from '@/lib/services/people/apollo';
+import { requireEnvVars } from '@/lib/route-utils';
+import { apolloPersonEnrich } from '@/lib/services/people';
 import { mockAuthSuccess, mockAuthFailure, expectError } from '@/tests/helpers';
 
 const mockAuth = requireAuth as jest.MockedFunction<typeof requireAuth>;

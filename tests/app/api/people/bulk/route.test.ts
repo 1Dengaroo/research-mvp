@@ -1,21 +1,22 @@
 jest.mock('@/lib/supabase/server', () => ({ requireAuth: jest.fn() }));
-jest.mock('@/lib/validation', () => ({
-  ...jest.requireActual('@/lib/validation'),
+jest.mock('@/lib/route-utils', () => ({
+  ...jest.requireActual('@/lib/route-utils'),
   requireEnvVars: jest.fn()
 }));
-jest.mock('@/lib/services/people/apollo', () => ({
-  apolloPeopleSearch: jest.fn()
+jest.mock('@/lib/services/people', () => ({
+  ...jest.requireActual('@/lib/services/people'),
+  bulkSearchPeople: jest.fn()
 }));
 
 import { POST } from '@/app/api/people/bulk/route';
 import { requireAuth } from '@/lib/supabase/server';
-import { requireEnvVars } from '@/lib/validation';
-import { apolloPeopleSearch } from '@/lib/services/people/apollo';
+import { requireEnvVars } from '@/lib/route-utils';
+import { bulkSearchPeople } from '@/lib/services/people';
 import { mockAuthSuccess, mockAuthFailure, expectError } from '@/tests/helpers';
 
 const mockAuth = requireAuth as jest.MockedFunction<typeof requireAuth>;
 const mockEnvVars = requireEnvVars as jest.MockedFunction<typeof requireEnvVars>;
-const mockSearch = apolloPeopleSearch as jest.MockedFunction<typeof apolloPeopleSearch>;
+const mockBulk = bulkSearchPeople as jest.MockedFunction<typeof bulkSearchPeople>;
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -35,7 +36,7 @@ describe('POST /api/people/bulk', () => {
 
   it('returns results mapped by company', async () => {
     mockAuth.mockResolvedValue(mockAuthSuccess());
-    mockSearch.mockResolvedValue(new Map());
+    mockBulk.mockResolvedValue([{ company_name: 'Acme', people: [] }]);
 
     const req = new Request('http://localhost', {
       method: 'POST',
@@ -51,7 +52,7 @@ describe('POST /api/people/bulk', () => {
 
   it('returns 500 on service error', async () => {
     mockAuth.mockResolvedValue(mockAuthSuccess());
-    mockSearch.mockRejectedValue(new Error('fail'));
+    mockBulk.mockRejectedValue(new Error('fail'));
 
     const req = new Request('http://localhost', {
       method: 'POST',

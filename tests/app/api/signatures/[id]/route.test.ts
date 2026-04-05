@@ -7,7 +7,7 @@ jest.mock('@/lib/supabase/queries', () => ({
 import { PATCH, DELETE } from '@/app/api/signatures/[id]/route';
 import { requireAuth } from '@/lib/supabase/server';
 import { updateSignatureWithDefault, deleteSignature } from '@/lib/supabase/queries';
-import { mockAuthSuccess, mockAuthFailure, expectError } from '@/tests/helpers';
+import { mockAuthSuccess, expectError } from '@/tests/helpers';
 
 const mockAuth = requireAuth as jest.MockedFunction<typeof requireAuth>;
 const mockUpdate = updateSignatureWithDefault as jest.MockedFunction<

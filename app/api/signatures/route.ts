@@ -1,43 +1,23 @@
 import { NextRequest } from 'next/server';
-import { requireAuth } from '@/lib/supabase/server';
-import { signatureCreateBodySchema, parseBody } from '@/lib/validation';
+import { withAuth, jsonError, parseBody } from '@/lib/route-utils';
+import { signatureCreateBodySchema } from '@/lib/validation';
 import { listSignatures, createSignature } from '@/lib/supabase/queries';
 
-export async function GET() {
-  const auth = await requireAuth();
-  if (auth instanceof Response) return auth;
-  const { supabase, user } = auth;
+export const GET = () =>
+  withAuth(async (supabase, user) => {
+    const { data, error } = await listSignatures(supabase, user.id);
+    if (error) return jsonError('INTERNAL_ERROR', error.message, 500);
+    return Response.json({ signatures: data });
+  });
 
-  const { data, error } = await listSignatures(supabase, user.id);
+export const POST = (req: NextRequest) =>
+  withAuth(async (supabase, user) => {
+    const parsed = parseBody(signatureCreateBodySchema, await req.json());
+    if (!parsed.success) return parsed.response;
 
-  if (error) {
-    return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: error.message } },
-      { status: 500 }
-    );
-  }
+    const { name, body: signatureBody } = parsed.data;
+    const { data, error } = await createSignature(supabase, user.id, name, signatureBody);
+    if (error) return jsonError('INTERNAL_ERROR', error.message, 500);
 
-  return Response.json({ signatures: data });
-}
-
-export async function POST(req: NextRequest) {
-  const auth = await requireAuth();
-  if (auth instanceof Response) return auth;
-  const { supabase, user } = auth;
-
-  const parsed = parseBody(signatureCreateBodySchema, await req.json());
-  if (!parsed.success) return parsed.response;
-
-  const { name, body: signatureBody } = parsed.data;
-
-  const { data, error } = await createSignature(supabase, user.id, name, signatureBody);
-
-  if (error) {
-    return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: error.message } },
-      { status: 500 }
-    );
-  }
-
-  return Response.json(data, { status: 201 });
-}
+    return Response.json(data, { status: 201 });
+  });

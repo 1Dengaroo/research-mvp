@@ -1,27 +1,23 @@
 import { NextRequest } from 'next/server';
-import { requireAuth } from '@/lib/supabase/server';
-import { emailGenerateBodySchema, parseBody, requireEnvVars } from '@/lib/validation';
-import { streamEmailGeneration } from '@/lib/services/email/generation';
+import { withAuth, parseBody, requireEnvVars } from '@/lib/route-utils';
+import { emailGenerateBodySchema, streamEmailGeneration } from '@/lib/services/email';
 
-export async function POST(req: NextRequest) {
-  const auth = await requireAuth();
-  if (auth instanceof Response) return auth;
-  const { supabase, user } = auth;
+export const POST = (req: NextRequest) =>
+  withAuth(async (supabase, user) => {
+    const envError = requireEnvVars('ANTHROPIC_API_KEY');
+    if (envError) return envError;
 
-  const envError = requireEnvVars('ANTHROPIC_API_KEY');
-  if (envError) return envError;
+    const parsed = parseBody(emailGenerateBodySchema, await req.json());
+    if (!parsed.success) return parsed.response;
 
-  const parsed = parseBody(emailGenerateBodySchema, await req.json());
-  if (!parsed.success) return parsed.response;
+    const { company, contact, icp } = parsed.data;
+    const stream = streamEmailGeneration(supabase, user, company, contact, icp);
 
-  const { company, contact, icp } = parsed.data;
-  const stream = streamEmailGeneration(supabase, user, company, contact, icp);
-
-  return new Response(stream, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      Connection: 'keep-alive'
-    }
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive'
+      }
+    });
   });
-}

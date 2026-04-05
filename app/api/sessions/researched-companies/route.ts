@@ -1,26 +1,15 @@
 import { NextRequest } from 'next/server';
-import { requireAuth } from '@/lib/supabase/server';
+import { withAuth, jsonError } from '@/lib/route-utils';
 import { listResearchedCompanyNames } from '@/lib/supabase/queries';
 
-export async function GET(req: NextRequest) {
-  const auth = await requireAuth();
-  if (auth instanceof Response) return auth;
-  const { supabase, user } = auth;
-
-  const excludeSessionId = req.nextUrl.searchParams.get('exclude') ?? undefined;
-
-  const { data: companies, error } = await listResearchedCompanyNames(
-    supabase,
-    user.id,
-    excludeSessionId
-  );
-
-  if (error) {
-    return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: error.message } },
-      { status: 500 }
+export const GET = (req: NextRequest) =>
+  withAuth(async (supabase, user) => {
+    const excludeSessionId = req.nextUrl.searchParams.get('exclude') ?? undefined;
+    const { data: companies, error } = await listResearchedCompanyNames(
+      supabase,
+      user.id,
+      excludeSessionId
     );
-  }
-
-  return Response.json({ companies });
-}
+    if (error) return jsonError('INTERNAL_ERROR', error.message, 500);
+    return Response.json({ companies });
+  });

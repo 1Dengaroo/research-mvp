@@ -101,6 +101,7 @@ describe('icpCriteriaSchema', () => {
   });
 
   it('defaults locations to empty array', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { locations: _, ...withoutLocations } = validIcp;
     const result = icpCriteriaSchema.safeParse(withoutLocations);
     expect(result.success).toBe(true);

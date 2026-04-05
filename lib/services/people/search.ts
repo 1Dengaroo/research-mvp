@@ -1,6 +1,23 @@
 import { apolloPeopleSearch, apolloPersonEnrich } from './apollo';
 import { rankPeopleForCompany } from './ranking';
 import type { ICPCriteria, PeopleSearchResult } from '@/lib/types';
+import type { ApolloPersonPreview } from './types';
+
+/**
+ * Bulk-fetch people previews for a list of companies (no ranking, no enrichment).
+ * Returns 10 people per company via Apollo's free search.
+ */
+export async function bulkSearchPeople(
+  companies: { name: string; apollo_org_id: string }[]
+): Promise<{ company_name: string; people: ApolloPersonPreview[] }[]> {
+  const orgIds = companies.map((c) => c.apollo_org_id);
+  const peopleByOrg = await apolloPeopleSearch(orgIds, 10);
+
+  return companies.map((company) => ({
+    company_name: company.name,
+    people: peopleByOrg.get(company.name) ?? []
+  }));
+}
 
 /**
  * Search for people at companies via Apollo, rank them by ICP fit,

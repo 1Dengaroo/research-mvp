@@ -1,43 +1,24 @@
 import { NextRequest } from 'next/server';
-import { requireAuth } from '@/lib/supabase/server';
-import { signatureUpdateBodySchema, parseBody } from '@/lib/validation';
+import { withAuth, jsonError, parseBody } from '@/lib/route-utils';
+import { signatureUpdateBodySchema } from '@/lib/validation';
 import { updateSignatureWithDefault, deleteSignature } from '@/lib/supabase/queries';
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const auth = await requireAuth();
-  if (auth instanceof Response) return auth;
-  const { supabase, user } = auth;
+export const PATCH = (req: NextRequest, { params }: { params: Promise<{ id: string }> }) =>
+  withAuth(async (supabase, user) => {
+    const { id } = await params;
+    const parsed = parseBody(signatureUpdateBodySchema, await req.json());
+    if (!parsed.success) return parsed.response;
 
-  const parsed = parseBody(signatureUpdateBodySchema, await req.json());
-  if (!parsed.success) return parsed.response;
+    const { data, error } = await updateSignatureWithDefault(supabase, id, user.id, parsed.data);
+    if (error) return jsonError('INTERNAL_ERROR', error.message, 500);
 
-  const { data, error } = await updateSignatureWithDefault(supabase, id, user.id, parsed.data);
+    return Response.json(data);
+  });
 
-  if (error) {
-    return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: error.message } },
-      { status: 500 }
-    );
-  }
-
-  return Response.json(data);
-}
-
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const auth = await requireAuth();
-  if (auth instanceof Response) return auth;
-  const { supabase, user } = auth;
-
-  const { error } = await deleteSignature(supabase, id, user.id);
-
-  if (error) {
-    return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: error.message } },
-      { status: 500 }
-    );
-  }
-
-  return Response.json({ success: true });
-}
+export const DELETE = (_req: NextRequest, { params }: { params: Promise<{ id: string }> }) =>
+  withAuth(async (supabase, user) => {
+    const { id } = await params;
+    const { error } = await deleteSignature(supabase, id, user.id);
+    if (error) return jsonError('INTERNAL_ERROR', error.message, 500);
+    return Response.json({ success: true });
+  });
