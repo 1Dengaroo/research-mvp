@@ -49,7 +49,7 @@ export function StrategyChat() {
   }, [input, isStrategizing, sendStrategyMessage]);
 
   return (
-    <Card className="h-full min-h-[400px] !gap-0 !py-0 lg:min-h-0">
+    <Card className="h-full min-h-[400px] lg:min-h-0">
       <div className="bg-card border-border flex shrink-0 items-center border-b px-4 py-2.5">
         <span className="text-muted-foreground section-label">Strategy Chat</span>
       </div>

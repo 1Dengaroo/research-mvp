@@ -9,16 +9,16 @@ import {
 import { MAX_WIDTH } from '@/lib/layout';
 import { FAQS } from './landing-constants';
 import { PrimaryCta, SecondaryCta } from './cta-buttons.client';
-import { GradientText } from './gradient-text';
 import { HeroIllustrations } from './hero-illustrations';
 import { HeroPipeline } from './hero-pipeline.client';
 import { BentoGrid } from './bento-grid';
 import { SignalsSection } from './signals-section.client';
-import { InteractiveDemo } from './interactive-demo.client';
+import { UseCasesSection } from './use-cases-section';
+import { CtaSection } from './cta-section';
 
 export function Landing() {
   return (
-    <div className="relative flex flex-col overflow-x-hidden">
+    <div className="relative flex flex-col overflow-x-clip">
       <div
         className="pointer-events-none fixed inset-0 z-1 hidden opacity-[0.025] md:block"
         style={{
@@ -36,6 +36,42 @@ export function Landing() {
         }}
       >
         <HeroIllustrations />
+
+        {/* Light cone from top center */}
+        <div
+          className="pointer-events-none absolute top-[-64px] left-0 z-[1] w-full"
+          aria-hidden="true"
+          style={
+            {
+              '--cone-spread': '10%',
+              '--cone-gap': '3%',
+              '--cone-offset-y': '-5%',
+              '--cone-color': 'rgba(200, 190, 255, 0.18)',
+              '--glow-spread': '4%',
+              '--glow-color': 'rgba(140, 120, 255, 0.04)',
+              '--cone-start': 'calc(50% - var(--cone-spread))',
+              '--cone-end': 'calc(50% + var(--cone-spread))',
+              '--glow-start': 'calc(var(--cone-start) - var(--glow-spread))',
+              '--glow-end': 'calc(var(--cone-end) + var(--glow-spread))',
+              '--mask-width': '100%',
+              '--mask-height': '720px',
+              '--mask-fade-start': '0px',
+              '--mask-fade-end': '100px',
+              height: 'var(--mask-height)',
+              background: [
+                'conic-gradient(from 0deg at 50% var(--cone-offset-y), #0000 0, #0000 var(--glow-start), var(--glow-color) var(--cone-start), var(--cone-color) calc(var(--cone-start) + var(--cone-gap)), var(--cone-color) 50%, var(--cone-color) calc(var(--cone-end) - var(--cone-gap)), var(--glow-color) var(--cone-end), #0000 var(--glow-end), #0000 100%)',
+                'radial-gradient(ellipse 30% 60% at 50% 10%, rgba(120, 100, 255, 0.06) 0%, transparent 100%)'
+              ].join(', '),
+              maskImage: [
+                "url(\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='grain'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch' result='noise'/><feComponentTransfer in='noise'><feFuncA type='linear' slope='0.4' intercept='0.6'/></feComponentTransfer></filter><rect width='100%25' height='100%25' filter='url(%23grain)'/></svg>\")",
+                'linear-gradient(to bottom, #0000 var(--mask-fade-start), #000 var(--mask-fade-end))',
+                'radial-gradient(ellipse var(--mask-width) var(--mask-height) at 50% 0, #000 0, #000 30%, #0000 100%)'
+              ].join(', '),
+              maskComposite: 'intersect, intersect',
+              WebkitMaskComposite: 'source-in, source-in'
+            } as React.CSSProperties
+          }
+        />
 
         <div
           className={`relative z-10 mx-auto flex w-full ${MAX_WIDTH} flex-col items-center px-6 pt-28 pb-44 sm:pt-32 sm:pb-56`}
@@ -88,6 +124,7 @@ export function Landing() {
         </div>
       </section>
 
+      {/* BentoGrid section */}
       <div className="relative">
         <div className="pointer-events-none absolute inset-0 hidden overflow-hidden md:block">
           <div
@@ -116,30 +153,15 @@ export function Landing() {
           <div id="features">
             <BentoGrid />
           </div>
+        </div>
+      </div>
 
-          <div className="flex justify-center">
-            <div className="h-px w-2/3 bg-linear-to-r from-transparent via-(--landing-border-card) to-transparent" />
-          </div>
+      {/* How it works — dark section */}
+      <UseCasesSection />
 
-          <section id="use-cases" className="scroll-mt-16 py-24 sm:py-36">
-            <div className="mb-14 sm:mb-20">
-              <p className="text-landing-fg-muted mb-3 text-xs font-medium tracking-widest uppercase">
-                How it works
-              </p>
-              <h2
-                className="text-landing-fg text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl"
-                style={{ textWrap: 'balance' }}
-              >
-                From signal to sent in minutes
-              </h2>
-              <p className="text-landing-fg-secondary mt-3 max-w-md text-sm leading-relaxed">
-                Three steps. Fully automated. No manual research required.
-              </p>
-            </div>
-
-            <InteractiveDemo />
-          </section>
-
+      {/* Signals, FAQs, CTA */}
+      <div className="relative">
+        <div className={`relative mx-auto flex w-full ${MAX_WIDTH} flex-col px-6`}>
           <div className="flex justify-center">
             <div className="h-px w-2/3 bg-linear-to-r from-transparent via-(--landing-border-card) to-transparent" />
           </div>
@@ -173,7 +195,7 @@ export function Landing() {
                     <AccordionItem
                       key={i}
                       value={`faq-${i}`}
-                      className="overflow-hidden rounded-xl border border-(--landing-border-card) bg-(--landing-bg-card) px-5"
+                      className="rounded-xl border border-(--landing-border-card) bg-(--landing-bg-card) px-5"
                       style={{ boxShadow: '0 1px 3px rgba(80, 70, 180, 0.04)' }}
                     >
                       <AccordionTrigger className="text-landing-fg hover:text-landing-fg [&>svg]:text-landing-fg-muted py-5 text-left text-sm leading-snug font-medium no-underline transition-colors duration-150 hover:no-underline">
@@ -190,27 +212,10 @@ export function Landing() {
               </div>
             </div>
           </section>
-
-          <section className="py-24 sm:py-36">
-            <p className="text-landing-fg-muted mb-4 text-xs font-medium tracking-widest uppercase">
-              Get started today
-            </p>
-            <h2
-              className="text-landing-fg text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl"
-              style={{ textWrap: 'balance' }}
-            >
-              Stop missing signals. <GradientText>Start converting them.</GradientText>
-            </h2>
-            <p className="text-landing-fg-secondary mt-4 max-w-md text-sm leading-relaxed sm:text-base">
-              Detect signals, find contacts, and send personalized outreach — all in one place.
-            </p>
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-              <PrimaryCta>Get started free</PrimaryCta>
-              <SecondaryCta />
-            </div>
-          </section>
         </div>
       </div>
+
+      <CtaSection />
     </div>
   );
 }

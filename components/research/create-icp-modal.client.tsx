@@ -98,7 +98,7 @@ export function CreateICPModal({
             {error && <p className="text-destructive px-6 pt-3 text-sm">{error}</p>}
 
             <div className="p-6">
-              <Card className="gap-0 py-0">
+              <Card>
                 <div className="bg-card border-border flex items-center justify-between border-b px-4 py-2.5">
                   <span className="text-muted-foreground section-label">Customer Profile</span>
                   {description.trim() && (

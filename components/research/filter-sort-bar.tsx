@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -34,17 +35,17 @@ export function FilterSortBar({
     <div className="mb-3 flex flex-wrap items-center gap-2">
       <div className="flex flex-wrap gap-1.5">
         {SIGNAL_TYPES.map((type) => (
-          <button
+          <Button
             key={type}
+            variant={activeFilters.has(type) ? 'default' : 'ghost'}
+            size="xs"
             onClick={() => onToggleFilter(type)}
-            className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
-              activeFilters.has(type)
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted text-muted-foreground hover:text-foreground'
+            className={`rounded-full ${
+              activeFilters.has(type) ? '' : 'bg-muted text-muted-foreground hover:text-foreground'
             }`}
           >
             {SIGNAL_LABELS[type]}
-          </button>
+          </Button>
         ))}
       </div>
       <div className="ml-auto flex items-center gap-1.5">

@@ -70,7 +70,7 @@ export function SessionsList({
           </p>
         </Card>
       ) : (
-        <Card className="!gap-0 !py-0">
+        <Card>
           {sessions.map((session, i) => (
             <div
               key={session.id}

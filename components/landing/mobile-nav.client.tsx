@@ -24,9 +24,10 @@ export function MobileNav() {
     <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
       {/* Hamburger trigger */}
       <DialogPrimitive.Trigger asChild>
-        <button
-          type="button"
-          className="text-landing-fg-secondary relative z-50 flex size-8 items-center justify-center md:hidden"
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          className="text-landing-fg-secondary relative z-50 hover:bg-transparent md:hidden"
           aria-label="Open menu"
         >
           <div className="flex w-4 flex-col gap-1.25">
@@ -39,7 +40,7 @@ export function MobileNav() {
               style={{ transform: open ? 'translateY(-3px) rotate(-45deg)' : 'none' }}
             />
           </div>
-        </button>
+        </Button>
       </DialogPrimitive.Trigger>
 
       <DialogPrimitive.Portal>
@@ -53,16 +54,17 @@ export function MobileNav() {
 
           {/* Close button — top right, matches hamburger position */}
           <DialogPrimitive.Close asChild>
-            <button
-              type="button"
-              className="text-landing-fg-secondary absolute top-3.5 right-6 z-50 flex size-8 items-center justify-center rounded-sm focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none"
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="text-landing-fg-secondary absolute top-3.5 right-6 z-50 rounded-sm hover:bg-transparent"
               aria-label="Close menu"
             >
               <div className="flex w-4 flex-col gap-1.25">
                 <span className="block h-px w-full origin-center translate-y-0.75 rotate-45 bg-current" />
                 <span className="block h-px w-full origin-center -translate-y-0.75 -rotate-45 bg-current" />
               </div>
-            </button>
+            </Button>
           </DialogPrimitive.Close>
 
           {/* Nav links — stagger in from top */}
@@ -82,13 +84,13 @@ export function MobileNav() {
                 {link.label}
               </a>
             ))}
-            <button
-              type="button"
+            <Button
+              variant="ghost"
               onClick={() => {
                 openDemo();
                 close();
               }}
-              className="text-landing-fg py-5 text-left text-2xl font-medium tracking-tight transition-all duration-500 ease-out"
+              className="text-landing-fg h-auto justify-start py-5 text-left text-2xl font-medium tracking-tight transition-all duration-500 ease-out hover:bg-transparent"
               style={{
                 opacity: open ? 1 : 0,
                 transform: open ? 'translateY(0)' : 'translateY(20px)',
@@ -96,7 +98,7 @@ export function MobileNav() {
               }}
             >
               Book a demo
-            </button>
+            </Button>
           </nav>
 
           {/* Bottom section */}

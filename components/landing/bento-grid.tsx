@@ -1,5 +1,3 @@
-import { ArrowRight } from 'lucide-react';
-
 function SignalMock() {
   return (
     <div className="mt-6 overflow-hidden rounded-xl border border-(--landing-border-card) bg-(--landing-bg-card) shadow-(--landing-shadow-card)">
@@ -103,7 +101,7 @@ function EmailMock() {
         <span className="text-landing-fg-muted text-2xs">
           Plain text · Signal-led · Under 80 words
         </span>
-        <div className="text-2xs rounded-full bg-(--landing-skel-base) px-2.5 py-1 font-medium text-(--landing-fg-secondary)">
+        <div className="text-2xs text-landing-fg-secondary rounded-full bg-(--landing-skel-base) px-2.5 py-1 font-medium">
           Send
         </div>
       </div>
@@ -134,9 +132,7 @@ function SequenceMock() {
           >
             <div
               className="text-2xs size-2 shrink-0 rounded-full"
-              style={{
-                backgroundColor: `var(--landing-score-${step.color}-text)`
-              }}
+              style={{ backgroundColor: `var(--landing-score-${step.color}-text)` }}
             />
             <div className="min-w-0 flex-1">
               <span className="text-landing-fg text-xs2 font-medium">{step.label}</span>
@@ -157,7 +153,6 @@ const FEATURES = [
     title: 'Signal Detection',
     eyebrow: 'Research',
     description: 'Monitors the web for buying signals and surfaces companies most likely to buy.',
-    color: 'var(--landing-bento-purple)',
     span: 'lg:col-span-2',
     mock: SignalMock
   },
@@ -165,7 +160,6 @@ const FEATURES = [
     title: 'Contact Discovery',
     eyebrow: 'Prospecting',
     description: 'Maps decision-makers with verified emails and LinkedIn profiles.',
-    color: 'var(--landing-bento-teal)',
     span: '',
     mock: ContactMock
   },
@@ -173,7 +167,6 @@ const FEATURES = [
     title: 'AI Outreach',
     eyebrow: 'Generation',
     description: 'Plain-text emails grounded in the trigger signal. Personalized, concise.',
-    color: 'var(--landing-bento-rose)',
     span: '',
     mock: EmailMock
   },
@@ -181,7 +174,6 @@ const FEATURES = [
     title: 'Smart Sequences',
     eyebrow: 'Automation',
     description: 'Multi-touch follow-ups that adapt. Each email takes a different angle.',
-    color: 'var(--landing-bento-amber)',
     span: 'lg:col-span-2',
     mock: SequenceMock
   }
@@ -190,11 +182,14 @@ const FEATURES = [
 export function BentoGrid() {
   return (
     <section className="py-20 sm:py-28">
-      <div className="mb-12">
+      <div className="section-heading mb-12">
         <p className="text-landing-fg-muted mb-3 text-xs font-medium tracking-widest uppercase">
           Platform
         </p>
-        <h2 className="text-landing-fg text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">
+        <h2
+          className="text-landing-fg text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl xl:text-[2.75rem]"
+          style={{ textWrap: 'balance' }}
+        >
           Everything you need for outbound
         </h2>
         <p className="text-landing-fg-secondary mt-4 max-w-lg text-sm leading-relaxed sm:text-base">
@@ -209,8 +204,7 @@ export function BentoGrid() {
           return (
             <div
               key={f.title}
-              className={`group overflow-hidden rounded-2xl p-6 transition-shadow duration-200 hover:shadow-(--landing-shadow-card-hover) sm:p-8 ${f.span}`}
-              style={{ backgroundColor: f.color }}
+              className={`overflow-hidden rounded-xl border border-(--landing-border-card) bg-(--landing-bg-card) p-6 shadow-(--landing-shadow-card) transition-shadow duration-200 hover:shadow-(--landing-shadow-card-hover) sm:p-8 ${f.span}`}
             >
               <p className="text-landing-fg-muted text-2xs font-medium tracking-widest uppercase">
                 {f.eyebrow}
@@ -219,12 +213,6 @@ export function BentoGrid() {
               <p className="text-landing-fg-secondary mt-1.5 max-w-md text-sm leading-relaxed">
                 {f.description}
               </p>
-              <a
-                href="#use-cases"
-                className="text-landing-fg-muted hover:text-landing-fg mt-3 inline-flex items-center gap-1 text-xs font-medium transition-colors"
-              >
-                Learn more <ArrowRight className="size-3" />
-              </a>
               <Mock />
             </div>
           );

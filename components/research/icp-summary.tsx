@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown, Pencil } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import type { ICPCriteria } from '@/lib/types';
 
@@ -15,8 +16,9 @@ export function ICPSummary({
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <Card className="mb-6 !gap-0 !py-0">
-      <button
+    <Card className="mb-6">
+      <Button
+        variant="ghost"
         onClick={() => setExpanded(!expanded)}
         className="flex w-full items-center gap-3 px-4 py-3 text-left"
       >
@@ -25,22 +27,24 @@ export function ICPSummary({
         </div>
         <div className="flex items-center gap-2">
           {onEditCriteria && (
-            <span
+            <Button
+              variant="ghost"
+              size="xs"
               onClick={(e) => {
                 e.stopPropagation();
                 onEditCriteria();
               }}
-              className="text-muted-foreground hover:text-primary flex items-center gap-1 text-xs transition-colors"
+              className="text-muted-foreground hover:text-primary"
             >
               <Pencil className="size-3" />
               Edit
-            </span>
+            </Button>
           )}
           <ChevronDown
             className={`text-muted-foreground size-4 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
           />
         </div>
-      </button>
+      </Button>
       <div
         className={`overflow-hidden transition-all duration-200 ${expanded ? 'max-h-40' : 'max-h-0'}`}
       >

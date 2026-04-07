@@ -58,33 +58,37 @@ function NavButton({
   return (
     <>
       {/* Mobile: circular step indicator */}
-      <button
+      <Button
+        variant="ghost"
+        size="icon-xs"
         onClick={() => enabled && onClick()}
         disabled={!enabled}
-        className={`flex size-8 items-center justify-center rounded-full text-xs font-medium transition-colors md:hidden ${
+        className={`size-8 rounded-full md:hidden ${
           active
-            ? 'bg-primary text-primary-foreground'
+            ? 'bg-primary text-primary-foreground hover:bg-primary/90'
             : status === 'completed'
-              ? 'bg-primary/15 text-primary'
+              ? 'bg-primary/15 text-primary hover:bg-primary/20'
               : enabled
                 ? 'bg-muted text-muted-foreground hover:text-foreground'
-                : 'bg-muted/50 text-muted-foreground/50 cursor-not-allowed'
+                : 'bg-muted/50 text-muted-foreground/50'
         }`}
       >
         {mobileContent}
-      </button>
+      </Button>
       {/* Desktop: full label */}
-      <button
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={() => enabled && onClick()}
         disabled={!enabled}
-        className={`hidden items-center gap-1.5 rounded-md px-2.5 py-1.5 transition-colors md:flex ${
+        className={`hidden md:flex ${
           active
-            ? 'bg-muted text-foreground font-medium'
+            ? 'bg-muted text-foreground hover:bg-muted font-medium'
             : status === 'completed'
               ? 'text-primary hover:bg-muted/50'
               : enabled
                 ? 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                : 'text-muted-foreground/50 cursor-not-allowed'
+                : 'text-muted-foreground/50'
         }`}
       >
         {status === 'in-progress' ? (
@@ -95,7 +99,7 @@ function NavButton({
           <Icon className="size-3" />
         )}
         {label}
-      </button>
+      </Button>
     </>
   );
 }

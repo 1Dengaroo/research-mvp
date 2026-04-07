@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 interface EditableNameProps {
@@ -75,15 +76,15 @@ export function EditableName({
   }
 
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
       onClick={(e) => {
         e.stopPropagation();
         setEditing(true);
       }}
-      className={`cursor-pointer text-left transition-opacity hover:opacity-70 md:truncate ${className}`}
+      className={`h-auto p-0 text-left hover:bg-transparent hover:opacity-70 md:truncate ${className}`}
     >
       {value}
-    </button>
+    </Button>
   );
 }

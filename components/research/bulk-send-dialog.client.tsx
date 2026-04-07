@@ -185,19 +185,18 @@ export function BulkSendDialog({
             <span className="text-muted-foreground text-xs font-medium">Send:</span>
             <div className="flex gap-1">
               {STEP_LABELS.map((label, i) => (
-                <button
+                <Button
                   key={label}
-                  type="button"
+                  variant={globalStep === i ? 'default' : 'ghost'}
+                  size="xs"
                   onClick={() => handleGlobalStepChange(i)}
                   disabled={isSending}
-                  className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
-                    globalStep === i
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground hover:text-foreground'
-                  }`}
+                  className={
+                    globalStep === i ? '' : 'bg-muted text-muted-foreground hover:text-foreground'
+                  }
                 >
                   {label}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -208,7 +207,7 @@ export function BulkSendDialog({
             {drafts.map((draft, i) => {
               const email = getEmail(draft);
               return (
-                <Card key={draft.contact.key} className="bg-muted/30 gap-0! p-3">
+                <Card key={draft.contact.key} className="bg-muted/30 p-3">
                   <div className="flex items-start gap-3">
                     <div className="mt-0.5 shrink-0">
                       {draft.status === 'sending' && (
@@ -241,18 +240,19 @@ export function BulkSendDialog({
                     {draft.status === 'pending' && !isSending && draft.sequence && (
                       <div className="flex shrink-0 gap-0.5">
                         {STEP_LABELS.map((_, si) => (
-                          <button
+                          <Button
                             key={si}
-                            type="button"
+                            variant={draft.stepIndex === si ? 'default' : 'ghost'}
+                            size="icon-xs"
                             onClick={() => handleDraftStepChange(i, si)}
-                            className={`size-6 rounded text-[10px] font-medium transition-colors ${
+                            className={`text-[10px] ${
                               draft.stepIndex === si
-                                ? 'bg-primary text-primary-foreground'
+                                ? ''
                                 : 'bg-muted text-muted-foreground hover:text-foreground'
                             }`}
                           >
                             {si + 1}
-                          </button>
+                          </Button>
                         ))}
                       </div>
                     )}

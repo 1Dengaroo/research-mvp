@@ -110,13 +110,9 @@ export function AuthForm({ defaultMode = Mode.SignIn }: AuthFormProps) {
 
       <p className="text-muted-foreground text-center text-sm">
         {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-        <button
-          type="button"
-          className="text-primary hover:text-primary/80 font-medium underline-offset-4 hover:underline"
-          onClick={switchMode}
-        >
+        <Button type="button" variant="link" className="h-auto p-0" onClick={switchMode}>
           {isSignUp ? 'Sign in' : 'Sign up'}
-        </button>
+        </Button>
       </p>
     </div>
   );

@@ -86,7 +86,7 @@ export function TranscriptStep() {
 
       {error && <p className="text-destructive mb-4 text-sm">{error}</p>}
 
-      <Card className="gap-0! py-0!">
+      <Card>
         <div className="bg-card border-border flex items-center justify-between border-b px-4 py-2.5">
           <span className="text-muted-foreground section-label">Customer Profile</span>
           {transcript.trim() && (

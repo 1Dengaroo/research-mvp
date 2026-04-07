@@ -22,7 +22,7 @@ export function LoadingStatus({
   const CurrentIcon = stage?.icon ?? Search;
 
   return (
-    <Card className="mb-6 !gap-0 !py-0">
+    <Card className="mb-6">
       <div className="relative px-4 py-4">
         <div className="bg-muted absolute inset-x-0 bottom-0 h-0.5">
           <div className="bg-primary h-full w-1/3 animate-[shimmer_2s_ease-in-out_infinite] rounded-full" />

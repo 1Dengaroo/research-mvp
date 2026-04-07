@@ -204,18 +204,22 @@ export function OutreachStep() {
   return (
     <div className="flex flex-col gap-4 md:flex-row" style={{ height: 'min(700px, 70vh)' }}>
       {/* Contact sidebar */}
-      <Card className="flex w-full shrink-0 flex-col !gap-0 overflow-hidden !py-0 md:w-72 lg:w-80">
+      <Card className="flex w-full shrink-0 flex-col md:w-72 lg:w-80">
         <div className="border-border flex items-center gap-2 border-b px-4 py-3">
           <span className="text-xs font-medium">
             {selectedKeys.size}/{MAX_SELECTED}
           </span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="bg-muted text-muted-foreground hover:text-foreground flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors">
+              <Button
+                variant="ghost"
+                size="xs"
+                className="bg-muted text-muted-foreground hover:text-foreground rounded-full"
+              >
                 <Building2 className="size-3" />
                 {companyNames.length - hiddenCompanies.size}/{companyNames.length}
                 <ChevronDown className="size-2.5" />
-              </button>
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
               {companyNames.map((name) => (
@@ -271,7 +275,7 @@ export function OutreachStep() {
           </div>
         )}
 
-        <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="min-h-0 flex-1 overflow-y-auto p-2">
           {[...grouped.entries()]
             .filter(([name]) => !hiddenCompanies.has(name))
             .map(([companyName, companyContacts]) => {
@@ -279,7 +283,7 @@ export function OutreachStep() {
               const companyResult = companyContacts[0]?.result;
               return (
                 <div key={companyName}>
-                  <div className="bg-card border-border sticky top-0 z-10 flex items-center gap-2 border-y px-4 py-2">
+                  <div className="bg-card border-border sticky top-0 z-10 flex items-center gap-2 border-b px-3 py-2">
                     <CompanyLogoWithFallback
                       name={companyName}
                       website={companyResult?.website}
@@ -298,7 +302,7 @@ export function OutreachStep() {
                       return (
                         <div
                           key={c.key}
-                          className="flex w-full items-center gap-2 px-4 py-2.5 text-left"
+                          className="flex w-full items-center gap-2 px-3 py-2.5 text-left"
                         >
                           <div className="min-w-0 flex-1">
                             <p className="text-muted-foreground truncate text-sm leading-none">
@@ -332,12 +336,12 @@ export function OutreachStep() {
                     const isSelected = selectedKeys.has(c.key);
                     const isAtLimit = selectedKeys.size >= MAX_SELECTED && !isSelected;
                     return (
-                      <button
+                      <Button
                         key={c.key}
-                        type="button"
+                        variant="ghost"
                         onClick={() => toggleContact(c.key)}
                         disabled={isAtLimit}
-                        className={`flex w-full items-center gap-2 px-4 py-2.5 text-left transition-colors ${
+                        className={`flex h-auto w-full items-center gap-2 rounded-md px-3 py-2.5 text-left ${
                           isSelected ? 'bg-muted' : isAtLimit ? 'opacity-40' : 'hover:bg-muted/50'
                         }`}
                       >
@@ -360,7 +364,7 @@ export function OutreachStep() {
                             Sent
                           </span>
                         )}
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
@@ -370,16 +374,17 @@ export function OutreachStep() {
       </Card>
 
       {/* Email editor with tabs */}
-      <Card className="min-h-0 flex-1 !gap-0 overflow-hidden !py-0">
+      <Card className="min-h-0 flex-1 overflow-hidden">
         {/* Tabs */}
         {selectedContacts.length > 0 && (
           <div className="border-border flex shrink-0 gap-0 overflow-x-auto border-b">
             {selectedContacts.map((c) => (
-              <button
+              <Button
                 key={c.key}
-                type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => setActiveKey(c.key)}
-                className={`shrink-0 border-b-2 px-4 py-2.5 text-xs font-medium transition-colors ${
+                className={`shrink-0 rounded-none border-b-2 px-4 py-2.5 text-xs ${
                   activeKey === c.key
                     ? 'border-border text-foreground'
                     : 'text-muted-foreground hover:text-foreground border-transparent'
@@ -389,7 +394,7 @@ export function OutreachStep() {
                 <span className="text-muted-foreground font-normal">
                   {c.companyName.length > 15 ? c.companyName.slice(0, 15) + '...' : c.companyName}
                 </span>
-              </button>
+              </Button>
             ))}
           </div>
         )}

@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+import { MAX_WIDTH } from '@/lib/layout';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDemoStore } from '@/components/landing/demo-store';
@@ -54,46 +56,61 @@ export function LandingFooter() {
   const openDemo = useDemoStore((s) => s.openDemo);
 
   return (
-    <footer className="py-16">
-      <div className="mb-10 flex justify-center">
-        <div className="h-px w-full bg-linear-to-r from-transparent via-white/6 to-transparent" />
-      </div>
-
-      <div className="flex flex-col gap-10 sm:flex-row sm:justify-between">
-        {/* Link columns */}
-        <div className="grid grid-cols-3 gap-8 sm:flex sm:gap-16">
-          {FOOTER_COLUMNS.map((col) => (
-            <div key={col.title}>
-              <p className="text-landing-fg-muted mb-3 text-xs font-medium">{col.title}</p>
-              <ul className="space-y-2">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    {'action' in link ? (
-                      <Button
-                        variant="link"
-                        className="text-landing-fg-secondary hover:text-landing-fg h-auto p-0 text-sm font-normal no-underline transition-colors duration-150 hover:no-underline"
-                        onClick={openDemo}
-                      >
-                        {link.label}
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="link"
-                        asChild
-                        className="text-landing-fg-secondary hover:text-landing-fg h-auto p-0 text-sm font-normal no-underline transition-colors duration-150 hover:no-underline"
-                      >
-                        <a href={link.href}>{link.label}</a>
-                      </Button>
-                    )}
-                  </li>
-                ))}
-              </ul>
+    <footer className="bg-(--landing-bg-footer) py-16">
+      <div className={`mx-auto w-full ${MAX_WIDTH} px-6`}>
+        <div className="flex flex-col gap-12 sm:flex-row sm:justify-between">
+          {/* Brand column */}
+          <div className="flex max-w-[220px] flex-col gap-4">
+            <div className="flex items-center gap-2">
+              <Image src="/remes-logo.png" alt="Remes" width={22} height={22} className="rounded" />
+              <span className="text-landing-fg text-sm font-semibold tracking-tight">Remes</span>
             </div>
-          ))}
+            <p className="text-landing-fg-muted text-sm leading-relaxed">
+              AI-powered outbound sales for SMBs. Monitor buying signals, find contacts, and send
+              personalized outreach — automatically.
+            </p>
+          </div>
+
+          {/* Link columns */}
+          <div className="grid grid-cols-3 gap-8 sm:flex sm:gap-16">
+            {FOOTER_COLUMNS.map((col) => (
+              <div key={col.title}>
+                <p className="text-landing-fg mb-4 text-sm font-semibold tracking-tight">
+                  {col.title}
+                </p>
+                <ul className="space-y-2.5">
+                  {col.links.map((link) => (
+                    <li key={link.label}>
+                      {'action' in link ? (
+                        <Button
+                          variant="link"
+                          className="text-landing-fg-secondary hover:text-landing-fg h-auto p-0 text-sm font-normal no-underline transition-colors duration-150 hover:no-underline"
+                          onClick={openDemo}
+                        >
+                          {link.label}
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="link"
+                          asChild
+                          className="text-landing-fg-secondary hover:text-landing-fg h-auto p-0 text-sm font-normal no-underline transition-colors duration-150 hover:no-underline"
+                        >
+                          <a href={link.href}>{link.label}</a>
+                        </Button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Social + copyright */}
-        <div className="flex flex-col items-start gap-4 sm:items-end sm:justify-end">
+        {/* Bottom bar */}
+        <div className="mt-12 flex items-center justify-between border-t border-black/8 pt-6">
+          <p className="text-landing-fg-muted text-xs">
+            &copy; {new Date().getFullYear()} Remes. All rights reserved.
+          </p>
           <div className="flex items-center gap-1">
             {SOCIAL_LINKS.map((social) => (
               <Tooltip key={social.label}>
@@ -102,7 +119,7 @@ export function LandingFooter() {
                     variant="ghost"
                     size="icon"
                     asChild
-                    className="text-landing-fg-muted hover:text-landing-fg size-8 hover:bg-white/5"
+                    className="text-landing-fg-secondary hover:text-landing-fg size-8 hover:bg-black/5"
                   >
                     <a href={social.href} aria-label={social.label}>
                       {social.icon}
@@ -113,9 +130,6 @@ export function LandingFooter() {
               </Tooltip>
             ))}
           </div>
-          <p className="text-landing-fg-muted text-xs">
-            &copy; {new Date().getFullYear()} Remes. All rights reserved.
-          </p>
         </div>
       </div>
     </footer>

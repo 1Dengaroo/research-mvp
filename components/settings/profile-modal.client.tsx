@@ -34,7 +34,7 @@ export function ProfileModal() {
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && closeProfile()}>
       <DialogContent size="lg" className="p-0">
-        <div className="flex max-h-[90dvh] flex-col md:h-[560px] md:flex-row">
+        <div className="flex max-h-[90dvh] flex-col md:h-140 md:flex-row">
           {/* Sidebar */}
           <div className="border-border flex w-full shrink-0 flex-col border-b p-4 md:w-48 md:border-r md:border-b-0">
             <DialogHeader className="mb-4 px-1">
@@ -47,9 +47,9 @@ export function ProfileModal() {
               value={tab}
               onValueChange={setTab}
               orientation="vertical"
-              className="!flex-row !gap-0 md:!flex-col"
+              className="flex-row! md:flex-col!"
             >
-              <TabsList className="flex h-fit w-full flex-row gap-0.5 overflow-x-auto bg-transparent p-0 shadow-none md:flex-col">
+              <TabsList className="flex h-fit w-full flex-row gap-0.5 overflow-x-auto bg-transparent p-1 shadow-none md:flex-col">
                 {TAB_ITEMS.map((item) => (
                   <TabsTrigger
                     key={item.value}

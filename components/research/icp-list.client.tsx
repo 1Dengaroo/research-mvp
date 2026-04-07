@@ -256,7 +256,7 @@ export function ICPList({ icps: initialICPs }: { icps: SavedICP[] }) {
           </p>
         </Card>
       ) : (
-        <Card className="!gap-0 !py-0">
+        <Card>
           {icps.map((icp) => (
             <ICPRow
               key={icp.id}

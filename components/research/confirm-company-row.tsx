@@ -1,6 +1,7 @@
 'use client';
 
 import { ExternalLink, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { CompanyLogoWithFallback } from '@/components/shared/company-logo';
 import type { DiscoveredCompanyPreview } from '@/lib/types';
 
@@ -50,14 +51,15 @@ export function CompanyRow({
   onToggle: () => void;
 }) {
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={onToggle}
       disabled={disabled}
-      className={`animate-in fade-in slide-in-from-bottom-2 fill-mode-both border-border flex w-full items-start gap-4 border-b px-4 py-3 text-left transition-colors duration-300 last:border-b-0 ${
+      className={`animate-in fade-in slide-in-from-bottom-2 fill-mode-both border-border flex h-auto w-full items-start gap-4 rounded-none border-b px-4 py-3 text-left duration-300 last:border-b-0 ${
         selected
           ? 'bg-card hover:bg-muted/30'
           : disabled
-            ? 'bg-card cursor-not-allowed opacity-30'
+            ? 'bg-card opacity-30'
             : 'bg-card opacity-50 hover:opacity-70'
       }`}
       style={{ animationDelay: `${index * 80}ms` }}
@@ -114,6 +116,6 @@ export function CompanyRow({
           </p>
         )}
       </div>
-    </button>
+    </Button>
   );
 }

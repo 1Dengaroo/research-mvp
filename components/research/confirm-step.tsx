@@ -22,16 +22,14 @@ function FilterChip({
   onClick: () => void;
 }) {
   return (
-    <button
+    <Button
+      variant={active ? 'default' : 'ghost'}
+      size="xs"
       onClick={onClick}
-      className={`rounded-full px-2.5 py-0.5 text-xs transition-colors ${
-        active
-          ? 'bg-primary text-primary-foreground'
-          : 'bg-muted text-muted-foreground hover:bg-muted/80'
-      }`}
+      className={`rounded-full ${active ? '' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
     >
       {label}
-    </button>
+    </Button>
   );
 }
 
@@ -144,13 +142,13 @@ export function ConfirmStep() {
             </div>
           )}
 
-          <Card className="min-h-0 flex-1 !gap-0 !py-0">
+          <Card className="min-h-0 flex-1">
             {/* Header */}
             <div className="bg-card border-border flex shrink-0 items-center gap-4 border-b px-4 py-2.5">
               {allFiltered && (
-                <button onClick={toggleAll}>
+                <Button variant="ghost" size="icon-xs" onClick={toggleAll}>
                   <Checkbox checked={allSelected} />
-                </button>
+                </Button>
               )}
               <span className="text-muted-foreground section-label">Company</span>
               <span
@@ -209,12 +207,14 @@ export function ConfirmStep() {
                       Custom
                     </span>
                   </div>
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon-xs"
                     onClick={() => setSelectedCompanies(selected.filter((n) => n !== name))}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     <X className="size-3.5" />
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>
@@ -242,18 +242,16 @@ export function ConfirmStep() {
                   </Button>
                 </div>
               ) : (
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setAdding(true)}
                   disabled={atLimit}
-                  className={`flex items-center gap-2 text-sm transition-colors ${
-                    atLimit
-                      ? 'text-muted-foreground/40 cursor-not-allowed'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
+                  className="text-muted-foreground hover:text-foreground gap-2"
                 >
                   <Plus className="size-3.5" />
                   Add a company
-                </button>
+                </Button>
               )}
             </div>
           </Card>
