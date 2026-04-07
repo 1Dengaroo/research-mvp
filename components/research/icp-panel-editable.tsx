@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { X, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
@@ -64,12 +65,14 @@ function EditableTagGroup({
             }}
           >
             {tag}
-            <button
+            <Button
+              variant="ghost"
+              size="icon-xs"
               onClick={() => handleRemove(tag)}
-              className="hover:text-destructive ml-0.5 opacity-60 transition-opacity hover:opacity-100"
+              className="hover:text-destructive ml-0.5 size-auto p-0 opacity-60 hover:opacity-100"
             >
               <X className="size-2.5" />
-            </button>
+            </Button>
           </span>
         ))}
         {adding ? (
@@ -88,12 +91,14 @@ function EditableTagGroup({
             className="h-5 w-24 rounded-md border-none px-1.5 text-xs shadow-none focus-visible:ring-1"
           />
         ) : (
-          <button
+          <Button
+            variant="ghost"
+            size="icon-xs"
             onClick={() => setAdding(true)}
-            className="text-muted-foreground hover:text-foreground hover:bg-muted flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-xs transition-colors"
+            className="text-muted-foreground hover:text-foreground size-auto px-1.5 py-0.5"
           >
             <Plus className="size-2.5" />
-          </button>
+          </Button>
         )}
       </div>
     </div>
@@ -115,7 +120,7 @@ export function IcpPanelEditable({
   };
 
   return (
-    <Card className="!gap-0 !py-0">
+    <Card>
       {header && (
         <div className="bg-card border-border flex items-center justify-between border-b px-4 py-2.5">
           {header}

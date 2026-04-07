@@ -11,6 +11,7 @@
   --landing-bg-card: #ffffff;
   --landing-bg-card-hover: #efedf6;
   --landing-bg-modal: #ffffff;
+  --landing-bg-footer: #ffffff;
 
   --landing-brand-1: #455eb5;
   --landing-brand-2: #5643cc;
@@ -75,15 +76,16 @@
   --landing-btn-primary-bg: #4a38b5;
   --landing-btn-primary-text: #ffffff;
   --landing-btn-primary-hover: #3d2e9e;
-  --landing-btn-secondary-bg: transparent;
-  --landing-btn-secondary-text: rgba(0, 0, 0, 0.6);
-  --landing-btn-secondary-border: rgba(0, 0, 0, 0.12);
-  --landing-btn-secondary-hover: rgba(0, 0, 0, 0.04);
+  --landing-btn-secondary-bg: #ffffff;
+  --landing-btn-secondary-text: rgba(0, 0, 0, 0.82);
+  --landing-btn-secondary-border: rgba(0, 0, 0, 0.22);
+  --landing-btn-secondary-hover: #f0eef8;
+  --landing-btn-secondary-shadow: 0 1px 4px rgba(0, 0, 0, 0.08), 0 2px 12px rgba(80, 70, 180, 0.08);
 
   /* ── Bento card backgrounds ── */
   --landing-bento-purple: rgba(86, 67, 204, 0.1);
   --landing-bento-teal: rgba(70, 227, 183, 0.08);
-  --landing-bento-amber: rgba(247, 193, 43, 0.08);
+  --landing-bento-amber: rgba(250, 220, 50, 0.1);
   --landing-bento-rose: rgba(229, 72, 77, 0.08);
 
   --landing-header-bg: rgba(255, 255, 255, 0.88);
@@ -143,6 +145,18 @@
   --landing-hero-btn-secondary-hover: rgba(255, 255, 255, 0.06);
   --landing-hero-stroke: #2537b1;
   --landing-hero-stroke-light: rgba(37, 55, 177, 0.4);
+
+  /* ── Dark section (How it works) ── */
+  --landing-section-dark-bg: rgb(8, 5, 42);
+  --landing-section-dark-stroke: rgba(86, 67, 204, 0.55);
+  --landing-section-dark-stroke-light: rgba(86, 67, 204, 0.2);
+  --landing-section-dark-border: rgba(86, 67, 204, 0.3);
+
+  /* ── CTA section (light blue) ── */
+  --landing-cta-bg: rgb(4, 20, 50);
+  --landing-cta-stroke: rgba(56, 165, 220, 0.55);
+  --landing-cta-stroke-light: rgba(56, 165, 220, 0.2);
+  --landing-cta-border: rgba(56, 165, 220, 0.25);
 }
 
 /*

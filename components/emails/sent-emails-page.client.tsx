@@ -67,13 +67,13 @@ export function SentEmailsPage({ emails }: { emails: SentEmail[] }) {
         ) : (
           <div className="flex gap-4">
             {/* Email list */}
-            <Card className="w-full shrink-0 gap-0 py-0 md:w-3/5">
+            <Card className="w-full shrink-0 md:w-3/5">
               {emails.map((email) => (
-                <button
+                <Button
                   key={email.id}
-                  type="button"
+                  variant="ghost"
                   onClick={() => setSelectedId(email.id)}
-                  className={`border-border flex w-full items-center gap-3 border-b px-4 py-3 text-left transition-colors last:border-b-0 ${
+                  className={`border-border h-auto w-full justify-start gap-3 rounded-none border-b px-4 py-3 text-left last:border-b-0 ${
                     selectedId === email.id ? 'bg-muted/70' : 'hover:bg-muted/40'
                   }`}
                 >
@@ -110,12 +110,12 @@ export function SentEmailsPage({ emails }: { emails: SentEmail[] }) {
                       {formatDate(email.created_at)}
                     </span>
                   </div>
-                </button>
+                </Button>
               ))}
             </Card>
 
             {/* Desktop email preview */}
-            <Card className="hidden min-h-100 flex-1 flex-col gap-0 py-0 md:flex">
+            <Card className="hidden min-h-100 flex-1 flex-col md:flex">
               {selected ? (
                 <EmailDetailContent email={selected} />
               ) : (

@@ -58,7 +58,7 @@ function EmailPreview({
   signatureBody: string | null;
 }) {
   return (
-    <Card className="bg-muted/30 h-full gap-0 py-0">
+    <Card className="bg-muted/30 h-full">
       <div className="border-border space-y-1 border-b px-4 py-3">
         <div className="flex items-baseline gap-2">
           <span className="text-muted-foreground text-xs font-medium">To:</span>
@@ -264,19 +264,17 @@ export function EmailEditorInline({
         </div>
         <div className="flex items-center gap-1">
           {STEP_LABELS.map((label, i) => (
-            <button
+            <Button
               key={label}
               type="button"
+              variant={activeStep === i ? 'default' : 'ghost'}
+              size="xs"
               onClick={() => handleStepChange(i)}
               disabled={generating}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                activeStep === i
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:text-foreground'
-              }`}
+              className={activeStep === i ? '' : 'text-muted-foreground'}
             >
               {label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -362,35 +360,41 @@ export function EmailEditorInline({
             </Button>
             <div className="ml-auto flex items-center gap-2">
               <div className="flex items-center gap-1">
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon-xs"
                   onClick={() => handleStepChange(activeStep - 1)}
                   disabled={activeStep === 0 || generating}
                   className="text-muted-foreground hover:text-foreground disabled:opacity-30"
                 >
                   <ChevronLeft className="size-4" />
-                </button>
+                </Button>
                 <span className="text-muted-foreground text-xs tabular-nums">
                   {activeStep + 1}/3
                 </span>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon-xs"
                   onClick={() => handleStepChange(activeStep + 1)}
                   disabled={activeStep === 2 || generating}
                   className="text-muted-foreground hover:text-foreground disabled:opacity-30"
                 >
                   <ChevronRight className="size-4" />
-                </button>
+                </Button>
               </div>
               {gmailChecked && !gmailConnected && (
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="xs"
                   onClick={() => useProfileStore.getState().openProfile('connections')}
-                  className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs transition-colors"
+                  className="text-muted-foreground hover:text-foreground"
                 >
                   <Link2 className="size-3" />
                   Connect Gmail
-                </button>
+                </Button>
               )}
               <Button
                 size="icon-sm"
@@ -447,13 +451,15 @@ export function EmailEditorInline({
         >
           <div className="mb-2 flex shrink-0 items-center justify-between">
             <p className="text-muted-foreground text-xs font-medium">Preview</p>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="xs"
               onClick={() => setShowPreview(false)}
-              className="text-muted-foreground hover:text-foreground text-xs md:hidden"
+              className="text-muted-foreground hover:text-foreground md:hidden"
             >
               Back to editor
-            </button>
+            </Button>
           </div>
           <div className="min-h-0 flex-1">
             <EmailPreview

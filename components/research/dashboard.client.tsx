@@ -255,7 +255,7 @@ export function Dashboard({
                     </Link>
                   )}
                 </div>
-                <Card className="!gap-0 divide-y !py-0">
+                <Card className="p-2">
                   {recentEmails.length === 0 ? (
                     <div className="py-10 text-center">
                       <p className="text-muted-foreground text-sm">No emails sent yet</p>
@@ -265,7 +265,7 @@ export function Dashboard({
                       <Link
                         key={email.id}
                         href={`/emails?email=${email.id}`}
-                        className="hover:bg-muted/50 flex items-center gap-3 px-4 py-3.5 transition-colors"
+                        className="hover:bg-muted/50 flex items-center gap-3 rounded-md px-3 py-3 transition-colors"
                       >
                         <div className="bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-medium">
                           {email.contact_name
@@ -302,7 +302,7 @@ export function Dashboard({
               {icps.length > 0 && (
                 <div>
                   <h2 className="mb-4 text-sm font-medium">Saved Profiles</h2>
-                  <Card className="!gap-0 divide-y !py-0">
+                  <Card className="divide-y">
                     {icps.slice(0, 4).map((icp) => (
                       <div key={icp.id} className="px-4 py-3">
                         <span className="text-sm font-medium">{icp.name}</span>

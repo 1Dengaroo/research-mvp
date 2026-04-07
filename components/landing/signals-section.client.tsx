@@ -6,14 +6,14 @@ import {
   FileText,
   Globe,
   Linkedin,
-  Moon,
   Newspaper,
   Sparkles,
-  Sun,
   TrendingUp,
   Users,
   FileBarChart
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ThemeToggleButton } from './theme-toggle-button';
 import { SIGNALS, SIGNAL_PREVIEWS } from './landing-constants';
 import { RotatingWord } from './rotating-word.client';
 
@@ -64,7 +64,6 @@ export function SignalsSection() {
     setStreamedText(preview.emailOpener);
   }, []);
 
-  // Start animation only when section scrolls into view
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -83,7 +82,6 @@ export function SignalsSection() {
     return () => observer.disconnect();
   }, []);
 
-  // Run preview when display changes (only after entering view)
   useEffect(() => {
     if (!hasEnteredView) return;
     runPreview(displayIndex);
@@ -115,10 +113,10 @@ export function SignalsSection() {
           {CYCLABLE_SIGNALS.map((signal, i) => {
             const isSelected = selectedIndex === i;
             return (
-              <button
+              <Button
                 key={signal.source}
-                type="button"
-                className="flex w-full cursor-pointer items-start gap-3 rounded-xl border bg-(--landing-bg-card) p-4 text-left transition-all duration-200"
+                variant="ghost"
+                className="h-auto w-full items-start justify-start gap-3 rounded-xl border bg-(--landing-bg-card) p-4 text-left transition-all duration-200 hover:bg-(--landing-bg-card)"
                 style={{
                   borderColor: isSelected
                     ? 'var(--landing-accent-light)'
@@ -144,7 +142,7 @@ export function SignalsSection() {
                     {signal.example}
                   </p>
                 </div>
-              </button>
+              </Button>
             );
           })}
 
@@ -188,15 +186,29 @@ export function SignalsSection() {
             data-theme={theme}
             className="overflow-hidden rounded-xl border"
             style={{
-              borderColor: 'var(--border)',
-              boxShadow: 'var(--landing-shadow-card)',
+              borderColor:
+                selectedSignal?.color && selectedSignal.color !== 'custom'
+                  ? `${selectedSignal.color}50`
+                  : 'var(--border)',
+              boxShadow:
+                selectedSignal?.color && selectedSignal.color !== 'custom'
+                  ? `var(--landing-shadow-card), 0 0 0 1px ${selectedSignal.color}18`
+                  : 'var(--landing-shadow-card)',
               backgroundColor: 'var(--card)',
-              color: 'var(--card-foreground)'
+              color: 'var(--card-foreground)',
+              transition: 'border-color 300ms, box-shadow 300ms'
             }}
           >
             <div
               className="flex items-center justify-between px-5 py-3.5"
-              style={{ borderBottom: '1px solid var(--border)' }}
+              style={{
+                borderBottom: '1px solid var(--border)',
+                backgroundColor:
+                  selectedSignal?.color && selectedSignal.color !== 'custom'
+                    ? `${selectedSignal.color}08`
+                    : undefined,
+                transition: 'background-color 300ms'
+              }}
             >
               <div className="flex items-center gap-2">
                 <div
@@ -222,24 +234,16 @@ export function SignalsSection() {
                 >
                   {selectedSignal?.source}
                 </span>
-                <button
-                  type="button"
-                  className="flex size-8 cursor-pointer items-center justify-center rounded-lg"
-                  style={{
-                    backgroundColor: 'var(--accent)',
-                    color: 'var(--accent-foreground)'
-                  }}
-                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                  aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-                >
-                  {theme === 'dark' ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
-                </button>
+                <ThemeToggleButton
+                  theme={theme}
+                  onToggle={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                />
               </div>
             </div>
 
             <div
               className="h-105 overflow-hidden sm:h-115"
-              style={{ backgroundColor: 'var(--background)' }}
+              style={{ backgroundColor: 'var(--card)' }}
             >
               <div className="p-4 sm:p-5">
                 <div className="flex flex-col gap-2">
@@ -254,7 +258,11 @@ export function SignalsSection() {
                           transform: visible ? 'translateY(0)' : 'translateY(8px)',
                           transition: 'none',
                           border: '1px solid var(--border)',
-                          backgroundColor: 'var(--card)'
+                          backgroundColor: 'var(--card)',
+                          boxShadow:
+                            selectedSignal?.color && selectedSignal.color !== 'custom'
+                              ? `inset 3px 0 0 ${selectedSignal.color}`
+                              : 'none'
                         }}
                       >
                         <div

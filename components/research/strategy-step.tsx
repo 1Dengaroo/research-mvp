@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useResearchStore } from '@/lib/store/research-store';
 import { IcpPanelEditable } from './icp-panel-editable';
 import { SaveICPButton } from './save-icp-button.client';
@@ -48,7 +49,8 @@ export function StrategyStep() {
         {/* Mobile ICP toggle */}
         {icp && (
           <div className="lg:hidden">
-            <button
+            <Button
+              variant="ghost"
               onClick={() => setIcpOpen(!icpOpen)}
               className="bg-card flex w-full items-center justify-between rounded-[var(--card-radius)] px-4 py-3 shadow-xs"
             >
@@ -56,7 +58,7 @@ export function StrategyStep() {
               <ChevronDown
                 className={`text-muted-foreground size-4 transition-transform duration-200 ${icpOpen ? 'rotate-180' : ''}`}
               />
-            </button>
+            </Button>
             <div
               className={`overflow-hidden transition-all duration-200 ${icpOpen ? 'mt-2 max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}
             >

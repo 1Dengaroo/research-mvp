@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from 'react';
 import { Check } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { Button } from '@/components/ui/button';
 import { themes } from '@/lib/theme/theme-registry';
 import { fonts } from '@/lib/theme/font-registry';
 import { useFont } from '@/lib/theme/font-provider';
@@ -27,11 +28,12 @@ export function AppearanceTab() {
         <h3 className="mb-3 text-sm font-medium">Theme</h3>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {themes.map((t) => (
-            <button
+            <Button
               key={t.id}
+              variant="outline"
               onClick={() => setTheme(t.id)}
-              className={`hover:bg-accent/50 flex flex-col items-center gap-1.5 rounded-lg border p-3 text-xs transition-colors ${
-                mounted && t.id === theme ? 'border-primary ring-primary ring-1' : 'border-border'
+              className={`hover:bg-accent/50 h-auto flex-col gap-1.5 rounded-lg p-3 text-xs ${
+                mounted && t.id === theme ? 'border-primary ring-primary ring-1' : ''
               }`}
             >
               <div className="flex gap-1">
@@ -53,7 +55,7 @@ export function AppearanceTab() {
                 />
               </div>
               <span>{t.name}</span>
-            </button>
+            </Button>
           ))}
         </div>
       </section>
@@ -62,13 +64,12 @@ export function AppearanceTab() {
         <h3 className="mb-3 text-sm font-medium">Font</h3>
         <div className="flex flex-col gap-1">
           {fonts.map((f) => (
-            <button
+            <Button
               key={f.id}
+              variant="outline"
               onClick={() => setFont(f.id)}
-              className={`hover:bg-accent/50 flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition-colors ${
-                mounted && f.id === currentFont.id
-                  ? 'border-primary ring-primary ring-1'
-                  : 'border-border'
+              className={`hover:bg-accent/50 h-auto justify-between rounded-lg px-3 py-2 ${
+                mounted && f.id === currentFont.id ? 'border-primary ring-primary ring-1' : ''
               }`}
               style={f.variable ? { fontFamily: `var(${f.variable})` } : undefined}
             >
@@ -77,7 +78,7 @@ export function AppearanceTab() {
                 <span className="text-muted-foreground text-xs">{f.description}</span>
               </div>
               {mounted && f.id === currentFont.id && <Check className="text-primary size-3.5" />}
-            </button>
+            </Button>
           ))}
         </div>
       </section>

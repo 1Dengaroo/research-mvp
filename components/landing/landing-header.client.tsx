@@ -33,10 +33,11 @@ function UserAvatar({ light }: { light: boolean }) {
   }
 
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
+      size="icon-sm"
       onClick={() => openProfile()}
-      className="rounded-full transition-opacity duration-150 hover:opacity-80"
+      className="rounded-full hover:bg-transparent hover:opacity-80"
     >
       {user.user_metadata?.avatar_url ? (
         // eslint-disable-next-line @next/next/no-img-element -- external Google avatar URL
@@ -51,7 +52,7 @@ function UserAvatar({ light }: { light: boolean }) {
           {(user.email?.[0] ?? '?').toUpperCase()}
         </div>
       )}
-    </button>
+    </Button>
   );
 }
 

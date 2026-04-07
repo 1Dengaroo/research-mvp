@@ -30,10 +30,10 @@ export function PrimaryCta({
   return (
     <Button
       size="lg"
-      className={`group gap-2 rounded-full px-8 py-6 text-sm font-semibold transition-all duration-200 hover:opacity-90 ${
+      className={`group gap-2 rounded-full px-8 py-6 text-sm font-semibold transition-all duration-200 ${
         isHero
-          ? 'bg-(--landing-hero-btn-primary-bg) text-(--landing-hero-btn-primary-text) shadow-(--landing-hero-btn-primary-shadow) hover:shadow-(--landing-hero-btn-primary-hover-shadow)'
-          : 'bg-(--landing-btn-primary-bg) text-(--landing-btn-primary-text) shadow-(--landing-shadow-btn) hover:shadow-(--landing-shadow-btn-hover)'
+          ? 'bg-(--landing-hero-btn-primary-bg) text-(--landing-hero-btn-primary-text) shadow-(--landing-hero-btn-primary-shadow) hover:bg-(--landing-hero-btn-primary-bg)/90 hover:shadow-(--landing-hero-btn-primary-hover-shadow)'
+          : 'bg-(--landing-btn-primary-bg) text-(--landing-btn-primary-text) shadow-(--landing-shadow-btn) hover:bg-(--landing-btn-primary-hover) hover:shadow-(--landing-shadow-btn-hover)'
       }`}
       onClick={handleClick}
     >
@@ -58,10 +58,10 @@ export function SecondaryCta({
     <Button
       variant="ghost"
       size="lg"
-      className={`rounded-full border px-8 py-6 text-sm font-medium transition-all duration-200 ${
+      className={`rounded-full border px-8 py-6 text-sm font-semibold transition-all duration-200 ${
         isHero
           ? 'border-(--landing-hero-btn-secondary-border) text-(--landing-hero-btn-secondary-text) hover:bg-(--landing-hero-btn-secondary-hover)'
-          : 'border-(--landing-btn-secondary-border) text-(--landing-btn-secondary-text) hover:bg-(--landing-btn-secondary-hover)'
+          : 'border-(--landing-btn-secondary-border) bg-(--landing-btn-secondary-bg) text-(--landing-btn-secondary-text) shadow-(--landing-btn-secondary-shadow) hover:bg-(--landing-btn-secondary-hover)'
       }`}
       onClick={openDemo}
     >
