@@ -131,7 +131,7 @@ export function SignalsSection() {
       }, emailDelay);
       timeoutsRef.current.push(emailTimeout);
     },
-    [clearAnimations]
+    [clearAnimations, SKIP_ANIMATIONS]
   );
 
   // Start animation only when section scrolls into view
@@ -156,8 +156,11 @@ export function SignalsSection() {
   // Run preview animation when display changes (only after entering view)
   useEffect(() => {
     if (!hasEnteredView) return;
-    runPreview(displayIndex);
-    return clearAnimations;
+    const t = setTimeout(() => runPreview(displayIndex), 0);
+    return () => {
+      clearTimeout(t);
+      clearAnimations();
+    };
   }, [displayIndex, hasEnteredView, runPreview, clearAnimations]);
 
   const selectedSignal = CYCLABLE_SIGNALS[displayIndex] ?? SIGNALS[displayIndex];
@@ -258,9 +261,10 @@ export function SignalsSection() {
         <div className="lg:sticky lg:top-24 lg:self-start">
           <div
             data-theme={theme}
-            className="overflow-hidden rounded-xl border shadow-lg"
+            className="overflow-hidden rounded-xl border"
             style={{
               borderColor: 'var(--border)',
+              boxShadow: '0 0 40px rgba(255, 255, 255, 0.06), 0 0 80px rgba(255, 255, 255, 0.03)',
               backgroundColor: 'var(--card)',
               color: 'var(--card-foreground)'
             }}
