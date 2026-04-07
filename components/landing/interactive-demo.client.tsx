@@ -47,9 +47,12 @@ export function InteractiveDemo() {
   const rafRef = useRef<number>(0);
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const cycleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const transitionRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pausedRef = useRef(false);
 
-  pausedRef.current = paused;
+  useEffect(() => {
+    pausedRef.current = paused;
+  }, [paused]);
 
   const clearTimeouts = useCallback(() => {
     timeoutsRef.current.forEach(clearTimeout);
@@ -57,8 +60,6 @@ export function InteractiveDemo() {
     if (cycleRef.current) clearTimeout(cycleRef.current);
     cancelAnimationFrame(rafRef.current);
   }, []);
-
-  const transitionRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const goToStep = useCallback((step: number, userInitiated = false) => {
     if (userInitiated) setPaused(true);
@@ -137,8 +138,9 @@ export function InteractiveDemo() {
 
   // Run animation when step changes
   useEffect(() => {
-    runStep(activeStep);
+    const t = setTimeout(() => runStep(activeStep), 0);
     return () => {
+      clearTimeout(t);
       clearTimeouts();
       if (transitionRef.current) clearTimeout(transitionRef.current);
     };
@@ -147,9 +149,10 @@ export function InteractiveDemo() {
   return (
     <div
       data-theme={theme}
-      className="overflow-hidden rounded-xl border shadow-lg"
+      className="overflow-hidden rounded-xl border"
       style={{
         borderColor: 'var(--border)',
+        boxShadow: '0 0 40px rgba(255, 255, 255, 0.06), 0 0 80px rgba(255, 255, 255, 0.03)',
         backgroundColor: 'var(--card)',
         color: 'var(--card-foreground)'
       }}
