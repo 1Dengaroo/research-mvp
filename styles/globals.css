@@ -203,4 +203,21 @@
 
 html:has(.marketing) {
   background-color: #fff;
+  color-scheme: light;
+}
+
+/* Force light semantic tokens on landing pages regardless of dark mode */
+.dark .marketing {
+  --background: #f6f5fc;
+  --foreground: #1c1a30;
+  --card: #ffffff;
+  --card-foreground: #1c1a30;
+  --muted: #e6e5f4;
+  --muted-foreground: #7e7c9a;
+  --border: #d4cee4;
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+  --secondary: #ecedf8;
+  --secondary-foreground: #2d2c4a;
+  color-scheme: light;
 }
