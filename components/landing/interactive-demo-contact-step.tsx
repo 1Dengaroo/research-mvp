@@ -55,8 +55,8 @@ export function ContactStep({
                     className="text-sm font-medium"
                     style={{
                       color: isEnriched ? 'var(--foreground)' : 'var(--muted-foreground)',
-                      filter: isEnriched ? 'none' : 'blur(2px)',
-                      transition: 'color 300ms, filter 300ms'
+                      opacity: isEnriched ? 1 : 0.4,
+                      transition: 'color 300ms, opacity 300ms'
                     }}
                   >
                     {isEnriched ? c.name : c.name.replace(/(\s\w)\w+$/, '$1***')}
