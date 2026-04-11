@@ -68,27 +68,7 @@ export function Landing() {
           </div>
 
           <div className="relative mt-10 animate-[hero-fade-in_0.8s_ease-out_0.5s_both] sm:mt-12">
-            <div
-              className="pointer-events-none absolute -inset-20 z-0"
-              style={{
-                background:
-                  'radial-gradient(ellipse 70% 50% at 50% 30%, rgba(37, 55, 177, 0.35) 0%, rgba(86, 67, 204, 0.12) 40%, transparent 70%)',
-                filter: 'blur(30px)'
-              }}
-            />
-            <div
-              className="pointer-events-none absolute -top-16 left-1/2 z-0 -translate-x-1/2"
-              style={{
-                width: 500,
-                height: 200,
-                background:
-                  'radial-gradient(ellipse at center, rgba(255, 255, 255, 0.06) 0%, transparent 70%)',
-                filter: 'blur(20px)'
-              }}
-            />
-            <div className="relative z-10">
-              <HeroPipeline />
-            </div>
+            <HeroPipeline />
           </div>
         </div>
       </HeroBackdrop>
@@ -109,29 +89,6 @@ export function Landing() {
 
       {/* Bento grid */}
       <div className="relative">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div
-            className="absolute top-[10%] left-1/2 -translate-x-1/2"
-            style={{
-              width: 900,
-              height: 500,
-              background:
-                'radial-gradient(ellipse at center, var(--landing-glow-white) 0%, transparent 60%)',
-              filter: 'blur(80px)'
-            }}
-          />
-          <div
-            className="absolute top-[50%] left-1/2 -translate-x-1/2"
-            style={{
-              width: 800,
-              height: 500,
-              background:
-                'radial-gradient(ellipse at center, var(--landing-glow-purple) 0%, transparent 60%)',
-              filter: 'blur(100px)'
-            }}
-          />
-        </div>
-
         <div className={`relative mx-auto flex w-full ${MAX_WIDTH} flex-col px-6`}>
           <div id="features">
             <BentoGrid />

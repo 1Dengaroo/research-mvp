@@ -1,6 +1,7 @@
 import { LandingHeader } from '@/components/landing/landing-header.client';
 import { LandingFooter } from '@/components/shared/landing-footer';
 import { DemoModal } from '@/components/landing/demo-modal.client';
+import { CookieConsentBanner } from '@/components/shared/cookie-consent-banner.client';
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -9,6 +10,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       {children}
       <LandingFooter />
       <DemoModal />
+      <CookieConsentBanner />
     </div>
   );
 }

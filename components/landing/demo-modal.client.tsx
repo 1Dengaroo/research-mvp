@@ -116,7 +116,7 @@ export function DemoModal() {
                       aria-invalid={fieldState.invalid}
                     />
                     {fieldState.error && (
-                      <p className="text-xs text-red-400">{fieldState.error.message}</p>
+                      <p className="text-destructive text-xs">{fieldState.error.message}</p>
                     )}
                   </div>
                 )}
@@ -136,7 +136,7 @@ export function DemoModal() {
                       aria-invalid={fieldState.invalid}
                     />
                     {fieldState.error && (
-                      <p className="text-xs text-red-400">{fieldState.error.message}</p>
+                      <p className="text-destructive text-xs">{fieldState.error.message}</p>
                     )}
                   </div>
                 )}
@@ -156,13 +156,13 @@ export function DemoModal() {
                       aria-invalid={fieldState.invalid}
                     />
                     {fieldState.error && (
-                      <p className="text-xs text-red-400">{fieldState.error.message}</p>
+                      <p className="text-destructive text-xs">{fieldState.error.message}</p>
                     )}
                   </div>
                 )}
               />
 
-              {submitError && <p className="text-sm text-red-400">{submitError}</p>}
+              {submitError && <p className="text-destructive text-sm">{submitError}</p>}
 
               <Button
                 type="submit"
