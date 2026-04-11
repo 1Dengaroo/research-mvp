@@ -483,7 +483,7 @@ export function HeroBackdrop({
 
       {cone && (
         <div
-          className="pointer-events-none absolute -top-16 left-0 z-1 w-full"
+          className="pointer-events-none absolute -top-16 left-0 z-1 hidden w-full md:block"
           aria-hidden="true"
           style={
             {
@@ -519,9 +519,9 @@ export function HeroBackdrop({
         />
       )}
 
-      {/* Noise texture */}
+      {/* Noise texture — absolute (not fixed) to avoid scroll repaint */}
       <div
-        className="pointer-events-none fixed inset-0 z-1 opacity-[0.025]"
+        className="pointer-events-none absolute inset-0 z-1 opacity-[0.025]"
         aria-hidden="true"
         style={{
           backgroundImage: 'var(--landing-noise)',

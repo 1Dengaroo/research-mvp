@@ -82,7 +82,15 @@ export function LandingHeader() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 60);
+        ticking = false;
+      });
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -92,21 +100,23 @@ export function LandingHeader() {
 
   return (
     <div
-      className={`fixed top-0 right-0 left-0 z-50 flex justify-center transition-all duration-500 ease-out ${scrolled ? 'px-4 pt-2.5' : 'pt-0'}`}
+      className={`fixed top-0 right-0 left-0 z-50 flex justify-center transition-[padding] duration-500 ease-out ${scrolled ? 'px-4 pt-2.5' : 'pt-0'}`}
     >
       <header
-        className="w-full transition-all duration-500 ease-out"
+        className="w-full transition-[background-color,border-color,box-shadow] duration-500 ease-out"
         style={{
           maxWidth: scrolled ? '90rem' : '100%',
           backgroundColor: scrolled ? 'var(--landing-header-bg)' : 'transparent',
           borderRadius: scrolled ? '9999px' : '0',
           border: scrolled ? '1px solid var(--landing-border-card)' : '1px solid transparent',
-          backdropFilter: scrolled ? 'blur(24px) saturate(1.3)' : 'none',
-          boxShadow: scrolled ? 'var(--landing-shadow-header)' : 'none'
+          backdropFilter: scrolled ? 'blur(12px)' : 'none',
+          WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
+          boxShadow: scrolled ? 'var(--landing-shadow-header)' : 'none',
+          contain: 'layout style'
         }}
       >
         <div
-          className={`mx-auto flex w-full ${MAX_WIDTH} items-center justify-between transition-all duration-500 ease-out`}
+          className={`mx-auto flex w-full ${MAX_WIDTH} items-center justify-between transition-[padding] duration-500 ease-out`}
           style={{ padding: scrolled ? '10px 24px' : '18px 24px' }}
         >
           <div className="flex items-center gap-6">

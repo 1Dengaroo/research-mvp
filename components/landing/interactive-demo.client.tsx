@@ -243,8 +243,7 @@ export function InteractiveDemo() {
           style={{
             opacity: transitioning ? 0 : 1,
             transform: transitioning ? 'translateY(6px)' : 'translateY(0)',
-            transition: 'opacity 200ms ease-out, transform 200ms ease-out',
-            willChange: 'opacity, transform'
+            transition: 'opacity 200ms ease-out, transform 200ms ease-out'
           }}
         >
           {activeStep === 0 && <SignalStep visibleCount={visibleCompanies} />}
